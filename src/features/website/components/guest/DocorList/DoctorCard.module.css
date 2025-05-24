@@ -1,0 +1,101 @@
+.card {
+  width: 250px;
+  background: var(--primary-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-accent);
+  padding: 18px;
+  margin: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid var(--secondary-background);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px var(--shadow-dark);
+}
+
+.avatarWrapper {
+  background: var(--gradient-circle);
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--secondary-background);
+}
+
+.info {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.rating, .visits {
+  color: var(--accent-color);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.star {
+  color: #f4c430;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0;
+  color: var(--text-primary);
+}
+
+.specialty {
+  color: var(--accent-color);
+  font-weight: 500;
+  margin: 6px 0;
+}
+
+.price, .level {
+  margin: 6px 0;
+  color: var(--text-secondary);
+}
+
+.button {
+  margin-top: 12px;
+  padding: 10px 16px;
+  background-color: var(--accent-color); /* Use the soft taupe color */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.button:hover {
+  background-color: #8c7d6a; /* Slightly darker shade of --accent-color for hover */
+}
+
+.secondaryButton {
+  margin-top: 8px;
+  padding: 9px 16px;
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  border: 1px solid var(--button-secondary-border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.secondaryButton:hover {
+  background-color: var(--hover-accent);
+}

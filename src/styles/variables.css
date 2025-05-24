@@ -1,0 +1,84 @@
+:root {
+  /* Font */
+  --font-family: 'Montserrat', sans-serif;
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-lg: 20px;
+  --font-size-xl: 28px;
+  --font-size-xxl: 36px;
+
+  /* Màu nền chính */
+  --primary-background: #f9f6f6; /* Off-white/cream */
+  --secondary-background: #e6dfdc; /* Light beige */
+  --light-background: #ffffff; /* White, bổ sung cho card hoặc section */
+
+  /* Màu accent và điểm nhấn */
+  --accent-color: #9e8e7b; /* Soft taupe */
+  --deep-taupe: #61474C; /* Deep taupe, màu mới làm điểm nhấn chính */
+  --dark-accent: #4a3639; /* Tông đậm hơn của deep taupe, bổ sung cho hover */
+
+  /* Màu text */
+  --text-primary: #333333; /* Black/dark gray */
+  --text-secondary: #666666; /* Medium gray */
+  --text-accent: #61474C; /* Deep taupe cho text nổi bật */
+
+  /* Màu button */
+  --button-primary-bg: #61474C; /* Deep taupe thay cho black để đồng bộ */
+  --button-primary-text: #fbf9f6; /* Off-white cho contrast */
+  --button-secondary-bg: transparent;
+  --button-secondary-text: #9e8e7b; /* Soft taupe */
+  --button-secondary-border: #bdbdbd; /* Light gray */
+  --button-hover-bg: #4a3639; /* Darker taupe cho hover */
+
+  /* Màu hover và shadow */
+  --hover-accent: rgba(97, 71, 76, 0.2); /* Deep taupe với opacity */
+  --shadow-accent: rgba(97, 71, 76, 0.25); /* Deep taupe shadow, tăng độ đậm */
+  --shadow-dark-gray: rgba(51, 51, 51, 0.15); /* Shadow tối, đổi tên cho rõ */
+
+  /* Gradient */
+  --gradient-circle: radial-gradient(
+    50% 50% at 50% 50%,
+    #e1d7d1 0%,
+    rgba(237, 231, 227, 0) 100%
+  );
+  --gradient-accent: linear-gradient(
+    135deg,
+    #61474C 0%,
+    #9e8e7b 100%
+  ); /* Gradient mới dùng deep taupe và soft taupe */
+
+  /* Màu trạng thái */
+  --success-green: #4caf50; /* Green */
+  --warning-red: #f44336; /* Red */
+  --info-blue: #2196f3; /* Blue */
+  --warning-orange: #ff9800; /* Orange */
+
+  /* Màu border và card */
+  --card-border: rgba(158, 142, 123, 0.2); /* Soft taupe */
+  --card-hover-border: rgba(97, 71, 76, 0.4); /* Deep taupe */
+  --card-background: #ffffff; /* White cho card */
+  --card-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    var(--secondary-background) 100%
+  );
+  --card-hover-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    #ddd4d0 100%
+  );
+
+  /* Khoảng cách */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Breakpoints cho responsive */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+}   

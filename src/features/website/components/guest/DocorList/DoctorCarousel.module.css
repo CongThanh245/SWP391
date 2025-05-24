@@ -1,0 +1,50 @@
+
+.carouselContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin: 0 auto;
+  background-color: #D5C7BE;
+  justify-content: center;
+}
+
+.carouselWrapper {
+  width: 1064px; /* Width of 4 cards (266px * 4) */
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  transition: transform 0.5s ease;
+  width: max-content; /* Allow content to determine width */
+}
+
+.carouselItem {
+  flex: 0 0 auto;
+  width: 250px;
+  margin-right: 16px;
+}
+
+.scrollButton {
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 0 8px;
+  z-index: 1;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.scrollButton:hover {
+  background-color: #f0f0f0;
+}
+
+.scrollButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f0f0f0;
+}
