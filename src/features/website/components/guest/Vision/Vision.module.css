@@ -1,0 +1,114 @@
+/* components/Vision/Vision.module.css */
+.visionContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+    padding-bottom: 8%;
+}
+
+.sectionTitle {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.sectionTitle::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background-color: var(--accent-color);
+    border-radius: 2px;
+}
+
+.visionContent {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.visionText {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    padding: 30px;
+    background-color: var(--secondary-background);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px var(--shadow-accent);
+}
+
+.valuesGrid {
+    display: flex; /* Thay grid bằng flex để dễ dàng xếp 4 thẻ trên 1 hàng */
+    flex-direction: row; /* Đảm bảo các thẻ xếp theo hàng ngang */
+    gap: 30px; /* Khoảng cách giữa các thẻ */
+    margin-top: 20px;
+    max-width: 1200px; /* Giới hạn chiều rộng tối đa */
+    justify-self: center; /* Căn giữa các thẻ trên hàng */
+}
+
+.valueCard {
+    background-color: var(--primary-background);
+    padding: 40px 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 25px var(--shadow-accent);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+    max-width: 280px; /* Giảm max-width một chút để 4 thẻ fit trên 1 hàng */
+    width: 100%; /* Đảm bảo thẻ chiếm toàn bộ chiều rộng của container */
+}
+
+.valueCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px var(--shadow-dark);
+    border-color: var(--accent-color);
+}
+
+.valueIcon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.valueTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+
+.valueDescription {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .visionContainer {
+        gap: 60px;
+    }
+
+    .sectionTitle {
+        font-size: 2rem;
+    }
+
+    .visionText {
+        font-size: 1.125rem;
+        padding: 20px;
+    }
+
+    .valuesGrid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .valueCard {
+        padding: 30px 20px;
+    }
+}

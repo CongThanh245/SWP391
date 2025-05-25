@@ -1,0 +1,324 @@
+/* Container chính */
+.workingHoursContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 80px 20px;
+}
+
+/* Layout chính - chia 2 cột */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+/* Card section chung */
+.section {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 20px 40px var(--shadow-accent);
+  border: 1px solid rgba(158, 142, 123, 0.2);
+  transition: all 0.3s ease;
+}
+
+
+/* Tiêu đề section */
+.sectionTitle {
+  font-size: 2.2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #61474C, var(--accent-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 35px;
+  text-align: center;
+  position: relative;
+}
+
+.sectionTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-color), #61474C);
+  border-radius: 2px;
+}
+
+/* Phần giờ làm việc */
+.scheduleSection {
+  width: 100%;
+}
+
+.scheduleCard {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, var(--secondary-background) 100%);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 12px 32px rgba(158, 142, 123, 0.15);
+  border: 1px solid rgba(158, 142, 123, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.scheduleItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(158, 142, 123, 0.15);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.scheduleItem:last-child {
+  border-bottom: none;
+}
+
+
+
+.scheduleItem.closed {
+  opacity: 0.7;
+  color: #d32f2f;
+}
+
+.scheduleItem.closed .time {
+  color: #d32f2f;
+}
+
+.day {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  flex: 1;
+}
+
+.time {
+  font-weight: 600;
+  color: #61474C;
+  font-size: 1.05rem;
+  flex: 1;
+  text-align: center;
+}
+
+.status {
+  font-size: 1.3rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  flex: 0 0 auto;
+}
+
+/* Ghi chú */
+.note {
+  background: linear-gradient(135deg, #fff8e1 0%, #f3e5ab 100%);
+  border: 2px solid rgba(255, 193, 7, 0.3);
+  border-radius: 16px;
+  padding: 10px;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(255, 193, 7, 0.1);
+  margin-bottom: 20px;
+}
+
+.note p {
+  color: #5d4037;
+  line-height: 1.6;
+  font-size: 1rem;
+  margin-left: 20px;
+  font-weight: 600;
+}
+
+/* Phần thông tin liên hệ */
+.contactSection {
+  width: 100%;
+}
+
+.contactGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, var(--secondary-background) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(158, 142, 123, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.contactItem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(97, 71, 76, 0.08), transparent);
+  transition: left 0.5s ease;
+}
+
+
+.contactIcon {
+  font-size: 1.8rem;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent-color), #61474C);
+  border-radius: 14px;
+  color: white;
+  box-shadow: 0 6px 20px rgba(97, 71, 76, 0.3);
+  transition: all 0.3s ease;
+}
+
+
+
+.contactDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contactLabel {
+  font-size: 0.9rem;
+  color: var(--accent-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.contactValue {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  word-break: break-all;
+}
+
+/* Nút hành động */
+.actionButtons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.actionButtons button {
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.actionButtons button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+
+
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .workingHoursContainer {
+    padding: 60px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .workingHoursContainer {
+    padding: 40px 15px;
+  }
+
+  .section {
+    padding: 24px;
+    border-radius: 16px;
+  }
+
+  .sectionTitle {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+  }
+
+  .scheduleCard {
+    padding: 24px;
+  }
+
+  .scheduleItem {
+    padding: 16px 0;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    align-items: center;
+  }
+
+
+  
+  .day, .time {
+    text-align: center;
+    flex: none;
+  }
+
+  .contactItem {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .contactIcon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.6rem;
+  }
+
+  .contactValue {
+    font-size: 1rem;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+  }
+
+  .actionButtons button {
+    padding: 14px 28px;
+  }
+
+  .note {
+    padding: 20px;
+  }
+
+  .note p {
+    margin-left: 10px;
+    font-size: 0.95rem;
+  }
+}
