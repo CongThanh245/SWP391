@@ -99,10 +99,6 @@ body {
   transition: transform 0.3s ease;
 }
 
-.registerCard:hover {
-  transform: translateY(-5px);
-}
-
 /* Header */
 .registerHeader {
   text-align: center;

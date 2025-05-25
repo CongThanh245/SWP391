@@ -3,7 +3,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: 1rem;
+  padding: 5rem 0 8rem 0;
   margin: 0 auto;
   background-color: #D5C7BE;
   justify-content: center;
@@ -19,7 +19,13 @@
   transition: transform 0.5s ease;
   width: max-content; /* Allow content to determine width */
 }
-
+.carouseTitle {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--error-color);
+    margin-bottom: 16px;
+    justify-self: center;
+}
 .carouselItem {
   flex: 0 0 auto;
   width: 250px;

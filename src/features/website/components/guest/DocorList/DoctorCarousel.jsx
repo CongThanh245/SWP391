@@ -62,6 +62,7 @@ function DoctorsCarousel() {
       </button>
 
       <div className={styles.carouselWrapper}>
+        <p className={styles.carouseTitle}>Đội ngũ chuyên gia</p>
         <div className={styles.carousel} ref={carouselRef}>
           {doctors.map((doctor, index) => (
             <div key={`doctor-${index}`} className={styles.carouselItem}>
