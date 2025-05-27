@@ -7,7 +7,6 @@ import FAQ from '@features/website/components/shared/FAQ/FAQ';
 import TestimonialSection from '@features/website/components/guest/TestimonialSection/TestimonialSection';
 
 const GuestHomePage = () => {
-    console.log('Rendering GuestHomePage');
     return (
         <div>
             <HeroSection></HeroSection>

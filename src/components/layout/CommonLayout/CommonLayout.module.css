@@ -1,0 +1,49 @@
+/* CommonLayout.module.css - Updated */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--primary-background);
+  font-family: var(--font-family);
+  padding-top: 140px; /* Tạo space cho fixed header */
+}
+
+.content {
+  flex: 1;
+  padding: var(--spacing-xl);
+  min-height: calc(100vh - 140px);
+  background-color: var(--primary-background);
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .layout {
+    padding-top: 120px;
+  }
+  
+  .content {
+    margin-left: 180px;
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    padding-top: 100px;
+  }
+  
+  .content {
+    margin-left: 160px;
+    padding: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .layout {
+    padding-top: 80px;
+  }
+  
+  .content {
+    margin-left: 140px;
+    padding: var(--spacing-sm);
+  }
+}

@@ -1,4 +1,4 @@
-// src/routes/index.js
+// src/routes/index.jsx
 import { Routes, Route } from 'react-router-dom';
 import GuestLayout from '@components/layout/GuestLayout/GuestLayout.jsx';
 import GuestHomePage from '@features/website/pages/guest/GuestHomePage.jsx';
@@ -7,11 +7,13 @@ import LoginPage from '@features/auth/pages/LoginPage/LoginPage.jsx';
 import RegisterPage from '@features/auth/pages/RegisterPage/RegisterPage.jsx';
 import VerifyOtpPage from '@features/auth/pages/VerifyOtpPage/VerifyOtpPage.jsx';
 
+
 const AppRoutes = () => (
   <Routes>
     <Route element={<GuestLayout />}>
       <Route path="/" element={<GuestHomePage />} />
       <Route path="/about-us" element={<GuestAboutUs />} />
+      <Route path='health-records' element={<ProfilePage/>}/>
     </Route>
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
