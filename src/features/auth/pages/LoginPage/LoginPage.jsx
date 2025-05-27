@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import styles from "./LoginPage.module.css";
 import { FcGoogle } from "react-icons/fc"; // Cần cài đặt: npm install react-icons
+import { GoogleLogin } from "@react-oauth/google";
 
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({
@@ -14,6 +15,10 @@ const LoginPage = () => {
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
+ const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:8088/api/v1/oauth2/authorization/google';
+  };
+     
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setCredentials({
@@ -28,15 +33,12 @@ const LoginPage = () => {
     // Xử lý logic đăng nhập ở đây
   };
 
-  const handleGoogleLogin = () => {
-    console.log("Đăng nhập với Google");
-    // Xử lý login với Google ở đây
-  };
+  
 
   return (
     <div className={styles.loginContainer}>
       <div className={styles.backToHome}>
-          <a href="/">Quay lại trang chủ</a>
+        <a href="/">Quay lại trang chủ</a>
       </div>
       <div className={styles.loginCard}>
         <div className={styles.loginHeader}>
@@ -48,11 +50,10 @@ const LoginPage = () => {
           {/* Input Tên đăng nhập với floating label */}
           <div className={styles.formGroup}>
             <label
-              className={`${styles.floatingLabel} ${
-                isUsernameFocused || credentials.username
+              className={`${styles.floatingLabel} ${isUsernameFocused || credentials.username
                   ? styles.floatingLabelActive
                   : ""
-              }`}
+                }`}
               htmlFor="username"
             >
               Tên đăng nhập
@@ -72,11 +73,10 @@ const LoginPage = () => {
           {/* Input Mật khẩu với floating label */}
           <div className={styles.formGroup}>
             <label
-              className={`${styles.floatingLabel} ${
-                isPasswordFocused || credentials.password
+              className={`${styles.floatingLabel} ${isPasswordFocused || credentials.password
                   ? styles.floatingLabelActive
                   : ""
-              }`}
+                }`}
               htmlFor="password"
             >
               Mật khẩu
@@ -117,13 +117,13 @@ const LoginPage = () => {
             <span>Hoặc</span>
           </div>
 
-          <button
-            type="button"
-            className={styles.googleButton}
+          <button 
+            type="button" 
+            className={styles.googleLoginButton}
             onClick={handleGoogleLogin}
           >
             <FcGoogle className={styles.googleIcon} />
-            <span>Đăng nhập bằng Google</span>
+            Đăng nhập với Google
           </button>
         </form>
 
@@ -136,5 +136,7 @@ const LoginPage = () => {
     </div>
   );
 };
+
+
 
 export default LoginPage;

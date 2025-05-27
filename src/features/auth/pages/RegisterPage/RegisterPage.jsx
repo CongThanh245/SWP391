@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "./RegisterPage.module.css";
-import { FcGoogle } from "react-icons/fc";
+import { registerUser } from "../../../../api/authApi";
+import { useNavigate } from 'react-router-dom';
 
 // Định nghĩa cấu trúc form fields
 const FORM_FIELDS = [
@@ -24,10 +25,6 @@ const FORM_FIELDS = [
     required: true,
     validation: {
       required: "Vui lòng nhập ngày sinh",
-      pattern: {
-        value: /^\d{2}\/\d{2}\/\d{4}$/,
-        message: "Định dạng ngày tháng không hợp lệ (DD/MM/YYYY)",
-      },
     },
   },
   {
@@ -108,8 +105,10 @@ const FORM_FIELDS = [
   },
 ];
 
+
 const RegisterPage = () => {
   // Khởi tạo state form data động từ FORM_FIELDS
+  const navigate = useNavigate();
   const initialFormData = FORM_FIELDS.reduce(
     (acc, field) => {
       acc[field.name] = "";
@@ -135,10 +134,18 @@ const RegisterPage = () => {
 
     // Xóa lỗi khi người dùng bắt đầu sửa
     if (errors[name]) {
-      setErrors({
-        ...errors,
+      setErrors(prev => ({
+        ...prev,
         [name]: null,
-      });
+      }));
+    }
+
+    // Xóa API error khi user bắt đầu sửa
+    if (errors.apiError) {
+      setErrors(prev => ({
+        ...prev,
+        apiError: null,
+      }));
     }
 
     // Kiểm tra xác nhận mật khẩu ngay khi gõ
@@ -151,15 +158,15 @@ const RegisterPage = () => {
         name === "confirmPassword" ? value : formData.confirmPassword;
 
       if (confirmValue && passwordToCheck !== confirmValue) {
-        setErrors({
-          ...errors,
+        setErrors(prev => ({
+          ...prev,
           confirmPassword: "Mật khẩu không trùng khớp",
-        });
+        }));
       } else if (confirmValue) {
-        setErrors({
-          ...errors,
+        setErrors(prev => ({
+          ...prev,
           confirmPassword: null,
-        });
+        }));
       }
     }
   };
@@ -175,11 +182,11 @@ const RegisterPage = () => {
       return validation.required;
     }
 
-    if (validation.pattern && !validation.pattern.value.test(value)) {
+    if (validation.pattern && value && !validation.pattern.value.test(value)) {
       return validation.pattern.message;
     }
 
-    if (validation.minLength && value.length < validation.minLength.value) {
+    if (validation.minLength && value && value.length < validation.minLength.value) {
       return validation.minLength.message;
     }
 
@@ -216,33 +223,32 @@ const RegisterPage = () => {
     return isValid;
   };
 
-  // Xử lý submit form
-  const handleSubmit = (e) => {
+  // Xử lý submit form - FIXED: Removed duplicate function
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     if (validateForm()) {
-      console.log("Đăng ký với:", formData);
-
-      // Mô phỏng API call
-      setTimeout(() => {
-        setIsSubmitting(false);
+      try {
+        const result = await registerUser(formData);
+        console.log("Đăng ký thành công:", result);
         setSubmitSuccess(true);
-        // Hiển thị thông báo thành công trong 3 giây, sau đó reset form
-        setTimeout(() => {
-          setFormData(initialFormData);
-          setSubmitSuccess(false);
-        }, 3000);
-      }, 1500);
+
+
+      } catch (error) {
+        console.error("Lỗi khi đăng ký:", error);
+        setErrors(prev => ({
+          ...prev,
+          apiError:
+            error.response?.data?.message ||
+            "Đăng ký thất bại. Vui lòng thử lại sau.",
+        }));
+      } finally {
+        setIsSubmitting(false);
+      }
     } else {
       setIsSubmitting(false);
     }
-  };
-
-  // Xử lý đăng ký với Google
-  const handleGoogleRegister = () => {
-    console.log("Đăng ký với Google");
-    // Xử lý đăng ký với Google ở đây
   };
 
   return (
@@ -267,12 +273,26 @@ const RegisterPage = () => {
               <strong>{formData.email}</strong>.
             </p>
             <p>
-              Vui lòng kiểm tra hộp thư và nhấp vào liên kết kích hoạt để hoàn
+              Vui lòng kiểm tra hộp thư và nhập mã OTP kích hoạt để hoàn
               tất quá trình đăng ký.
             </p>
+            <button
+              onClick={() =>
+                navigate('/verify-otp', { state: { email: formData.email } })
+              }
+            >
+              Tiếp tục
+            </button>
           </div>
         ) : (
           <form className={styles.registerForm} onSubmit={handleSubmit}>
+            {/* Display API error at the top if exists */}
+            {errors.apiError && (
+              <div className={styles.apiErrorMessage}>
+                <p className={styles.errorMessage}>{errors.apiError}</p>
+              </div>
+            )}
+
             {FORM_FIELDS.map((field) => (
               <div key={field.id} className={styles.formGroup}>
                 <label htmlFor={field.id}>
@@ -297,7 +317,7 @@ const RegisterPage = () => {
               </div>
             ))}
 
-            {/* <div className={styles.formOptions}>
+            <div className={styles.formOptions}>
               <div className={styles.agreeTerms}>
                 <input
                   type="checkbox"
@@ -310,10 +330,10 @@ const RegisterPage = () => {
                   Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a>
                 </label>
               </div>
-            </div> */}
-            {errors.agreeTerms && (
-              <p className={styles.errorMessage}>{errors.agreeTerms}</p>
-            )}
+              {errors.agreeTerms && (
+                <p className={styles.errorMessage}>{errors.agreeTerms}</p>
+              )}
+            </div>
 
             <button
               type="submit"
