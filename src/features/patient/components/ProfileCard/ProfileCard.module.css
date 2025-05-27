@@ -1,0 +1,81 @@
+.card {
+  background-color: var(--card-background);
+  border-radius: 12px;
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 4px 12px var(--shadow-dark-gray);
+  transition: all 0.3s ease;
+}
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xl);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 32px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.info {
+  flex: 1;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.name {
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin: 0;
+  margin-bottom: var(--spacing-xs);
+}
+
+.patientId {
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  margin: 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+.joinDate {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.editIcon {
+  margin-right: 8px;
+}
+
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+}

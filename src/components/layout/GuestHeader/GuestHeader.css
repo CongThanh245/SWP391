@@ -1,15 +1,64 @@
 /* Header.css */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
+/* Top info bar styles */
+.top-info-bar {
+  width: 100%;
+  background: var(--primary-background);
+}
+
+.top-info-container {
+  /* max-width: 1200px; */
+  margin: 0 auto;
+  padding: 5px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  border-bottom: 0.01px solid var(--secondary-background);
+}
+
+.contact-info {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.hotline, .working-hours, .email {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+
+.hotline strong, .email strong {
+  font-weight: 600;
+}
+
+.phone-icon, .clock-icon, .email-icon {
+  font-size: 14px;
+}
+
+.email-info {
+  display: flex;
+  align-items: center;
+}
+
+
+/* Main header styles */
 .header {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--primary-background);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000;
-  border-bottom: 1px solid #f0ebe5;
+  z-index: 100;
 }
 
 .container {
@@ -19,8 +68,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Allow wrapping */
-  min-height: 80px; /* Changed to min-height to allow expansion */
+  flex-wrap: wrap;
+  min-height: 80px;
 }
 
 .logo-container {
@@ -65,8 +114,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 20px; /* Adjusted gap */
-  flex-wrap: wrap; /* Allow wrapping */
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .nav-item {
@@ -154,13 +203,25 @@
 
 /* Responsive Styles */
 @media (max-width: 1024px) {
+  .top-info-container {
+    padding: 5px 15px;
+  }
+
+  .contact-info {
+    gap: 15px;
+  }
+
+  .hotline, .working-hours, .email {
+    font-size: 11px;
+  }
+
   .container {
     min-height: auto;
     padding: 10px 15px;
   }
 
   .nav-list {
-    gap: 10px; /* Smaller gap for medium screens */
+    gap: 10px;
   }
 
   .nav-link {
@@ -183,6 +244,29 @@
 }
 
 @media (max-width: 768px) {
+  .top-info-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 15px;
+  }
+
+  .contact-info {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .email-info {
+    width: 100%;
+  }
+
+  .email {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
   .container {
     flex-direction: column;
     align-items: flex-start;
@@ -237,6 +321,20 @@
 }
 
 @media (max-width: 480px) {
+  .top-info-bar {
+    padding: 6px 0;
+  }
+
+  .hotline, .working-hours, .email {
+    font-size: 10px;
+  }
+
+  .contact-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
   .logo {
     height: 35px;
   }

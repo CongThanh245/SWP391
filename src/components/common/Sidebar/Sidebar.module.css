@@ -1,0 +1,104 @@
+/* Sidebar.module.css - Updated */
+.sidebar {
+  width: 200px; /* Thu nhỏ từ 280px xuống 200px */
+  height: 350px; /* Trừ đi chiều cao header */
+  background-color: var(--light-background);
+  border-right: 1px solid var(--card-border);
+  padding: var(--spacing-md); /* Giảm padding */
+  position: sticky;
+  left: 0;
+  top: 140px; /* Đặt dưới header (top-info-bar + main header ≈ 140px) */
+  z-index: 99; /* Thấp hơn header */
+  box-shadow: 2px 0 10px var(--shadow-dark-gray);
+  border-radius: 0 10px 10px 0; /* Bo góc bên phải */
+  margin-left: 20px;
+}
+
+.header {
+  margin-bottom: var(--spacing-lg); /* Giảm margin */
+}
+
+.title {
+  color: var(--deep-taupe);
+  font-size: var(--font-size-md); /* Giảm size từ lg xuống md */
+  font-weight: 600; /* Giảm từ 700 xuống 600 */
+  margin: 0;
+  margin-bottom: var(--spacing-md); /* Giảm margin */
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm); /* Giảm gap từ md xuống sm */
+  padding: var(--spacing-sm) var(--spacing-md); /* Giảm padding */
+  margin-bottom: var(--spacing-xs); /* Giảm margin */
+  border-radius: 6px; /* Giảm border-radius */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: transparent;
+  color: var(--text-secondary);
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.menuItem:hover {
+  background-color: var(--hover-accent);
+  transform: translateX(5px); /* Thêm hiệu ứng hover */
+}
+
+.menuItem.active {
+  background-color: var(--hover-accent);
+  color: var(--deep-taupe);
+  font-weight: 600;
+  border: 1px solid var(--card-hover-border);
+  transform: translateX(8px); /* Hiệu ứng khi active */
+}
+
+.icon {
+  flex-shrink: 0;
+  font-size: 18px; /* Giảm size icon */
+}
+
+.label {
+  font-size: var(--font-size-sm); /* Giảm từ base xuống sm */
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 180px;
+    top: 120px; /* Điều chỉnh cho responsive header */
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 160px;
+    top: 100px;
+    padding: var(--spacing-sm);
+  }
+  
+  .title {
+    font-size: var(--font-size-sm);
+  }
+  
+  .menuItem {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .label {
+    font-size: var(--font-size-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 140px;
+    top: 80px;
+  }
+}
