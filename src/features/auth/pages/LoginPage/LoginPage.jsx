@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import styles from "./LoginPage.module.css";
 import { FcGoogle } from "react-icons/fc"; // Cần cài đặt: npm install react-icons
 import { GoogleLogin } from "@react-oauth/google";
-
+import {  useNavigate } from 'react-router-dom';
+import { authenticateUser } from "../../../../api/authApi";
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({
     username: "",
@@ -14,6 +15,10 @@ const LoginPage = () => {
   // Trạng thái để kiểm soát focus và giá trị của input
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const navigate = useNavigate();
 
  const handleGoogleLogin = () => {
     window.location.href = 'http://localhost:8088/api/v1/oauth2/authorization/google';
@@ -27,10 +32,44 @@ const LoginPage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Đăng nhập với:", credentials);
-    // Xử lý logic đăng nhập ở đây
+    
+    setError('');
+    setLoading(true);
+    try {
+      if(!credentials.username || !credentials.password){
+        throw new Error('Vui lòng nhập đầy đủ email và mật khẩu');
+      }
+      console.log("Đăng nhập với:", credentials);
+
+      const result = await authenticateUser({
+        email: credentials.username,
+        password: credentials.password
+      });
+      console.log("Đăng nhập thành công:", result);
+
+      if (result.token) {
+            localStorage.setItem('authToken', result.token);
+            localStorage.setItem('user', JSON.stringify(result.user));
+        }
+        setSuccessMessage('Đăng nhập thành công!');
+setTimeout(() => {
+            navigate('/register'); // or wherever you want to redirect
+            // window.location.href = '/dashboard'; // alternative redirect method
+        }, 1000);
+    } catch (error) {
+      console.error("Lỗi đăng nhập:", error.message);
+        setError(error.message);
+        
+        // Clear password field on error for security
+        setCredentials(prev => ({
+            ...prev,
+            password: ''
+        }));
+    }finally{
+      setLoading(false);
+    }
   };
 
   
