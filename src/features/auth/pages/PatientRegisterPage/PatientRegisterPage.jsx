@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "./RegisterPage.module.css";
+import styles from "./PatientRegisterPage.module.css";
 import { registerUser } from "../../../../api/authApi";
 import { useNavigate } from 'react-router-dom';
 

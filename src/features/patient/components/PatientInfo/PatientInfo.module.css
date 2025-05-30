@@ -39,6 +39,9 @@
   flex-shrink: 0;
   size: 18; /* Giảm từ 20 */
 }
+.editIcon{
+  margin-right: 8px;
+}
 
 .label {
   color: var(--text-secondary);
