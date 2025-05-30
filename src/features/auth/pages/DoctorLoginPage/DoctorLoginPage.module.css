@@ -1,0 +1,134 @@
+/* src/pages/DoctorLoginPage/DoctorLoginPage.module.css */
+
+/* =========== Theme variables =========== */
+.doctorContainer {
+  --primary-background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); /* gradient xanh nhạt */
+  --secondary-background: #ffffff;                                        /* trắng tinh cho card */
+  
+  --text-primary: #1f2937;     /* xám đen nhẹ */
+  --text-secondary: #374151;   /* xám đậm */
+  
+  --accent-color: #11998e;     /* xanh chính của doctor */
+  --accent-hover: #0d7377;     /* xanh đậm hơn khi hover */
+  
+  --border-color: rgba(17, 153, 142, 0.3);  /* viền nhạt */
+  --shadow-light: rgba(0, 0, 0, 0.06);
+  --shadow-accent: rgba(17, 153, 142, 0.2);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--primary-background);
+  padding: 1rem;
+}
+
+/* =========== Card wrapper =========== */
+.formWrapper {
+  background: var(--secondary-background);
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow:
+    0 10px 30px var(--shadow-light),
+    0 4px 15px var(--shadow-accent);
+  max-width: 380px;
+  width: 100%;
+}
+
+/* =========== Header =========== */
+.formWrapper :global(.loginHeader) {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.formWrapper :global(.loginHeader h1) {
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+.formWrapper :global(.loginHeader p) {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+/* =========== Inputs =========== */
+.formWrapper :global(.formGroup) {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+.formWrapper :global(.formGroup input) {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid rgba(55, 65, 81, 0.2);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: #fefefe;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.formWrapper :global(.formGroup input:focus) {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.15);
+  outline: none;
+}
+.formWrapper :global(.floatingLabel) {
+  left: 1rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+.formWrapper :global(.floatingLabelActive) {
+  color: var(--accent-color);
+  font-size: 0.8rem;
+  background: var(--secondary-background);
+  padding: 0 0.25rem;
+  top: -8px;
+}
+
+/* =========== Button =========== */
+.formWrapper :global(.loginButton) {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px var(--shadow-accent);
+  transition: background 0.3s, transform 0.2s;
+}
+.formWrapper :global(.loginButton:hover:not(:disabled)) {
+  background: linear-gradient(135deg, #0d7377 0%, #2dd4bf 100%);
+  transform: translateY(-1px);
+}
+.formWrapper :global(.loginButton:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========== Messages =========== */
+.formWrapper :global(.errorMessage),
+.formWrapper :global(.successMessage) {
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.formWrapper :global(.errorMessage) {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  color: #c53030;
+}
+.formWrapper :global(.successMessage) {
+  background: rgba(72, 187, 120, 0.1);
+  border: 1px solid rgba(72, 187, 120, 0.2);
+  color: #2f855a;
+}
+
+/* =========== Responsive =========== */
+@media (max-width: 480px) {
+  .formWrapper {
+    padding: 1.5rem;
+  }
+}

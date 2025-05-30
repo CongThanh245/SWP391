@@ -1,4 +1,4 @@
-  # SWP391
+# SWP391
   ## Project Structure
 
   The project follows a **feature-based structure**, grouping code by feature (e.g., auth, blog, appointment) and role (e.g., patient, doctor, admin). Below is the folder structure:
@@ -78,8 +78,10 @@
 
   To simplify imports, we use aliases defined in `jsconfig.json` and `vite.config.js`. Examples:
 
+
   ```jsx
   import Header from '@components/layout/Header';
   import WebsiteInfo from '@features/website/pages/WebsiteInfo';
   import useAuth from '@hooks/useAuth';
+
 

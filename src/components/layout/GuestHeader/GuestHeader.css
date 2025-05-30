@@ -231,6 +231,7 @@
 
   .logo {
     height: 40px;
+    filter: brightness(1.5) saturate(0.5) hue-rotate(0deg);
   }
 
   .logo-name {
