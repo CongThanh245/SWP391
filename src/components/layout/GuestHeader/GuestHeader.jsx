@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../GuestHeader/GuestHeader.css"; // Adjust the path as necessary
 import logo from "../../../assets/images/LogoFertiCare.svg";
+import apiClient from "@api/axiosConfig"
 
 const Header = () => {
+
+  const [user, setUser] = useState(null);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState({
     services: false,
     doctors: false,
@@ -17,6 +21,48 @@ const Header = () => {
       [menu]: !isDropdownOpen[menu],
     });
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("token");
+    const urlRole = params.get("role");
+
+    let authToken = localStorage.getItem("authToken");
+    let userRole = localStorage.getItem("role");
+
+    // Nếu có token mới từ URL, cập nhật
+    if (urlToken && urlRole) {
+      localStorage.setItem("authToken", urlToken);
+      localStorage.setItem("role", urlRole);
+
+      // Cập nhật biến local
+      authToken = urlToken;
+      userRole = urlRole;
+
+      // Clean URL
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete("token");
+      cleanUrl.searchParams.delete("role");
+      window.history.replaceState({}, document.title, cleanUrl.pathname);
+    }
+
+    // Gọi API với token (mới hoặc cũ)
+    if (authToken && userRole === "PATIENT") {
+      apiClient
+        .get("/patients/me")
+        .then((res) => {
+          setUser(res.data);
+          localStorage.setItem("user", JSON.stringify(res.data));
+        })
+        .catch((err) => {
+          console.error("Lỗi lấy thông tin bệnh nhân", err);
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("role");
+          localStorage.removeItem("user");
+          setUser(null); // Reset user state
+        });
+    }
+  }, []);
 
   return (
     <header className="header">
@@ -107,9 +153,20 @@ const Header = () => {
         </nav>
 
         <div className="auth-buttons">
-          <button className="login-button" onClick={() => navigate("/login")}>
-            Đăng nhập
-          </button>
+          {user ? (
+            <div className="user-info" onClick={() => navigate("/profile")}>
+              <img
+                src={user.avatarUrl}
+                alt="Avatar"
+                className="avatar"
+              />
+              <span>{user.patientName}</span>
+            </div>
+          ) : (
+            <button className="login-button" onClick={() => navigate("/login")}>
+              Đăng nhập
+            </button>
+          )}
         </div>
       </div>
     </header>
