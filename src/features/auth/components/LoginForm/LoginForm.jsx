@@ -7,7 +7,7 @@ const LoginForm = ({
   title = 'Đăng nhập',
   subtitle = 'Chào mừng bạn trở lại',
   apiEndpoint,
-  redirectPath = '/dashboard',
+  redirectPath = '/',
 }) => {
   const [credentials, setCredentials] = useState({
     username: "",
@@ -47,8 +47,7 @@ const LoginForm = ({
         },
         body: JSON.stringify({
           email: credentials.username,
-          password: credentials.password,
-          userType: userType
+          password: credentials.password
         })
       });
 
@@ -62,7 +61,7 @@ const LoginForm = ({
       if (result.token) {
         localStorage.setItem('authToken', result.token);
         localStorage.setItem('user', JSON.stringify(result.user));
-        localStorage.setItem('userType', userType);
+        localStorage.setItem('role', userType);
       }
 
       setSuccessMessage('Đăng nhập thành công!');

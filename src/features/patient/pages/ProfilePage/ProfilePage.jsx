@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Calendar, FileText, Activity, Bell } from 'lucide-react';
 import Sidebar from '@components/common/Sidebar/Sidebar';
 import CommonLayout from '@components/layout/CommonLayout/CommonLayout';
@@ -9,11 +9,21 @@ import styles from './ProfilePage.module.css';
 
 const ProfilePage = () => {
   const [activeMenuItem, setActiveMenuItem] = useState('profile');
-
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Invalid user JSON in localStorage:", error);
+      }
+    }
+  }, []);
   // Sample user data
   const userData = {
-    name: 'Nguyễn Thị Lan',
-    patientId: 'BN001234',
+    name: user?.patientName || "Chưa có tên",
+    patientId: user?.patientId|| "BN001234",
     joinDate: '15/01/2024',
     birthDate: '15/03/1990',
     address: '123 Đường ABC, Quận 1, TP.HCM',

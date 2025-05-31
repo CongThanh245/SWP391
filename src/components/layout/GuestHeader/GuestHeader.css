@@ -182,8 +182,22 @@
   margin-left: 15px;
   flex-shrink: 0;
 }
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
 
-.login-button {
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #eee;
+}
+
+.login-button, .logout-button {
   background-color: #000000;
   color: #FFFFFF;
   border: none;
