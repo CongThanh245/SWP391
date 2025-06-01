@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Phone, Mail, MapPin, User, Heart, Edit2 } from 'lucide-react';
+import { Calendar, Phone, Mail, MapPin, User, Heart, Edit2, ShieldAlert } from 'lucide-react';
 import Button from '../../../../components/common/Button/Button';
 import styles from './PatientInfo.module.css';
 
@@ -10,7 +10,8 @@ const PatientInfo = ({ user, onEdit }) => {
     { icon: Phone, label: 'Số điện thoại', value: user.phone },
     { icon: User, label: 'Giới tính', value: user.gender },
     { icon: Mail, label: 'Email', value: user.email },
-    { icon: Heart, label: 'Tình trạng hôn nhân', value: user.maritalStatus }
+    { icon: Heart, label: 'Tình trạng hôn nhân', value: user.maritalStatus },
+    { icon: ShieldAlert, label: 'Người liên hệ khẩn cấp', value: user.emergencyContact}
   ];
 
   return (
