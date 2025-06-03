@@ -98,7 +98,7 @@
 .logo-tagline {
   font-family: 'Montserrat', sans-serif;
   font-size: 10px;
-  color: #9e8e7b;
+  color: #4d3c2d;
   letter-spacing: 1px;
 }
 
@@ -184,7 +184,7 @@
 }
 
 .login-button {
-  background-color: #000000;
+  background-color: #4d3c2d;
   color: #FFFFFF;
   border: none;
   border-radius: 5px;

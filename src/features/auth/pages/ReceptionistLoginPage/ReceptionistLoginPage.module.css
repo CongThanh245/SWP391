@@ -1,27 +1,28 @@
 /* src/pages/ReceptionistLoginPage/ReceptionistLoginPage.module.css */
 .receptionistContainer {
-  /* Receptionist theme variables - Complete set */
-  --primary-background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+  /* Receptionist theme variables - New palette */
+  --primary-background: linear-gradient(135deg, #E8E2E2 0%, #F5ECEF 100%);
   --secondary-background: rgba(255, 255, 255, 0.95);
-  --gradient-circle: radial-gradient(circle, rgba(255, 154, 158, 0.3) 0%, rgba(254, 207, 239, 0.2) 70%);
+  --gradient-circle: radial-gradient(circle, rgba(232, 226, 226, 0.4) 0%, rgba(171, 148, 145, 0.15) 70%);
   
   /* Text colors */
-  --text-primary: #2c3e50;
-  --text-secondary: #ff6b6b;
+  --text-primary: #463C2F; /* Mondo */
+  --text-secondary: #773B45; /* Lotus */
   
   /* Accent colors */
-  --accent-color: #ff6b6b;
-  --hover-accent: rgba(255, 107, 107, 0.1);
+  --accent-color: #773B45; /* Lotus */
+  --hover-accent: rgba(119, 59, 69, 0.1); /* Lotus with transparency */
   
   /* Button colors */
-  --button-primary-bg: linear-gradient(135deg, #ff6b6b 0%, #ff9a9e 100%);
-  --button-primary-text: #ffffff;
-  --button-secondary-bg: rgba(255, 255, 255, 0.8);
-  --button-secondary-border: rgba(255, 107, 107, 0.3);
+  --button-primary-bg: #773B45; /* Lotus */
+  --button-primary-text: #FFFFFF;
+  --button-secondary-bg: rgba(171, 148, 145, 0.8); /* Del Rio transparent */
+  --button-secondary-border: rgba(171, 148, 145, 0.3); /* Del Rio transparent */
   
   /* Shadow colors */
-  --shadow-accent: rgba(255, 107, 107, 0.2);
-  --shadow-dark: rgba(255, 154, 158, 0.1);
+  --shadow-accent: rgba(171, 148, 145, 0.2); /* Del Rio transparent */
+  --shadow-dark: rgba(70, 60, 47, 0.1); /* Mondo transparent */
+
   display: flex;
   justify-content: center;
   align-items: center;

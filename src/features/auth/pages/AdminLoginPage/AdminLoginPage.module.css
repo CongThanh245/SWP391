@@ -2,18 +2,21 @@
 
 /* =========== Theme variables =========== */
 .adminContainer {
-  --primary-background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f2 100%); /* gradient xám-lạnh */
-  --secondary-background: #ffffff;                                       /* trắng tinh cho card */
-  
-  --text-primary: #2d3748;     /* xám đen nhẹ */
-  --text-secondary: #4a5568;   /* xám đậm */
-  
-  --accent-color: #667eea;     /* indigo nhẹ */
-  --accent-hover: #5a67d8;     /* indigo đậm hơn khi hover */
-  
-  --border-color: rgba(102, 126, 234, 0.3);  /* viền nhạt */
-  --shadow-light: rgba(0, 0, 0, 0.06);
-  --shadow-accent: rgba(102, 126, 234, 0.2);
+  /* Nền lấy từ THEME 2 */
+  --primary-background: linear-gradient(135deg, #D3A6AA 0%, #F5ECEF 100%);
+  --secondary-background: rgba(255, 255, 255, 0.95);
+
+  /* Các biến còn lại lấy từ THEME 1 */
+  --text-primary: #563827;
+  --text-secondary: #802d46;
+
+  --accent-color: #802d46;
+  --hover-accent: rgba(128, 45, 70, 0.1);
+
+  --border-color: rgba(128, 45, 70, 0.3);
+
+  --shadow-light: rgba(86, 56, 39, 0.1);
+  --shadow-accent: rgba(128, 45, 70, 0.2);
 
   display: flex;
   justify-content: center;
@@ -60,7 +63,7 @@
 .formWrapper :global(.formGroup input) {
   width: 100%;
   padding: 1rem;
-  border: 1px solid rgba(74, 85, 104, 0.2);
+  border: 1px solid rgba(55, 65, 81, 0.2);
   border-radius: 8px;
   font-size: 1rem;
   color: var(--text-primary);
@@ -69,7 +72,7 @@
 }
 .formWrapper :global(.formGroup input:focus) {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.15);
   outline: none;
 }
 .formWrapper :global(.floatingLabel) {
@@ -92,14 +95,14 @@
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
   border: none;
   border-radius: 8px;
   box-shadow: 0 4px 15px var(--shadow-accent);
   transition: background 0.3s, transform 0.2s;
 }
 .formWrapper :global(.loginButton:hover:not(:disabled)) {
-  background: var(--accent-hover);
+  background: linear-gradient(135deg, #0d7377 0%, #2dd4bf 100%);
   transform: translateY(-1px);
 }
 .formWrapper :global(.loginButton:disabled) {
@@ -132,4 +135,3 @@
     padding: 1.5rem;
   }
 }
-     
