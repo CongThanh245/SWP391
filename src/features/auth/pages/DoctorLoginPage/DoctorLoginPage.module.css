@@ -2,35 +2,28 @@
 
 /* =========== Theme variables =========== */
 .doctorContainer {
-  --primary-background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); /* gradient xanh nhạt */
-  --secondary-background: #ffffff;                                        /* trắng tinh cho card */
-  
-  --text-primary: #1f2937;     /* xám đen nhẹ */
-  --text-secondary: #374151;   /* xám đậm */
-  
-  --accent-color: #11998e;     /* xanh chính của doctor */
-  --accent-hover: #0d7377;     /* xanh đậm hơn khi hover */
-  
-  --border-color: rgba(17, 153, 142, 0.3);  /* viền nhạt */
-  --shadow-light: rgba(0, 0, 0, 0.06);
-  --shadow-accent: rgba(17, 153, 142, 0.2);
+  background:
+    radial-gradient(circle at center,
+      rgba(217, 92, 99, 0.8) 0%,
+      rgba(217, 92, 99, 0.1) 50%,
+      rgba(217, 92, 99, 0) 100%
+    ),
+    #f8ecec;
 
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: var(--primary-background);
   padding: 1rem;
 }
 
-/* =========== Card wrapper =========== */
 .formWrapper {
   background: var(--secondary-background);
   padding: 2.5rem;
   border-radius: 16px;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(125, 69, 78, 0.25);  /* Đổi border */
   box-shadow:
-    0 10px 30px var(--shadow-light),
+    0 10px 30px rgba(211, 166, 170, 0.1),
     0 4px 15px var(--shadow-accent);
   max-width: 380px;
   width: 100%;
