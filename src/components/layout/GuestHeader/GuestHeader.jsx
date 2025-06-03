@@ -15,6 +15,14 @@ const Header = () => {
 
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
+    setUser(null); // clear frontend state
+    navigate("/login");
+  };
+
   const toggleDropdown = (menu) => {
     setIsDropdownOpen({
       ...isDropdownOpen,
@@ -154,19 +162,25 @@ const Header = () => {
 
         <div className="auth-buttons">
           {user ? (
-            <div className="user-info" onClick={() => navigate("/profile")}>
-              <img
-                src={user.avatarUrl}
-                alt="Avatar"
-                className="avatar"
-              />
-              <span>{user.patientName}</span>
-            </div>
-          ) : (
-            <button className="login-button" onClick={() => navigate("/login")}>
-              Đăng nhập
-            </button>
-          )}
+        <div className="user-info">
+          <img
+            src={user.avatarUrl || "/default-avatar.png"} // fallback if missing
+            alt="Avatar"
+            className="avatar"
+            onClick={() => navigate("/profile")}
+          />
+          <span className="username" onClick={() => navigate("/profile")}>
+            {user.patientName}
+          </span>
+          <button className="logout-button" onClick={handleLogout}>
+            Đăng xuất
+          </button>
+        </div>
+      ) : (
+        <button className="login-button" onClick={() => navigate("/login")}>
+          Đăng nhập
+        </button>
+      )}
         </div>
       </div>
     </header>

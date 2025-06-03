@@ -20,8 +20,8 @@ const PatientLoginPage = () => {
           userType="patient"
           title="Đăng nhập Bệnh nhân"
           subtitle="Chào mừng bạn trở lại"
-          apiEndpoint="http://localhost:8088/api/v1/auth/patient/login"
-          redirectPath="/patient/dashboard"
+          apiEndpoint="http://localhost:8088/api/v1/auth/authenticate"
+          redirectPath="/"
         />
 
         <div className={styles.additionalOptions}>

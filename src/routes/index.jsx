@@ -11,6 +11,7 @@ import ReceptionistLoginPage from '@features/auth/pages/ReceptionistLoginPage/Re
 import DoctorLoginPage from '@features/auth/pages/DoctorLoginPage/DoctorLoginPage';
 import AdminLoginPage from '@features/auth/pages/AdminLoginPage/AdminLoginPage';
 import ReceptionistDashboard from '@features/dashboard/ReceptionistDashboard/ReceptionistDashboard';
+import ProtectedRoute from './ProtectedRoute.jsx';
 
 
 const AppRoutes = () => (
@@ -18,7 +19,14 @@ const AppRoutes = () => (
     <Route element={<GuestLayout />}>
       <Route path="/" element={<GuestHomePage />} />
       <Route path="/about-us" element={<GuestAboutUs />} />
-      <Route path='health-records' element={<ProfilePage/>}/>
+      <Route
+        path="health-records"
+        element={
+          <ProtectedRoute requiredRoles={["PATIENT"]}>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
     </Route>
     <Route path="/login" element={<PatientLoginPage />} />
     <Route path="/register" element={<PatientRegisterPage />} />
@@ -27,6 +35,9 @@ const AppRoutes = () => (
     <Route path="/doctor-login" element={<DoctorLoginPage />} />
     <Route path="/admin-login" element={<AdminLoginPage />} />
     <Route path="recep-dashboard" element={<ReceptionistDashboard/>} />
+
+
+
   </Routes>
 );
 

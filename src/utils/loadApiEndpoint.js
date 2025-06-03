@@ -1,8 +1,12 @@
-export const getEndpointByOperationId = async (operationId) => {
-  const response = await fetch("/openapi.json");
-  const spec = await response.json();
+let cachedSpec = null;
 
-  for (const [path, methods] of Object.entries(spec.paths)) {
+export const getEndpointByOperationId = async (operationId) => {
+  if (!cachedSpec) {
+    const response = await fetch("/openapi.json");
+    cachedSpec = await response.json();
+  }
+
+  for (const [path, methods] of Object.entries(cachedSpec.paths)) {
     for (const [method, config] of Object.entries(methods)) {
       if (config.operationId === operationId) {
         return {
