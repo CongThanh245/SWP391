@@ -1,4 +1,4 @@
-import React from 'react';
+
 import HeroSection from '@features/website/components/shared/HeroSection/HeroSection.jsx';
 import JourneySection from '@features/website/components/guest/JourneySection/JourneySection';
 import DoctorsCarousel from '@features/website/components/guest/DocorList/DoctorCarousel';
@@ -8,17 +8,20 @@ import TestimonialSection from '@features/website/components/guest/TestimonialSe
 import FeaturesSection from '@features/website/components/patient/FeatureSection/FeatureSection';
 import PatientHero from '@features/website/components/patient/PatientHero/PatientHero';
 
+
+
 const GuestHomePage = () => {
+    
     return (
         <div>
             {/* <HeroSection></HeroSection> */}
             <PatientHero userName="bạn"></PatientHero>
             <FeaturesSection></FeaturesSection>
             <JourneySection></JourneySection>
-            <DoctorsCarousel/>
-            <TestimonialSection/>
-            <BlogSection/>
-            <FAQ/>
+            <DoctorsCarousel />
+            <TestimonialSection />
+            <BlogSection />
+            <FAQ />
         </div>
     );
 };

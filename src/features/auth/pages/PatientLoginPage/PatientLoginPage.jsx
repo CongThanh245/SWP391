@@ -5,7 +5,7 @@ import styles from './PatientLoginPage.module.css';
 
 const PatientLoginPage = () => {
   const handleGoogleLogin = () => {
-    window.location.href = `http://localhost:8088/api/v1/oauth2/authorization/google/patient`;
+    window.location.href = `http://localhost:8088/api/v1/oauth2/authorization/google`;
   };
 
   return (
