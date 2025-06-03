@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Sidebar.module.css';
+import styles from './PatientSidebar.module.css';
 import classNames from 'classnames';
 
 const Sidebar = ({ menuItems, activeItem, onItemClick, userRole = 'patient' }) => {

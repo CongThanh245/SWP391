@@ -1,0 +1,223 @@
+/* TestResultsEntry.module.css */
+.testResultsPage {
+  padding: var(--spacing-xl);
+  background: var(--primary-background);
+  min-height: 100vh;
+  font-family: var(--font-family);
+}
+
+.pageHeader {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.pageHeader h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-accent);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.pageHeader p {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.testForm {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: var(--spacing-xl);
+  box-shadow: 0 4px 16px var(--shadow-dark-gray);
+  position: relative;
+  overflow: hidden;
+}
+
+.testForm::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-accent);
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-lg);
+}
+
+.formGroup label {
+  display: block;
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px solid var(--card-border);
+  border-radius: 8px;
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  background: var(--light-background);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--hover-accent);
+  background: var(--card-background);
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.formGroup select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  background-size: 12px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.formGroup select option {
+  padding: var(--spacing-sm);
+  background: var(--card-background);
+  color: var(--text-primary);
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+/* Custom button styles to match design system */
+.submitButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  border: none;
+  border-radius: 8px;
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-accent);
+}
+
+.submitButton:hover {
+  background: var(--button-hover-bg);
+  box-shadow: 0 4px 12px var(--shadow-accent);
+  transform: translateY(-2px);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px var(--shadow-accent);
+}
+
+.submitButton svg {
+  flex-shrink: 0;
+}
+
+/* Upload area styles */
+.uploadArea {
+  border: 2px dashed var(--card-border);
+  border-radius: 8px;
+  padding: var(--spacing-xl);
+  text-align: center;
+  background: var(--secondary-background);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-bottom: var(--spacing-lg);
+}
+
+.uploadArea:hover {
+  border-color: var(--accent-color);
+  background: var(--hover-accent);
+}
+
+.uploadArea svg {
+  color: var(--accent-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.uploadArea p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+/* Form validation styles */
+.formGroup.error input,
+.formGroup.error select,
+.formGroup.error textarea {
+  border-color: var(--warning-red);
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+.errorMessage {
+  color: var(--warning-red);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.successMessage {
+  color: var(--success-green);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Responsive */
+@media (max-width: var(--breakpoint-md)) {
+  .testResultsPage {
+    padding: var(--spacing-lg);
+  }
+  
+  .testForm {
+    padding: var(--spacing-lg);
+    margin: 0 var(--spacing-md);
+  }
+  
+  .pageHeader h2 {
+    font-size: var(--font-size-lg);
+  }
+  
+  .formGroup input,
+  .formGroup select,
+  .formGroup textarea {
+    padding: var(--spacing-sm);
+  }
+}

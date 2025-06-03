@@ -2,26 +2,24 @@ import React from 'react';
 import styles from './DoctorCard.module.css';
 
 const DoctorCard = ({ doctor }) => {
-  const { name, title, specialty, price, level, rating, visits, image } = doctor;
+  const { name, title, specialty, image, yearsOfExperience } = doctor;
 
   return (
     <div className={styles.card}>
       <div className={styles.avatarWrapper}>
-        <img src={image} alt={name} className={styles.avatar} />
+        <img
+          src={image || '/assets/images/bacsi.png'}
+          alt={name}
+          className={styles.avatar}
+        />
       </div>
       <div className={styles.info}>
-        <div className={styles.rating}>
-          Đánh giá: {rating} <span className="star">★</span>
-        </div>
-        <div className={styles.visits}>
-          Lượt khám: {visits}
-        </div>
         <h3 className={styles.name}>{name}</h3>
-        <p className={styles.level}>
-          {title || level}
-        </p>
+        <p className={styles.title}>{title}</p>
         <p className={styles.specialty}>{specialty}</p>
-        <p className={styles.price}>{price}</p>
+        <p className={styles.experience}>
+          Kinh nghiệm: {yearsOfExperience} năm
+        </p>
         <button className={styles.button}>Tư vấn ngay</button>
       </div>
     </div>

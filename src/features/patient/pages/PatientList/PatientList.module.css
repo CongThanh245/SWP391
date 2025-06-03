@@ -1,0 +1,223 @@
+/* PatientList.module.css */
+.patientListPage {
+  padding: var(--spacing-xl);
+  background: var(--primary-background);
+  min-height: 100vh;
+  font-family: var(--font-family);
+}
+
+.pageHeader {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.pageHeader h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-accent);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.pageHeader p {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.searchSection {
+  margin-bottom: var(--spacing-xl);
+  display: flex;
+  justify-content: center;
+}
+
+.searchBox {
+  position: relative;
+  max-width: 400px;
+  width: 100%;
+}
+
+.searchBox svg {
+  position: absolute;
+  left: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-color);
+  z-index: 1;
+}
+
+.searchBox input {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 48px;
+  border: 2px solid var(--card-border);
+  border-radius: 25px;
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  background: var(--card-background);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-dark-gray);
+}
+
+.searchBox input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--hover-accent);
+}
+
+.searchBox input::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.patientGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.patientCard {
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: var(--spacing-lg);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-dark-gray);
+  position: relative;
+  overflow: hidden;
+}
+
+.patientCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--success-green);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.patientCard.inactive::before {
+  background: var(--warning-orange);
+}
+
+.patientCard:hover {
+  border-color: var(--card-hover-border);
+  box-shadow: 0 6px 20px var(--shadow-accent);
+  transform: translateY(-3px);
+}
+
+.patientCard:hover::before {
+  opacity: 1;
+}
+
+.patientInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.patientInfo svg {
+  color: var(--accent-color);
+  flex-shrink: 0;
+  padding: var(--spacing-sm);
+  background: var(--secondary-background);
+  border-radius: 50%;
+  border: 2px solid var(--card-border);
+  transition: all 0.3s ease;
+}
+
+.patientCard:hover .patientInfo svg {
+  border-color: var(--accent-color);
+  background: var(--hover-accent);
+}
+
+.patientInfo div h4 {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  font-weight: 600;
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.patientInfo div p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 400;
+}
+
+.patientDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) 0;
+}
+
+.detail svg {
+  color: var(--accent-color);
+  flex-shrink: 0;
+}
+
+.detail span {
+  font-weight: 400;
+}
+
+/* Status indicators */
+.statusBadge {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 12px;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusBadge.active {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-green);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.statusBadge.inactive {
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--warning-orange);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+/* Responsive */
+@media (max-width: var(--breakpoint-md)) {
+  .patientListPage {
+    padding: var(--spacing-lg);
+  }
+  
+  .patientGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .patientCard {
+    padding: var(--spacing-md);
+  }
+  
+  .pageHeader h2 {
+    font-size: var(--font-size-lg);
+  }
+  
+  .searchBox {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,38 @@
+/* AppointmentManagement.module.css */
+.appointmentPage {
+  padding: var(--spacing-xl);
+  background: var(--primary-background);
+  min-height: 100vh;
+  font-family: var(--font-family);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.pageHeader h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-accent);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.pageHeader p {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: var(--breakpoint-md)) {
+  .appointmentPage {
+    padding: var(--spacing-lg);
+  }
+  
+  .pageHeader h2 {
+    font-size: var(--font-size-lg);
+  }
+}

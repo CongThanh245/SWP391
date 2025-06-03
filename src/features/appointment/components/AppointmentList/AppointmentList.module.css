@@ -1,0 +1,290 @@
+/* AppointmentList.module.css */
+.appointmentList {
+  background: var(--card-background);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow-dark-gray);
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 2fr 1fr 1fr;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: var(--secondary-background);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.headerCell {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.appointmentRow {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 2fr 1fr 1fr;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--card-border);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.appointmentRow:last-child {
+  border-bottom: none;
+}
+
+.appointmentRow:hover {
+  background: var(--secondary-background);
+}
+
+/* Status indicators */
+.appointmentRow.upcoming {
+  border-left: 4px solid var(--info-blue);
+}
+
+.appointmentRow.completed {
+  border-left: 4px solid var(--success-green);
+}
+
+.appointmentRow.cancelled {
+  border-left: 4px solid var(--warning-red);
+  opacity: 0.7;
+}
+
+.patientInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--secondary-background);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--card-border);
+  flex-shrink: 0;
+}
+
+.avatar svg {
+  color: var(--accent-color);
+}
+
+.patientDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.patientId {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.patientName {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.phoneInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.phoneInfo svg {
+  color: var(--accent-color);
+}
+
+.timeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.date,
+.time {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.date svg,
+.time svg {
+  color: var(--accent-color);
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 20px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  width: fit-content;
+  height: fit-content;
+}
+
+.statusBadge.upcoming {
+  background: rgba(33, 150, 243, 0.1);
+  color: var(--info-blue);
+  border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.statusBadge.completed {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-green);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.statusBadge.cancelled {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--warning-red);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.statusIcon {
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.actionBtn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+}
+
+.actionBtn:hover {
+  transform: scale(1.1);
+}
+
+.actionBtn.edit {
+  color: var(--info-blue);
+  background: rgba(33, 150, 243, 0.1);
+}
+
+.actionBtn.edit:hover {
+  background: rgba(33, 150, 243, 0.2);
+}
+
+.actionBtn.complete {
+  color: var(--success-green);
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.actionBtn.complete:hover {
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.actionBtn.cancel {
+  color: var(--warning-red);
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.actionBtn.cancel:hover {
+  background: rgba(244, 67, 54, 0.2);
+}
+
+.actionBtn.view {
+  color: var(--accent-color);
+  background: var(--secondary-background);
+}
+
+.actionBtn.view:hover {
+  background: var(--hover-accent);
+}
+
+.actionBtn.restore {
+  color: var(--warning-orange);
+  background: rgba(255, 152, 0, 0.1);
+}
+
+.actionBtn.restore:hover {
+  background: rgba(255, 152, 0, 0.2);
+}
+
+/* Empty state */
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  color: var(--text-secondary);
+}
+
+.emptyIcon {
+  margin-bottom: var(--spacing-lg);
+  color: var(--accent-color);
+  opacity: 0.5;
+}
+
+.emptyState h3 {
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.emptyState p {
+  font-size: var(--font-size-base);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: var(--breakpoint-lg)) {
+  .tableHeader,
+  .appointmentRow {
+    grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr;
+  }
+}
+
+@media (max-width: var(--breakpoint-md)) {
+  .tableHeader {
+    display: none;
+  }
+  
+  .appointmentRow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .patientInfo {
+    justify-content: space-between;
+  }
+  
+  .timeInfo {
+    flex-direction: row;
+    gap: var(--spacing-lg);
+  }
+  
+  .actions {
+    justify-content: center;
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--card-border);
+  }
+}

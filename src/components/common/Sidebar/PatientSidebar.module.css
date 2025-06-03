@@ -12,6 +12,7 @@
   box-shadow: 2px 0 10px var(--shadow-dark-gray);
   border-radius: 0 10px 10px 0; /* Bo góc bên phải */
   margin-left: 20px;
+  margin-bottom: 24px;
 }
 
 .header {

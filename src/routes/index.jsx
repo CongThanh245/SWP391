@@ -10,6 +10,7 @@ import ProfilePage from '@features/patient/pages/ProfilePage/ProfilePage';
 import ReceptionistLoginPage from '@features/auth/pages/ReceptionistLoginPage/ReceptionistLoginPage';
 import DoctorLoginPage from '@features/auth/pages/DoctorLoginPage/DoctorLoginPage';
 import AdminLoginPage from '@features/auth/pages/AdminLoginPage/AdminLoginPage';
+import ReceptionistDashboard from '@features/dashboard/ReceptionistDashboard/ReceptionistDashboard';
 
 
 const AppRoutes = () => (
@@ -25,7 +26,7 @@ const AppRoutes = () => (
     <Route path="/recep-login" element={<ReceptionistLoginPage />} />
     <Route path="/doctor-login" element={<DoctorLoginPage />} />
     <Route path="/admin-login" element={<AdminLoginPage />} />
-
+    <Route path="recep-dashboard" element={<ReceptionistDashboard/>} />
   </Routes>
 );
 

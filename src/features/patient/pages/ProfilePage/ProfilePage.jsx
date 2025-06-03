@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Calendar, FileText, Activity, Bell } from 'lucide-react';
-import Sidebar from '@components/common/Sidebar/Sidebar';
+import Sidebar from '@components/common/Sidebar/PatientSidebar';
 import CommonLayout from '@components/layout/CommonLayout/CommonLayout';
 import ProfileCard from '@features/patient/components/ProfileCard/ProfileCard';
 import PatientInfo from '@features/patient/components/PatientInfo/PatientInfo';
