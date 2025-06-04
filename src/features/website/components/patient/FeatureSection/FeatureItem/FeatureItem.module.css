@@ -1,0 +1,32 @@
+.featureItem {
+  background-color: var(--primary-background);
+  border-radius: 10px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.featureItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px var(--shadow-accent);
+}
+
+.featureIcon {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.featureItem h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--accent-color);
+  margin-bottom: 15px;
+}
+
+.featureItem p {
+  font-size: 14px;
+  color: var(--text-primary);
+}

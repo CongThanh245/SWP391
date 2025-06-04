@@ -5,6 +5,8 @@ import DoctorsCarousel from '@features/website/components/guest/DocorList/Doctor
 import BlogSection from '@features/website/components/shared/BlogSection/BlogSection';
 import FAQ from '@features/website/components/shared/FAQ/FAQ';
 import TestimonialSection from '@features/website/components/guest/TestimonialSection/TestimonialSection';
+import FeaturesSection from '@features/website/components/patient/FeatureSection/FeatureSection';
+import PatientHero from '@features/website/components/patient/PatientHero/PatientHero';
 
 
 
@@ -12,7 +14,9 @@ const GuestHomePage = () => {
     
     return (
         <div>
-            <HeroSection></HeroSection>
+            {/* <HeroSection></HeroSection> */}
+            <PatientHero userName="bạn"></PatientHero>
+            <FeaturesSection></FeaturesSection>
             <JourneySection></JourneySection>
             <DoctorsCarousel />
             <TestimonialSection />

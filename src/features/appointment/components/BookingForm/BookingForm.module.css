@@ -1,0 +1,272 @@
+.bookingForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.formContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.leftColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.required {
+  color: var(--warning-red);
+  margin-left: var(--spacing-xs);
+}
+
+.select,
+.input,
+.textarea {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  background: var(--card-background);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.select:focus,
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--text-accent);
+  box-shadow: 0 0 0 2px var(--hover-accent);
+}
+
+.select:hover,
+.input:hover,
+.textarea:hover {
+  border-color: var(--accent-color);
+}
+
+.textarea {
+  min-height: 80px;
+  resize: vertical;
+  font-family: var(--font-family);
+}
+
+.doctorCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--card-background);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.doctorCard:hover {
+  border-color: var(--card-hover-border);
+  box-shadow: 0 1px 4px var(--shadow-accent);
+}
+
+.doctorCard.selected {
+  border-color: var(--text-accent);
+  background: var(--hover-accent);
+}
+
+.doctorAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gradient-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.doctorInfo {
+  flex: 1;
+}
+
+.doctorName {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.doctorSpecialty {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.doctorList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-height: 160px;
+  overflow-y: auto;
+  padding: var(--spacing-xs);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--light-background);
+}
+
+.timeSlots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--light-background);
+}
+
+.timeSlot {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  background: var(--card-background);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+}
+
+.timeSlot:hover {
+  border-color: var(--accent-color);
+  background: var(--hover-accent);
+}
+
+.timeSlot.selected {
+  border-color: var(--text-accent);
+  background: var(--text-accent);
+  color: white;
+}
+
+.timeSlot.unavailable {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.timeSlot.unavailable:hover {
+  border-color: var(--card-border);
+  background: #f5f5f5;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--card-border);
+}
+
+.cancelButton {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--card-border);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 6px;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancelButton:hover {
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+.submitButton {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 6px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.submitButton:hover {
+  background: var(--button-hover-bg);
+}
+
+.submitButton:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.errorMessage {
+  color: var(--warning-red);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.successMessage {
+  color: var(--success-green);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  padding: var(--spacing-sm);
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 6px;
+  margin-bottom: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .formContent {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .doctorList {
+    max-height: 120px;
+  }
+  
+  .timeSlots {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  }
+  
+  .buttonGroup {
+    flex-direction: column-reverse;
+    gap: var(--spacing-sm);
+  }
+  
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+    justify-content: center;
+  }
+}

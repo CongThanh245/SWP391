@@ -4,12 +4,12 @@
   min-height: 100vh;
   background-color: var(--primary-background);
   font-family: var(--font-family);
-  padding-top: 140px; /* Tạo space cho fixed header */
+  padding-top: 100px; /* Tạo space cho fixed header */
 }
 
 .content {
   flex: 1;
-  padding: var(--spacing-xl);
+  padding: 0 var(--spacing-xl);
   min-height: calc(100vh - 140px);
   background-color: var(--primary-background);
 }
@@ -21,7 +21,6 @@
   }
   
   .content {
-    margin-left: 180px;
     padding: var(--spacing-lg);
   }
 }

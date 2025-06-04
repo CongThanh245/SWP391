@@ -1,0 +1,103 @@
+/* AppointmentFilterTabs.module.css */
+.filterTabs {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-sm);
+  background: var(--card-background);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow-dark-gray);
+  border: 1px solid var(--card-border);
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-secondary);
+}
+
+.tab:hover {
+  background: var(--secondary-background);
+  color: var(--text-primary);
+}
+
+/* Blue theme for upcoming */
+.tab.blue.active {
+  background: rgba(33, 150, 243, 0.1);
+  border-color: var(--info-blue);
+  color: var(--info-blue);
+}
+
+.tab.blue:hover:not(.active) {
+  background: rgba(33, 150, 243, 0.05);
+}
+
+/* Green theme for completed */
+.tab.green.active {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: var(--success-green);
+  color: var(--success-green);
+}
+
+.tab.green:hover:not(.active) {
+  background: rgba(76, 175, 80, 0.05);
+}
+
+/* Red theme for cancelled */
+.tab.red.active {
+  background: rgba(244, 67, 54, 0.1);
+  border-color: var(--warning-red);
+  color: var(--warning-red);
+}
+
+.tab.red:hover:not(.active) {
+  background: rgba(244, 67, 54, 0.05);
+}
+
+.tabLabel {
+  font-weight: 600;
+}
+
+.tabCount {
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  padding: 2px 6px;
+  background: currentColor;
+  color: var(--card-background);
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.tab:not(.active) .tabCount {
+  background: var(--text-secondary);
+  color: var(--card-background);
+}
+
+/* Responsive */
+@media (max-width: var(--breakpoint-md)) {
+  .filterTabs {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  
+  .tabLabel {
+    font-size: var(--font-size-sm);
+  }
+}

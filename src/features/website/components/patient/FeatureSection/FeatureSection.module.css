@@ -1,0 +1,22 @@
+.featuresSection {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  max-width: 1200px;
+  margin: 60px auto;
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+  .featuresSection {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .featuresSection {
+    grid-template-columns: 1fr;
+  }
+}

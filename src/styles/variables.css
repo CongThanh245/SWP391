@@ -9,11 +9,11 @@
 
   /* Màu nền chính */
   --primary-background: #f9f6f6; /* Off-white/cream */
-  --secondary-background: #e6dfdc; /* Light beige */
+  --secondary-background: #EAE4E1; /* Light beige */
   --light-background: #ffffff; /* White, bổ sung cho card hoặc section */
 
   /* Màu accent và điểm nhấn */
-  --accent-color: #9e8e7b; /* Soft taupe */
+  --accent-color: #4d3c2d; /* Soft taupe */
   --deep-taupe: #61474C; /* Deep taupe, màu mới làm điểm nhấn chính */
   --dark-accent: #4a3639; /* Tông đậm hơn của deep taupe, bổ sung cho hover */
 
@@ -23,7 +23,7 @@
   --text-accent: #61474C; /* Deep taupe cho text nổi bật */
 
   /* Màu button */
-  --button-primary-bg: #61474C; /* Deep taupe thay cho black để đồng bộ */
+  --button-primary-bg: #4d3c2d; /* Deep taupe thay cho black để đồng bộ */
   --button-primary-text: #fbf9f6; /* Off-white cho contrast */
   --button-secondary-bg: transparent;
   --button-secondary-text: #9e8e7b; /* Soft taupe */

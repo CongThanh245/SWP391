@@ -17,7 +17,7 @@ function HeroSection() {
             chờ thiên thần nhỏ của mình.
           </p>
           <div className={styles.heroButtons}>
-            <Button variant="primary">Đăng ký dịch vụ</Button>
+            <Button variant="primary">Đăng ký lịch hẹn</Button>
             <Button variant="secondary">Tìm hiểu thêm</Button>
           </div>
         </div>

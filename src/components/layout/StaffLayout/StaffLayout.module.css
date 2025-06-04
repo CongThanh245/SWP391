@@ -1,0 +1,41 @@
+/* src/components/layout/StaffLayout/StaffLayout.module.css */
+
+.staffLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--primary-background);
+  font-family: var(--font-family);
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: 260px; /* Width của sidebar */
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--primary-background);
+  overflow-x: hidden;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .mainContent {
+    margin-left: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0;
+    padding: var(--spacing-md);
+  }
+  
+  .staffLayout {
+    position: relative;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: var(--spacing-sm);
+  }
+}

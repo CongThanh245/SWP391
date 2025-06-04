@@ -10,7 +10,7 @@
 
 .journeySection {
   padding: 60px 20px;
-  background-color: var(--background-light);
+  background-color: #d9cac2;
 }
 
 .journeyContainer {
@@ -42,7 +42,7 @@
 
 .journeyHighlight {
   font-style: italic;
-  color: var(--primary-color);
+  color: #FFFFFF;
 }
 
 .journeySubtitle {

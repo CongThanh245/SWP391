@@ -1,0 +1,164 @@
+/* DoctorList.module.css */
+.doctorListPage {
+  padding: var(--spacing-xl);
+  background: var(--primary-background);
+  min-height: 100vh;
+  font-family: var(--font-family);
+}
+
+.pageHeader {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.pageHeader h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-accent);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.pageHeader p {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.doctorGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: var(--spacing-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.doctorCard {
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: var(--spacing-lg);
+  display: flex;
+  gap: var(--spacing-lg);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-dark-gray);
+  position: relative;
+  overflow: hidden;
+}
+
+.doctorCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-accent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.doctorCard:hover {
+  border-color: var(--card-hover-border);
+  box-shadow: 0 6px 20px var(--shadow-accent);
+  transform: translateY(-4px);
+}
+
+.doctorCard:hover::before {
+  opacity: 1;
+}
+
+.doctorAvatar {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  background: var(--secondary-background);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--card-border);
+  transition: all 0.3s ease;
+}
+
+.doctorCard:hover .doctorAvatar {
+  border-color: var(--accent-color);
+  background: var(--hover-accent);
+}
+
+.doctorAvatar svg {
+  color: var(--accent-color);
+}
+
+.doctorInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.doctorInfo h3 {
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.doctorInfo > p {
+  font-size: var(--font-size-sm);
+  color: var(--text-accent);
+  font-weight: 500;
+  margin: 0;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--secondary-background);
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.doctorDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.detail svg {
+  color: var(--accent-color);
+  flex-shrink: 0;
+}
+
+.detail span {
+  font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: var(--breakpoint-md)) {
+  .doctorListPage {
+    padding: var(--spacing-lg);
+  }
+  
+  .doctorGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .doctorCard {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+  
+  .doctorAvatar {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .pageHeader h2 {
+    font-size: var(--font-size-lg);
+  }
+}
