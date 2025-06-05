@@ -1,7 +1,7 @@
 // src/features/doctor/components/DoctorsCarousel/DoctorsCarousel.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import DoctorCard from '@features/website/components/guest/DocorList/DoctorCard';
+import DoctorCard from '@features/website/components/guest/DocorCarousel/DoctorCard';
 import { useDoctors } from '@hooks/useDoctors';
 import styles from './DoctorCarousel.module.css';
 

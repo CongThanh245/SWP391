@@ -1,24 +1,19 @@
 import React from "react";
-import { User, Calendar, Phone } from "lucide-react";
+import { User, Phone } from "lucide-react";
+import { useDoctors } from "@hooks/useDoctors";
+import { Link } from "react-router-dom";
 import styles from "./DoctorList.module.css";
 
 const DoctorList = () => {
-  const doctors = [
-    {
-      id: "D001",
-      name: "BS. Nguyễn Văn Khoa",
-      specialty: "Sản phụ khoa",
-      phone: "0123456789",
-      schedule: "Thứ 2, 4, 6"
-    },
-    {
-      id: "D002",
-      name: "BS. Trần Thị Mai",
-      specialty: "Hiếm muộn",
-      phone: "0987654321", 
-      schedule: "Thứ 3, 5, 7"
-    }
-  ];
+  const { doctors, loading, error } = useDoctors();
+
+  if (loading) {
+    return <div className={styles.loading}>Đang tải...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.error}>Lỗi: {error}</div>;
+  }
 
   return (
     <div className={styles.doctorListPage}>
@@ -34,18 +29,21 @@ const DoctorList = () => {
               <User size={32} />
             </div>
             <div className={styles.doctorInfo}>
+              <h4>{doctor.id}</h4>
               <h3>{doctor.name}</h3>
-              <p>{doctor.specialty}</p>
+              <p>{doctor.specialization}</p>
               <div className={styles.doctorDetails}>
                 <div className={styles.detail}>
                   <Phone size={16} />
                   <span>{doctor.phone}</span>
                 </div>
-                <div className={styles.detail}>
-                  <Calendar size={16} />
-                  <span>{doctor.schedule}</span>
-                </div>
               </div>
+              <Link
+                to={`/receptionist-dashboard/doctor/${doctor.id}`}
+                className={styles.viewDetailsButton}
+              >
+                Xem chi tiết
+              </Link>
             </div>
           </div>
         ))}

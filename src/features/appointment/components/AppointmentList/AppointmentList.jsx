@@ -1,12 +1,15 @@
 import React from "react";
 import { User, Clock, Calendar, Phone, Edit, Trash2, CheckCircle, Eye, RefreshCw } from "lucide-react";
 import styles from "./AppointmentList.module.css";
+import { updateAppointmentStatus } from "@api/appointmentApi";
 
 const AppointmentList = ({ appointments, activeTab }) => {
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'upcoming':
+      case 'pending':
         return <Clock size={16} className={styles.statusIcon} />;
+      case 'confirmed':
+        return <CheckCircle size={16} className={styles.statusIcon} />;
       case 'completed':
         return <CheckCircle size={16} className={styles.statusIcon} />;
       case 'cancelled':
@@ -18,14 +21,26 @@ const AppointmentList = ({ appointments, activeTab }) => {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'upcoming':
-        return 'Sắp tới';
+      case 'pending':
+        return 'Chờ xác nhận';
+      case 'confirmed':
+        return 'Đã xác nhận';
       case 'completed':
-        return 'Hoàn thành';
+        return 'Đã hoàn thành';
       case 'cancelled':
         return 'Đã hủy';
       default:
-        return 'Sắp tới';
+        return 'Chờ xác nhận';
+    }
+  };
+
+  const handleStatusUpdate = async (id, newStatus) => {
+    try {
+      await updateAppointmentStatus(id, newStatus);
+      // Trigger a refresh by reloading appointments (simplest approach)
+      window.location.reload();
+    } catch (error) {
+      alert('Cập nhật trạng thái thất bại. Vui lòng thử lại.');
     }
   };
 
@@ -50,7 +65,7 @@ const AppointmentList = ({ appointments, activeTab }) => {
         <div className={styles.headerCell}>Trạng thái</div>
         <div className={styles.headerCell}>Actions</div>
       </div>
-      
+
       {appointments.map((appointment) => (
         <div key={appointment.id} className={`${styles.appointmentRow} ${styles[appointment.status]}`}>
           <div className={styles.patientInfo}>
@@ -58,16 +73,16 @@ const AppointmentList = ({ appointments, activeTab }) => {
               <User size={20} />
             </div>
             <div className={styles.patientDetails}>
-              <span className={styles.patientId}>{appointment.id}</span>
+              <span className={styles.patientId}>{appointment.appointmentId}</span>
               <span className={styles.patientName}>{appointment.patientName}</span>
             </div>
           </div>
-          
+
           <div className={styles.phoneInfo}>
             <Phone size={16} />
             <span>{appointment.phone}</span>
           </div>
-          
+
           <div className={styles.timeInfo}>
             <div className={styles.date}>
               <Calendar size={16} />
@@ -78,33 +93,71 @@ const AppointmentList = ({ appointments, activeTab }) => {
               <span>{appointment.time}</span>
             </div>
           </div>
-          
+
           <div className={`${styles.statusBadge} ${styles[appointment.status]}`}>
             {getStatusIcon(appointment.status)}
             <span>{getStatusText(appointment.status)}</span>
           </div>
-          
+
           <div className={styles.actions}>
-            {appointment.status === 'upcoming' && (
+            {appointment.status === 'pending' && (
               <>
-                <button className={`${styles.actionBtn} ${styles.edit}`} title="Chỉnh sửa">
+                <button
+                  className={`${styles.actionBtn} ${styles.edit}`}
+                  title="Chỉnh sửa"
+                  onClick={() => alert('Chỉnh sửa chưa được triển khai')}
+                >
                   <Edit size={16} />
                 </button>
-                <button className={`${styles.actionBtn} ${styles.complete}`} title="Hoàn thành">
+                <button
+                  className={`${styles.actionBtn} ${styles.complete}`}
+                  title="Xác nhận"
+                  onClick={() => handleStatusUpdate(appointment.id, 'confirmed')}
+                >
                   <CheckCircle size={16} />
                 </button>
-                <button className={`${styles.actionBtn} ${styles.cancel}`} title="Hủy">
+                <button
+                  className={`${styles.actionBtn} ${styles.cancel}`}
+                  title="Hủy"
+                  onClick={() => handleStatusUpdate(appointment.id, 'cancelled')}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </>
+            )}
+            {appointment.status === 'confirmed' && (
+              <>
+                <button
+                  className={`${styles.actionBtn} ${styles.complete}`}
+                  title="Hoàn thành"
+                  onClick={() => handleStatusUpdate(appointment.id, 'completed')}
+                >
+                  <CheckCircle size={16} />
+                </button>
+                <button
+                  className={`${styles.actionBtn} ${styles.cancel}`}
+                  title="Hủy"
+                  onClick={() => handleStatusUpdate(appointment.id, 'cancelled')}
+                >
                   <Trash2 size={16} />
                 </button>
               </>
             )}
             {appointment.status === 'completed' && (
-              <button className={`${styles.actionBtn} ${styles.view}`} title="Xem chi tiết">
+              <button
+                className={`${styles.actionBtn} ${styles.view}`}
+                title="Xem chi tiết"
+                onClick={() => alert(`Chi tiết: Bác sĩ: ${appointment.doctorName}, Ghi chú: ${appointment.notes}`)}
+              >
                 <Eye size={16} />
               </button>
             )}
             {appointment.status === 'cancelled' && (
-              <button className={`${styles.actionBtn} ${styles.restore}`} title="Khôi phục">
+              <button
+                className={`${styles.actionBtn} ${styles.restore}`}
+                title="Khôi phục"
+                onClick={() => handleStatusUpdate(appointment.id, 'pending')}
+              >
                 <RefreshCw size={16} />
               </button>
             )}

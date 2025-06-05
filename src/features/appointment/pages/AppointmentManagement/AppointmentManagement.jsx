@@ -1,68 +1,81 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styles from "./AppointmentManagement.module.css";
-import AppointmentFilterTabs from "../../components/AppointmentFilterTabs/AppointmentFilterTabs";
-import AppointmentList from "../../components/AppointmentList/AppointmentList";
+import AppointmentFilterTabs from "@features/appointment/components/AppointmentFilterTabs/AppointmentFilterTabs";
+import AppointmentList from "@features/appointment/components/AppointmentList/AppointmentList";
+import { fetchAppointments } from "@api/appointmentApi";
 
 const AppointmentManagement = () => {
-  const [activeTab, setActiveTab] = useState('upcoming');
+  const [activeTab, setActiveTab] = useState("pending");
+  const [appointments, setAppointments] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Sample data - trong thực tế sẽ fetch từ API
-  const allAppointments = [
-    {
-      id: "A001",
-      patientName: "Nguyễn Văn A",
-      phone: "0123456789",
-      date: "2024-12-15",
-      time: "14:30",
-      status: "upcoming"
-    },
-    {
-      id: "A002",
-      patientName: "Trần Thị B",
-      phone: "0987654321",
-      date: "2024-12-15",
-      time: "15:00",
-      status: "upcoming"
-    },
-    {
-      id: "A003",
-      patientName: "Lê Văn C",
-      phone: "0912345678",
-      date: "2024-12-14",
-      time: "10:00",
-      status: "completed"
-    },
-    {
-      id: "A004",
-      patientName: "Phạm Thị D",
-      phone: "0908765432",
-      date: "2024-12-13",
-      time: "16:30",
-      status: "completed"
-    },
-    {
-      id: "A005",
-      patientName: "Hoàng Văn E",
-      phone: "0934567890",
-      date: "2024-12-12",
-      time: "09:00",
-      status: "cancelled"
-    }
-  ];
+  // Valid statuses
+  const validStatuses = ["pending", "confirmed", "completed", "cancelled"];
+
+  // Fetch appointments on mount
+  useEffect(() => {
+    const loadAppointments = async () => {
+      setIsLoading(true);
+      try {
+        const data = await fetchAppointments();
+        // Map API data to UI format
+        const mappedAppointments = data
+          .filter((appt) => validStatuses.includes(appt.appointment_status)) // Only include valid statuses
+          .map((appt) => {
+            // Handle invalid appointment_date_time
+            let date, time;
+            const timestamp = parseInt(appt.appointment_date_time);
+            if (!isNaN(timestamp)) {
+              // Valid Unix timestamp
+              date = new Date(timestamp * 1000).toISOString().split("T")[0];
+              time = new Date(timestamp * 1000).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+            } else {
+              // Fallback for invalid date (e.g., "appointment_date_time 1")
+              date = "N/A";
+              time = "N/A";
+            }
+
+            return {
+              id: appt.id,
+              appointmentId: appt.appointment_id,
+              patientName: appt.patient_name,
+              phone: "N/A", // Not in API, placeholder
+              date,
+              time,
+              status: appt.appointment_status,
+              doctorName: appt.doctor_name,
+              notes: appt.notes,
+            };
+          });
+        setAppointments(mappedAppointments);
+      } catch (err) {
+        console.error("Error loading appointments:", err); // Improved logging
+        setError("Không thể tải lịch hẹn. Vui lòng thử lại.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadAppointments();
+  }, []);
 
   // Filtered appointments based on active tab
   const filteredAppointments = useMemo(() => {
-    return allAppointments.filter(appointment => appointment.status === activeTab);
-  }, [activeTab, allAppointments]);
+    return appointments.filter((appointment) => appointment.status === activeTab);
+  }, [activeTab, appointments]);
 
   // Count appointments by status
   const appointmentCounts = useMemo(() => {
     return {
-      upcoming: allAppointments.filter(app => app.status === 'upcoming').length,
-      completed: allAppointments.filter(app => app.status === 'completed').length,
-      cancelled: allAppointments.filter(app => app.status === 'cancelled').length
+      pending: appointments.filter((app) => app.status === "pending").length,
+      confirmed: appointments.filter((app) => app.status === "confirmed").length,
+      completed: appointments.filter((app) => app.status === "completed").length,
+      cancelled: appointments.filter((app) => app.status === "cancelled").length,
     };
-  }, [allAppointments]);
+  }, [appointments]);
 
   const handleTabChange = (tabKey) => {
     setActiveTab(tabKey);
@@ -74,17 +87,17 @@ const AppointmentManagement = () => {
         <h2>Quản lý bệnh nhân đặt lịch</h2>
         <p>Xem và quản lý tất cả lịch hẹn theo trạng thái</p>
       </div>
-      
-      <AppointmentFilterTabs 
+
+      {isLoading && <p>Đang tải...</p>}
+      {error && <p className={styles.error}>{error}</p>}
+
+      <AppointmentFilterTabs
         activeTab={activeTab}
         onTabChange={handleTabChange}
         appointmentCounts={appointmentCounts}
       />
-      
-      <AppointmentList 
-        appointments={filteredAppointments}
-        activeTab={activeTab}
-      />
+
+      <AppointmentList appointments={filteredAppointments} activeTab={activeTab} />
     </div>
   );
 };

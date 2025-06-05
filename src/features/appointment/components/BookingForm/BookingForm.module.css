@@ -1,32 +1,30 @@
+/* BookingForm.module.css */
 .bookingForm {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  max-width: 800px;
+  gap: var(--spacing-lg);
+  max-width: 600px; /* Reduced max-width for better fit within modal */
   width: 100%;
   margin: 0 auto;
+  padding: var(--spacing-md);
 }
 
+/* Form content as a single column, stretched layout */
 .formContent {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
 }
 
-.leftColumn,
-.rightColumn {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
+/* Form group for each input/select/textarea */
 .formGroup {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 }
 
+/* Label styling */
 .label {
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -34,24 +32,29 @@
   margin-bottom: var(--spacing-xs);
 }
 
+/* Required asterisk */
 .required {
   color: var(--warning-red);
   margin-left: var(--spacing-xs);
 }
 
+/* Input, Select, and Textarea styling */
 .select,
 .input,
 .textarea {
   padding: var(--spacing-sm);
   border: 1px solid var(--card-border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: var(--font-size-sm);
   font-family: var(--font-family);
   background: var(--card-background);
   color: var(--text-primary);
   transition: all 0.3s ease;
+  width: 100%; /* Full width for consistency */
+  box-sizing: border-box;
 }
 
+/* Focus and hover states */
 .select:focus,
 .input:focus,
 .textarea:focus {
@@ -66,121 +69,23 @@
   border-color: var(--accent-color);
 }
 
+/* Specific styling for select elements */
+.select {
+  appearance: none; /* Remove default arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px; /* Space for the custom arrow */
+}
+
+/* Textarea specific styling */
 .textarea {
-  min-height: 80px;
+  min-height: 100px;
   resize: vertical;
   font-family: var(--font-family);
 }
 
-.doctorCard {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
-  background: var(--card-background);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.doctorCard:hover {
-  border-color: var(--card-hover-border);
-  box-shadow: 0 1px 4px var(--shadow-accent);
-}
-
-.doctorCard.selected {
-  border-color: var(--text-accent);
-  background: var(--hover-accent);
-}
-
-.doctorAvatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--gradient-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: var(--font-size-sm);
-}
-
-.doctorInfo {
-  flex: 1;
-}
-
-.doctorName {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 var(--spacing-xs);
-}
-
-.doctorSpecialty {
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.doctorList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  max-height: 160px;
-  overflow-y: auto;
-  padding: var(--spacing-xs);
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
-  background: var(--light-background);
-}
-
-.timeSlots {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm);
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
-  background: var(--light-background);
-}
-
-.timeSlot {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border: 1px solid var(--card-border);
-  border-radius: 4px;
-  background: var(--card-background);
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: var(--font-size-xs);
-  color: var(--text-primary);
-}
-
-.timeSlot:hover {
-  border-color: var(--accent-color);
-  background: var(--hover-accent);
-}
-
-.timeSlot.selected {
-  border-color: var(--text-accent);
-  background: var(--text-accent);
-  color: white;
-}
-
-.timeSlot.unavailable {
-  background: #f5f5f5;
-  color: #999;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.timeSlot.unavailable:hover {
-  border-color: var(--card-border);
-  background: #f5f5f5;
-}
-
+/* Button group for form actions */
 .buttonGroup {
   display: flex;
   gap: var(--spacing-sm);
@@ -189,6 +94,7 @@
   border-top: 1px solid var(--card-border);
 }
 
+/* Cancel button */
 .cancelButton {
   background: transparent;
   color: var(--text-secondary);
@@ -205,6 +111,7 @@
   color: var(--text-primary);
 }
 
+/* Submit button */
 .submitButton {
   background: var(--button-primary-bg);
   color: var(--button-primary-text);
@@ -228,12 +135,14 @@
   opacity: 0.6;
 }
 
+/* Error message */
 .errorMessage {
   color: var(--warning-red);
   font-size: var(--font-size-xs);
   margin-top: var(--spacing-xs);
 }
 
+/* Success message */
 .successMessage {
   color: var(--success-green);
   font-size: var(--font-size-sm);
@@ -244,26 +153,21 @@
   margin-bottom: var(--spacing-md);
 }
 
-/* Responsive */
+/* Responsive adjustments */
 @media (max-width: 768px) {
+  .bookingForm {
+    padding: var(--spacing-sm);
+  }
+
   .formContent {
-    grid-template-columns: 1fr;
     gap: var(--spacing-md);
   }
-  
-  .doctorList {
-    max-height: 120px;
-  }
-  
-  .timeSlots {
-    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-  }
-  
+
   .buttonGroup {
     flex-direction: column-reverse;
     gap: var(--spacing-sm);
   }
-  
+
   .cancelButton,
   .submitButton {
     width: 100%;
