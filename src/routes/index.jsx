@@ -12,9 +12,18 @@ import DoctorLoginPage from '@features/auth/pages/DoctorLoginPage/DoctorLoginPag
 import AdminLoginPage from '@features/auth/pages/AdminLoginPage/AdminLoginPage';
 import ReceptionistDashboard from '@features/dashboard/ReceptionistDashboard/ReceptionistDashboard';
 import ProtectedRoute from './ProtectedRoute.jsx';
+import React, { useState } from 'react';
+import DoctorDashboard from '@features/doctor/pages/DoctorDashboard'
 
 
-const AppRoutes = () => (
+
+const AppRoutes = () => { 
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [selectedPatientId, setSelectedPatientId] = useState(null);
+
+  const handlePatientSelect = (id) => setSelectedPatientId(id);
+
+  return (
   <Routes>
     <Route element={<GuestLayout />}>
       <Route path="/" element={<GuestHomePage />} />
@@ -28,6 +37,7 @@ const AppRoutes = () => (
         }
       />
     </Route>
+   
     <Route path="/login" element={<PatientLoginPage />} />
     <Route path="/register" element={<PatientRegisterPage />} />
     <Route path="/verify-otp" element={<VerifyOtpPage />} />
@@ -36,9 +46,20 @@ const AppRoutes = () => (
     <Route path="/admin-login" element={<AdminLoginPage />} />
     <Route path="recep-dashboard" element={<ReceptionistDashboard/>} />
 
-
+       <Route
+        path="/doctor-dashboard"
+        element={
+          
+            <DoctorDashboard
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              onPatientSelect={handlePatientSelect}
+            />
+          
+        }
+      />
 
   </Routes>
 );
-
+};
 export default AppRoutes;
