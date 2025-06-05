@@ -35,7 +35,7 @@
 
 /* Blue theme for upcoming */
 .tab.blue.active {
-  background: rgba(33, 150, 243, 0.1);
+  background:   rgba(33, 150, 243, 0.1);
   border-color: var(--info-blue);
   color: var(--info-blue);
 }
@@ -74,7 +74,7 @@
   font-weight: 700;
   font-size: var(--font-size-sm);
   padding: 2px 6px;
-  background: currentColor;
+  background: var(--text-secondary);
   color: var(--card-background);
   border-radius: 10px;
   min-width: 20px;

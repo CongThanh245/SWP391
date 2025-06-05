@@ -1,7 +1,5 @@
-// src/features/doctor/hooks/useDoctors.js
-import { fetchDoctors } from '@api/doctorApi';
+import { getDoctors } from '@api/doctorApi';
 import { useState, useEffect } from 'react';
-
 
 export const useDoctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -11,11 +9,17 @@ export const useDoctors = () => {
   useEffect(() => {
     const loadDoctors = async () => {
       try {
-        const data = await fetchDoctors();
+        const data = await getDoctors();
         const mappedData = data.map((doctor) => ({
+          id: doctor.doctor_id,
           name: doctor.doctor_name,
-          title: doctor.degree,
-          specialty: doctor.specialization,
+          phone: doctor.phone,
+          licenseNumber: doctor.license_number,
+          degree: doctor.degree,
+          specialization: doctor.specialization,
+          about: doctor.about,
+          address: doctor.doctor_address,
+          gender: doctor.gender,
           image: doctor.image || '/assets/images/bacsi.png',
           yearsOfExperience: doctor.year_of_experience,
         }));

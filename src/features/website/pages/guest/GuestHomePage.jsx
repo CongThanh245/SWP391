@@ -1,7 +1,7 @@
 
 import HeroSection from '@features/website/components/shared/HeroSection/HeroSection.jsx';
 import JourneySection from '@features/website/components/guest/JourneySection/JourneySection';
-import DoctorsCarousel from '@features/website/components/guest/DocorList/DoctorCarousel';
+import DoctorsCarousel from '@features/website/components/guest/DocorCarousel/DoctorCarousel';
 import BlogSection from '@features/website/components/shared/BlogSection/BlogSection';
 import FAQ from '@features/website/components/shared/FAQ/FAQ';
 import TestimonialSection from '@features/website/components/guest/TestimonialSection/TestimonialSection';

@@ -3,24 +3,30 @@ import styles from "./AppointmentFilterTabs.module.css";
 
 const AppointmentFilterTabs = ({ activeTab, onTabChange, appointmentCounts }) => {
   const tabs = [
-    { 
-      key: 'upcoming', 
-      label: 'Sắp tới', 
-      count: appointmentCounts.upcoming,
-      color: 'blue'
+    {
+      key: 'pending',
+      label: 'Chờ xác nhận',
+      count: appointmentCounts.pending,
+      color: 'blue',
     },
-    { 
-      key: 'completed', 
-      label: 'Hoàn thành', 
+    {
+      key: 'confirmed',
+      label: 'Đã xác nhận',
+      count: appointmentCounts.confirmed,
+      color: 'green',
+    },
+    {
+      key: 'completed',
+      label: 'Đã hoàn thành',
       count: appointmentCounts.completed,
-      color: 'green'
+      color: 'purple',
     },
-    { 
-      key: 'cancelled', 
-      label: 'Đã hủy', 
+    {
+      key: 'cancelled',
+      label: 'Đã hủy',
       count: appointmentCounts.cancelled,
-      color: 'red'
-    }
+      color: 'red',
+    },
   ];
 
   return (

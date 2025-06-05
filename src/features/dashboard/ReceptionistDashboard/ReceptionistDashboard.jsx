@@ -1,5 +1,6 @@
 // src/features/receptionist/pages/ReceptionistDashboard.jsx
-import React, { useState } from "react";
+import React from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import {
   Calendar,
   Users,
@@ -13,55 +14,54 @@ import {
 import StaffLayout from "@components/layout/StaffLayout/StaffLayout";
 import StaffSidebar from "@components/common/Sidebar/StaffSidebar/StaffSidebar.jsx";
 import Button from "@components/common/Button/Button";
-
-// Import các page components
-
-
 import styles from "./ReceptionistDashboard.module.css";
-import AppointmentManagement from "@features/appointment/pages/AppointmentManagement/AppointmentManagement";
-import PreTestResult from "@features/test-result/pages/PreTestResult";
-import PatientList from "@features/patient/pages/PatientList/PatientList";
-import DoctorList from "@features/doctor/pages/DoctorList/DoctorList";
 
 const ReceptionistDashboard = () => {
-  const [activeItem, setActiveItem] = useState("dashboard"); // Default là dashboard
+  const navigate = useNavigate();
 
-  // Menu items cho receptionist - cấu trúc đơn giản phù hợp với StaffSidebar
+  // Menu items cho receptionist
   const menuItems = [
     {
       key: "dashboard",
       label: "Trang chủ",
       icon: User,
+      path: "/receptionist-dashboard",
     },
     {
       key: "appointment",
       label: "Xem lịch hẹn",
       icon: ClipboardList,
+      path: "/receptionist-dashboard/appointment",
     },
     {
       key: "test-results",
       label: "Nhập kết quả xét nghiệm",
       icon: ClipboardList,
+      path: "/receptionist-dashboard/test-results",
     },
-    { 
-      key: "search-patients", 
-      label: "Danh sách bệnh nhân", 
-      icon: Search 
+    {
+      key: "search-patients",
+      label: "Danh sách bệnh nhân",
+      icon: Search,
+      path: "/receptionist-dashboard/patients",
     },
-    { 
-      key: "search-doctors", 
-      label: "Danh sách bác sĩ", 
-      icon: Search 
+    {
+      key: "search-doctors",
+      label: "Danh sách bác sĩ",
+      icon: Search,
+      path: "/receptionist-dashboard/doctors",
     },
-    { 
-      key: "create-blog", 
-      label: "Tạo blog", 
-      icon: Plus 
+    {
+      key: "create-blog",
+      label: "Tạo blog",
+      icon: Plus,
+      path: "/receptionist-dashboard/create-blog",
     },
-    { 
-      key: "blog-list", 
-      label: "Danh sách blog", 
-      icon: FileText 
+    {
+      key: "blog-list",
+      label: "Danh sách blog",
+      icon: FileText,
+      path: "/receptionist-dashboard/blog-list",
     },
   ];
 
@@ -71,78 +71,12 @@ const ReceptionistDashboard = () => {
     role: "receptionist",
   };
 
-  // Dữ liệu cho dashboard home
-  const statsData = [
-    { label: "Lịch hẹn hôm nay", value: "24", color: "blue", icon: Calendar },
-    { label: "Bệnh nhân mới", value: "8", color: "green", icon: Users },
-    { label: "Chờ xác nhận", value: "12", color: "orange", icon: UserCheck },
-    {
-      label: "Kết quả chờ nhập",
-      value: "5",
-      color: "purple",
-      icon: ClipboardList,
-    },
-  ];
-
-  const quickActions = [
-    {
-      title: "Tạo lịch hẹn mới",
-      description: "Tạo lịch hẹn cho bệnh nhân",
-      icon: Plus,
-      color: "blue",
-      action: () => setActiveItem("appointment"),
-    },
-    {
-      title: "Xác nhận lịch hẹn",
-      description: "Xác nhận các lịch hẹn đang chờ",
-      icon: UserCheck,
-      color: "green",
-      action: () => setActiveItem("appointment"),
-    },
-    {
-      title: "Tìm kiếm bệnh nhân",
-      description: "Tìm kiếm thông tin bệnh nhân",
-      icon: Search,
-      color: "purple",
-      action: () => setActiveItem("search-patients"),
-    },
-    {
-      title: "Nhập kết quả xét nghiệm",
-      description: "Nhập kết quả xét nghiệm mới",
-      icon: FileText,
-      color: "orange",
-      action: () => setActiveItem("test-results"),
-    },
-  ];
-
-  const handleMenuClick = (key) => {
-    setActiveItem(key);
+  // Xử lý khi click vào menu
+  const handleMenuClick = (key, path) => {
+    navigate(path);
   };
 
-  // Function để render content dựa trên activeItem
-  const renderContent = () => {
-    switch (activeItem) {
-      case "appointment":
-        return <AppointmentManagement />;
-      case "test-results":
-        return <PreTestResult />;
-      case "search-patients":
-        return <PatientList />;
-      case "search-doctors":
-        return <DoctorList />;
-      case "create-blog":
-        // Tạm thời return placeholder, bạn cần tạo component này
-        return <div>Create Blog Page - Coming Soon</div>;
-      case "blog-list":
-        // Tạm thời return placeholder, bạn cần tạo component này
-        return <div>Blog List Page - Coming Soon</div>;
-      case "dashboard":
-      default:
-        return renderDashboardHome();
-    }
-  };
-
-  // Dashboard home content
+  // Nội dung trang chủ của dashboard
   const renderDashboardHome = () => (
     <div className={styles.dashboard}>
       {/* Header với thông tin user */}
@@ -163,7 +97,12 @@ const ReceptionistDashboard = () => {
       {/* Thống kê tổng quan */}
       <div className={styles.statsSection}>
         <div className={styles.statsGrid}>
-          {statsData.map((stat, index) => (
+          {[
+            { label: "Lịch hẹn hôm nay", value: "24", color: "blue", icon: Calendar },
+            { label: "Bệnh nhân mới", value: "8", color: "green", icon: Users },
+            { label: "Chờ xác nhận", value: "12", color: "orange", icon: UserCheck },
+            { label: "Kết quả chờ nhập", value: "5", color: "purple", icon: ClipboardList },
+          ].map((stat, index) => (
             <div
               key={index}
               className={`${styles.statCard} ${styles[stat.color]}`}
@@ -184,7 +123,36 @@ const ReceptionistDashboard = () => {
       <div className={styles.quickActionsSection}>
         <h3 className={styles.sectionTitle}>Thao tác nhanh</h3>
         <div className={styles.actionsGrid}>
-          {quickActions.map((action, index) => (
+          {[
+            {
+              title: "Tạo lịch hẹn mới",
+              description: "Tạo lịch hẹn cho bệnh nhân",
+              icon: Plus,
+              color: "blue",
+              path: "/receptionist-dashboard/appointment",
+            },
+            {
+              title: "Xác nhận lịch hẹn",
+              description: "Xác nhận các lịch hẹn đang chờ",
+              icon: UserCheck,
+              color: "green",
+              path: "/receptionist-dashboard/appointment",
+            },
+            {
+              title: "Tìm kiếm bệnh nhân",
+              description: "Tìm kiếm thông tin bệnh nhân",
+              icon: Search,
+              color: "purple",
+              path: "/receptionist-dashboard/patients",
+            },
+            {
+              title: "Nhập kết quả xét nghiệm",
+              description: "Nhập kết quả xét nghiệm mới",
+              icon: FileText,
+              color: "orange",
+              path: "/receptionist-dashboard/test-results",
+            },
+          ].map((action, index) => (
             <div
               key={index}
               className={`${styles.actionCard} ${styles[action.color]}`}
@@ -194,12 +162,13 @@ const ReceptionistDashboard = () => {
               </div>
               <div className={styles.actionContent}>
                 <h4 className={styles.actionTitle}>{action.title}</h4>
-                <p className={styles.actionDescription}>
-                  {action.description}
-                </p>
+                <p className={styles.actionDescription}>{action.description}</p>
               </div>
               <div className={styles.actionButton}>
-                <Button variant="primary" onClick={action.action}>
+                <Button
+                  variant="primary"
+                  onClick={() => navigate(action.path)}
+                >
                   Thực hiện
                 </Button>
               </div>
@@ -212,42 +181,36 @@ const ReceptionistDashboard = () => {
       <div className={styles.recentActivitySection}>
         <h3 className={styles.sectionTitle}>Hoạt động gần đây</h3>
         <div className={styles.activityList}>
-          <div className={styles.activityItem}>
-            <div className={styles.activityIcon}>
-              <Calendar size={20} />
+          {[
+            {
+              icon: Calendar,
+              text: "<strong>Nguyễn Văn A</strong> đã đặt lịch hẹn lúc 14:30",
+              time: "10 phút trước",
+            },
+            {
+              icon: UserCheck,
+              text: "<strong>Trần Thị B</strong> đã xác nhận lịch hẹn",
+              time: "25 phút trước",
+            },
+            {
+              icon: ClipboardList,
+              text: "Kết quả xét nghiệm cho <strong>Lê Văn C</strong> đã được cập nhật",
+              time: "1 giờ trước",
+            },
+          ].map((activity, index) => (
+            <div key={index} className={styles.activityItem}>
+              <div className={styles.activityIcon}>
+                <activity.icon size={20} />
+              </div>
+              <div className={styles.activityContent}>
+                <p
+                  className={styles.activityText}
+                  dangerouslySetInnerHTML={{ __html: activity.text }}
+                />
+                <span className={styles.activityTime}>{activity.time}</span>
+              </div>
             </div>
-            <div className={styles.activityContent}>
-              <p className={styles.activityText}>
-                <strong>Nguyễn Văn A</strong> đã đặt lịch hẹn lúc 14:30
-              </p>
-              <span className={styles.activityTime}>10 phút trước</span>
-            </div>
-          </div>
-
-          <div className={styles.activityItem}>
-            <div className={styles.activityIcon}>
-              <UserCheck size={20} />
-            </div>
-            <div className={styles.activityContent}>
-              <p className={styles.activityText}>
-                <strong>Trần Thị B</strong> đã xác nhận lịch hẹn
-              </p>
-              <span className={styles.activityTime}>25 phút trước</span>
-            </div>
-          </div>
-
-          <div className={styles.activityItem}>
-            <div className={styles.activityIcon}>
-              <ClipboardList size={20} />
-            </div>
-            <div className={styles.activityContent}>
-              <p className={styles.activityText}>
-                Kết quả xét nghiệm cho <strong>Lê Văn C</strong> đã được cập
-                nhật
-              </p>
-              <span className={styles.activityTime}>1 giờ trước</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
@@ -258,14 +221,23 @@ const ReceptionistDashboard = () => {
       sidebar={
         <StaffSidebar
           menuItems={menuItems}
-          activeItem={activeItem}
-          onItemClick={handleMenuClick}
+          activeItem={
+            menuItems.find((item) => item.path === window.location.pathname)?.key ||
+            "dashboard"
+          }
+          onItemClick={(key) =>
+            handleMenuClick(key, menuItems.find((item) => item.key === key).path)
+          }
           userRole="receptionist"
           userInfo={userInfo}
         />
       }
     >
-      {renderContent()}
+      {window.location.pathname === "/receptionist-dashboard" ? (
+        renderDashboardHome()
+      ) : (
+        <Outlet />
+      )}
     </StaffLayout>
   );
 };
