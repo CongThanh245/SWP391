@@ -241,6 +241,7 @@
   margin-bottom: var(--spacing-lg);
   color: var(--accent-color);
   opacity: 0.5;
+  justify-self: center;
 }
 
 .emptyState h3 {
