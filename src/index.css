@@ -1,0 +1,155 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Font */
+    --font-family: 'Montserrat', sans-serif;
+    --font-size-base: 16px;
+    --font-size-sm: 14px;
+    --font-size-lg: 20px;
+    --font-size-xl: 28px;
+    --font-size-xxl: 36px;
+
+    /* New color palette - #EAE4E1, #D9CAC2, #4D3C2D */
+    --primary-background: #EAE4E1; /* Light warm beige */
+    --secondary-background: #D9CAC2; /* Medium warm beige */
+    --light-background: #ffffff; /* White for cards */
+
+    /* Màu accent và điểm nhấn */
+    --accent-color: #D9CAC2; /* Medium warm beige */
+    --deep-taupe: #4D3C2D; /* Dark brown - main accent */
+    --dark-accent: #3a2a1f; /* Darker brown for hover */
+
+    /* Màu text */
+    --text-primary: #4D3C2D; /* Dark brown for primary text */
+    --text-secondary: #6b5a4a; /* Lighter brown for secondary text */
+    --text-accent: #4D3C2D; /* Dark brown for accent text */
+
+    /* Màu button */
+    --button-primary-bg: #4D3C2D; /* Dark brown */
+    --button-primary-text: #ffffff; /* White text */
+    --button-secondary-bg: transparent;
+    --button-secondary-text: #4D3C2D; /* Dark brown */
+    --button-secondary-border: #D9CAC2; /* Medium warm beige */
+    --button-hover-bg: #3a2a1f; /* Darker brown for hover */
+
+    /* Màu hover và shadow */
+    --hover-accent: rgba(77, 60, 45, 0.1); /* Dark brown with opacity */
+    --shadow-accent: rgba(77, 60, 45, 0.15); /* Dark brown shadow */
+    --shadow-dark-gray: rgba(77, 60, 45, 0.08); /* Light shadow */
+
+    /* Gradient */
+    --gradient-circle: radial-gradient(
+      50% 50% at 50% 50%,
+      #D9CAC2 0%,
+      rgba(217, 202, 194, 0) 100%
+    );
+    --gradient-accent: linear-gradient(
+      135deg,
+      #4D3C2D 0%,
+      #D9CAC2 100%
+    );
+
+    /* Màu trạng thái */
+    --success-green: #4caf50;
+    --warning-red: #f44336;
+    --info-blue: #2196f3;
+    --warning-orange: #ff9800;
+
+    /* Màu border và card */
+    --card-border: rgba(217, 202, 194, 0.3); /* Medium warm beige */
+    --card-hover-border: rgba(77, 60, 45, 0.2); /* Dark brown */
+    --card-background: #ffffff; /* White for cards */
+    --card-gradient: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      var(--secondary-background) 100%
+    );
+    --card-hover-gradient: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      #d0c1b3 100%
+    );
+
+    /* Khoảng cách */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+
+    /* Breakpoints cho responsive */
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+
+    /* Standard shadcn variables with new theme integration */
+    --background: 0 0% 100%;
+    --foreground: 24 25% 25%; /* Dark brown */
+    --card: 0 0% 100%;
+    --card-foreground: 24 25% 25%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 25% 25%;
+    --primary: 24 25% 25%; /* Dark brown */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 24 15% 78%; /* Medium warm beige */
+    --secondary-foreground: 24 25% 25%;
+    --muted: 24 15% 90%;
+    --muted-foreground: 24 15% 45%;
+    --accent: 24 15% 78%; /* Medium warm beige */
+    --accent-foreground: 24 25% 25%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 24 15% 85%;
+    --input: 24 15% 85%;
+    --ring: 24 25% 25%;
+    --radius: 0.5rem;
+    --sidebar-background: 24 25% 25%; /* Dark brown */
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 24 15% 78%; /* Medium warm beige */
+    --sidebar-primary-foreground: 24 25% 25%;
+    --sidebar-accent: 24 15% 85%;
+    --sidebar-accent-foreground: 24 25% 25%;
+    --sidebar-border: 24 20% 35%;
+    --sidebar-ring: 24 15% 78%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-[color:var(--primary-background)] text-[color:var(--text-primary)];
+    font-family: var(--font-family);
+  }
+
+  /* Custom theme classes */
+  .theme-gradient-bg {
+    background: linear-gradient(135deg, #EAE4E1 0%, #D9CAC2 100%);
+  }
+
+  .theme-card {
+    background: linear-gradient(135deg, #ffffff 0%, #EAE4E1 100%);
+    border: 1px solid rgba(217, 202, 194, 0.3);
+  }
+
+  .theme-card:hover {
+    border-color: rgba(77, 60, 45, 0.2);
+    box-shadow: 0 4px 12px rgba(77, 60, 45, 0.1);
+  }
+
+  .theme-accent-bg {
+    background-color: #D9CAC2;
+    color: #4D3C2D;
+  }
+
+  .theme-primary-bg {
+    background-color: #4D3C2D;
+    color: #ffffff;
+  }
+}

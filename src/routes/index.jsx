@@ -17,8 +17,18 @@ import AppointmentManagement from "@features/appointment/pages/AppointmentManage
 import PreTestResult from "@features/test-result/pages/PreTestResult.jsx";
 import PatientList from "@features/patient/pages/PatientList/PatientList.jsx";
 import DoctorList from "@features/doctor/pages/DoctorList/DoctorList.jsx";
+import React, { useState } from 'react';
+import DoctorDashboard from '@features/doctor/pages/DoctorDashboard'
 
-const AppRoutes = () => (
+
+
+const AppRoutes = () => { 
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [selectedPatientId, setSelectedPatientId] = useState(null);
+
+  const handlePatientSelect = (id) => setSelectedPatientId(id);
+
+  return (
   <Routes>
     <Route element={<GuestLayout />}>
       <Route path="/" element={<GuestHomePage />} />
@@ -32,6 +42,7 @@ const AppRoutes = () => (
         }
       />
     </Route>
+   
     <Route path="/login" element={<PatientLoginPage />} />
     <Route path="/register" element={<PatientRegisterPage />} />
     <Route path="/verify-otp" element={<VerifyOtpPage />} />
@@ -46,8 +57,21 @@ const AppRoutes = () => (
       <Route path="doctors" element={<DoctorList />} />
       <Route path="doctor/:id" element={<DoctorDetails />} />
     </Route>
+ <Route
+        path="/doctor-dashboard"
+        element={
+          
+            <DoctorDashboard
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              onPatientSelect={handlePatientSelect}
+            />
+          
+        }
+      />
 
   </Routes>
-);
+  );
+}
 
 export default AppRoutes;
