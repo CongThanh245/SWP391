@@ -1,6 +1,7 @@
 
 import {getEndpointByOperationId} from "../utils/loadApiEndpoint"
 import apiClient from "./axiosConfig"
+import {formatDate} from '@utils/format'
 
 const API_BASE_URL = "http://localhost:8088/api/v1";
 
@@ -23,13 +24,12 @@ export const registerUser = async (data) => {
 
         const { method, path } = await getEndpointByOperationId("register");
        const payload = {
-            firstName,
-            lastName,
+            patientName: `${firstName} ${lastName}`,
             email: data.email,
             password: data.password,
-            dateOfBirth: data.dateOfBirth,
+            dateOfBirth: "2025-06-19",
             phoneNumber: data.phoneNumber,
-            username: data.username,
+            gender: 'MALE'
         };
 
         let response;

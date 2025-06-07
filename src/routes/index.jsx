@@ -17,16 +17,12 @@ import AppointmentManagement from "@features/appointment/pages/AppointmentManage
 import PreTestResult from "@features/test-result/pages/PreTestResult.jsx";
 import PatientList from "@features/patient/pages/PatientList/PatientList.jsx";
 import DoctorList from "@features/doctor/pages/DoctorList/DoctorList.jsx";
-import React, { useState } from 'react';
+import React from 'react';
 import DoctorDashboard from '@features/doctor/pages/DoctorDashboard'
 
 
 
 const AppRoutes = () => { 
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedPatientId, setSelectedPatientId] = useState(null);
-
-  const handlePatientSelect = (id) => setSelectedPatientId(id);
 
   return (
   <Routes>
@@ -61,11 +57,7 @@ const AppRoutes = () => {
         path="/doctor-dashboard"
         element={
           
-            <DoctorDashboard
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              onPatientSelect={handlePatientSelect}
-            />
+            <DoctorDashboard/>
           
         }
       />

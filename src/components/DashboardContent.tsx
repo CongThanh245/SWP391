@@ -14,7 +14,20 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-export const DashboardContent: React.FC = () => {
+export interface DoctorStats {
+  ivfThisMonth: number;
+  iuiThisMonth: number;
+  completedTreatments: number;
+  totalPatients: number;
+  activePatients: number;
+  todayAppointments: number;
+}
+
+interface DashboardContentProps {
+  stats: DoctorStats;
+}
+
+export const DashboardContent: React.FC<DashboardContentProps> = ({stats}) => {
   return (
     <div className="space-y-6 theme-gradient-bg min-h-screen p-6">
       {/* Header */}
@@ -33,7 +46,7 @@ export const DashboardContent: React.FC = () => {
             <Calendar className="h-4 w-4" style={{ color: '#4D3C2D' }} />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" style={{ color: '#4D3C2D' }}>12</div>
+            <div className="text-2xl font-bold" style={{ color: '#4D3C2D' }}>{stats.todayAppointments}</div>
             <p className="text-xs text-gray-500 mt-1">
               <span className="text-green-600">+2</span> so với hôm qua
             </p>
@@ -46,7 +59,7 @@ export const DashboardContent: React.FC = () => {
             <Users className="h-4 w-4" style={{ color: '#D9CAC2' }} />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold" style={{ color: '#4D3C2D' }}>47</div>
+            <div className="text-2xl font-bold" style={{ color: '#4D3C2D' }}>{stats.activePatients}</div>
             <p className="text-xs text-gray-500 mt-1">
               <span className="text-blue-600">8</span> ca mới tuần này
             </p>
@@ -152,20 +165,20 @@ export const DashboardContent: React.FC = () => {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">IVF tháng này:</span>
-                <span className="font-semibold" style={{ color: '#4D3C2D' }}>18 ca</span>
+                <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.ivfThisMonth} ca</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">IUI tháng này:</span>
-                <span className="font-semibold" style={{ color: '#4D3C2D' }}>24 ca</span>
+                <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.iuiThisMonth} ca</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Hoàn tất điều trị:</span>
-                <span className="font-semibold text-green-600">15 ca</span>
+                <span className="font-semibold text-green-600">{stats.completedTreatments} ca</span>
               </div>
               <div className="pt-2 border-t" style={{ borderColor: '#D9CAC2' }}>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Tổng bệnh nhân:</span>
-                  <span className="font-semibold" style={{ color: '#4D3C2D' }}>156</span>
+                  <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.totalPatients}</span>
                 </div>
               </div>
             </CardContent>

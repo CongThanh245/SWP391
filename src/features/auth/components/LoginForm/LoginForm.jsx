@@ -3,7 +3,7 @@ import styles from "./LoginForm.module.css";
 import { useNavigate } from 'react-router-dom';
 
 const LoginForm = ({ 
-  userType = 'user', 
+  userType = 'PATIENT', 
   title = 'Đăng nhập',
   subtitle = 'Chào mừng bạn trở lại',
   apiEndpoint,
@@ -57,11 +57,10 @@ const LoginForm = ({
 
       const result = await response.json();
       console.log("Đăng nhập thành công:", result);
-
+      console.log(result);
       if (result.token) {
         localStorage.setItem('authToken', result.token);
-        localStorage.setItem('user', JSON.stringify(result.user));
-        localStorage.setItem('role', userType);
+        localStorage.setItem('role', result.accountType ?? '');
       }
 
       setSuccessMessage('Đăng nhập thành công!');
