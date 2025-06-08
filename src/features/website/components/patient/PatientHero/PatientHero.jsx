@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "./PatientHero.module.css";
 import BookingForm from "@features/appointment/components/BookingForm/BookingForm";
 
-const PatientHero = ({ userName = "bạn" }) => {
+const PatientHero = () => {
   const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
   const handleBookAppointment = () => {
     setIsBookingFormOpen(true);
@@ -33,7 +33,7 @@ const PatientHero = ({ userName = "bạn" }) => {
           </div>
 
           <h1 className={styles.title}>
-            Chào mừng {userName} đến với
+            Chào mừng bạn đến với
             <br />
             FertiCare
           </h1>
