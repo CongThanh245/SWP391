@@ -1,6 +1,5 @@
-// src/features/receptionist/pages/ReceptionistDashboard.jsx
 import React from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Calendar,
   Users,
@@ -18,6 +17,7 @@ import styles from "./ReceptionistDashboard.module.css";
 
 const ReceptionistDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Menu items cho receptionist
   const menuItems = [
@@ -72,8 +72,9 @@ const ReceptionistDashboard = () => {
   };
 
   // Xử lý khi click vào menu
-  const handleMenuClick = (key, path) => {
-    navigate(path);
+  const handleMenuClick = (key) => {
+    const item = menuItems.find((item) => item.key === key);
+    navigate(item.path);
   };
 
   // Nội dung trang chủ của dashboard
@@ -98,10 +99,25 @@ const ReceptionistDashboard = () => {
       <div className={styles.statsSection}>
         <div className={styles.statsGrid}>
           {[
-            { label: "Lịch hẹn hôm nay", value: "24", color: "blue", icon: Calendar },
+            {
+              label: "Lịch hẹn hôm nay",
+              value: "24",
+              color: "blue",
+              icon: Calendar,
+            },
             { label: "Bệnh nhân mới", value: "8", color: "green", icon: Users },
-            { label: "Chờ xác nhận", value: "12", color: "orange", icon: UserCheck },
-            { label: "Kết quả chờ nhập", value: "5", color: "purple", icon: ClipboardList },
+            {
+              label: "Chờ xác nhận",
+              value: "12",
+              color: "orange",
+              icon: UserCheck,
+            },
+            {
+              label: "Kết quả chờ nhập",
+              value: "5",
+              color: "purple",
+              icon: ClipboardList,
+            },
           ].map((stat, index) => (
             <div
               key={index}
@@ -216,15 +232,22 @@ const ReceptionistDashboard = () => {
     </div>
   );
 
+  const getActiveItem = () => {
+    return menuItems.find((item) => {
+      const isExactMatch = location.pathname === item.path;
+      const isNestedMatch = location.pathname.startsWith(item.path + "/") && item.path !== "/receptionist-dashboard";
+      return isExactMatch || (isNestedMatch && item.path.length > "/receptionist-dashboard".length);
+    })?.key || "dashboard";
+  };
+
+  const activeItem = getActiveItem();
+
   return (
     <StaffLayout
       sidebar={
         <StaffSidebar
           menuItems={menuItems}
-          activeItem={
-            menuItems.find((item) => item.path === window.location.pathname)?.key ||
-            "dashboard"
-          }
+          activeItem={activeItem}
           onItemClick={(key) =>
             handleMenuClick(key, menuItems.find((item) => item.key === key).path)
           }
@@ -233,11 +256,7 @@ const ReceptionistDashboard = () => {
         />
       }
     >
-      {window.location.pathname === "/receptionist-dashboard" ? (
-        renderDashboardHome()
-      ) : (
-        <Outlet />
-      )}
+      <Outlet />
     </StaffLayout>
   );
 };

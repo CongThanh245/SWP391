@@ -51,28 +51,8 @@ const PatientHero = () => {
             Đặt lịch hẹn ngay
           </button>
 
-          {/* Stats Section */}
-          <div className={styles.statsSection}>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>15+</span>
-              <span className={styles.statLabel}>Năm kinh nghiệm</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>5000+</span>
-              <span className={styles.statLabel}>Ca thành công</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>50+</span>
-              <span className={styles.statLabel}>Bác sĩ chuyên khoa</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>98%</span>
-              <span className={styles.statLabel}>Hài lòng</span>
-            </div>
-          </div>
         </div>
 
-        {/* Right Section - Feature Cards */}
         <div className={styles.rightSection}>
           <div className={styles.featureCard} onClick={handleViewSchedule}>
             <div className={styles.cardIcon}>📅</div>

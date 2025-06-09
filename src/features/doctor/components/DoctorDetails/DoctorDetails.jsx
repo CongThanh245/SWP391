@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useDoctors } from '@hooks/useDoctors';
 import styles from './DoctorDetails.module.css';
 
@@ -22,11 +22,7 @@ const DoctorDetails = () => {
   }
 
   return (
-    <div className={styles.doctorDetailsPage}>
-      <div className={styles.pageHeader}>
-        <h2>Chi tiết Bác sĩ</h2>
-        <p>Thông tin chi tiết về bác sĩ</p>
-      </div>
+    <div className={styles.doctorDetailsModal}>
       <div className={styles.doctorCard}>
         <div className={styles.doctorAvatar}>
           <img src={doctor.image} alt={doctor.name} className={styles.doctorImage} />
@@ -44,9 +40,6 @@ const DoctorDetails = () => {
           <p><strong>Giới thiệu:</strong> {doctor.about}</p>
         </div>
       </div>
-      <Link to="/receptionist-dashboard/doctors" className={styles.backButton}>
-        Quay lại
-      </Link>
     </div>
   );
 };

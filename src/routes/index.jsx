@@ -17,61 +17,58 @@ import AppointmentManagement from "@features/appointment/pages/AppointmentManage
 import PreTestResult from "@features/test-result/pages/PreTestResult.jsx";
 import PatientList from "@features/patient/pages/PatientList/PatientList.jsx";
 import DoctorList from "@features/doctor/pages/DoctorList/DoctorList.jsx";
-import React, { useState } from 'react';
-import DoctorDashboard from '@features/doctor/pages/DoctorDashboard'
+import React, { useState } from "react";
+import DoctorDashboard from "@features/doctor/pages/DoctorDashboard";
 
-
-
-const AppRoutes = () => { 
-  const [activeTab, setActiveTab] = useState('dashboard');
+const AppRoutes = () => {
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedPatientId, setSelectedPatientId] = useState(null);
 
   const handlePatientSelect = (id) => setSelectedPatientId(id);
 
   return (
-  <Routes>
-    <Route element={<GuestLayout />}>
-      <Route path="/" element={<GuestHomePage />} />
-      <Route path="/about-us" element={<GuestAboutUs />} />
+    <Routes>
+      <Route element={<GuestLayout />}>
+        <Route path="/" element={<GuestHomePage />} />
+        <Route path="/about-us" element={<GuestAboutUs />} />
+        <Route
+          path="health-records"
+          element={
+            <ProtectedRoute requiredRoles={["PATIENT"]}>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      <Route path="/login" element={<PatientLoginPage />} />
+      <Route path="/register" element={<PatientRegisterPage />} />
+      <Route path="/verify-otp" element={<VerifyOtpPage />} />
+      <Route path="/recep-login" element={<ReceptionistLoginPage />} />
+      <Route path="/doctor-login" element={<DoctorLoginPage />} />
+      <Route path="/admin-login" element={<AdminLoginPage />} />
+      <Route path="/receptionist-dashboard" element={<ReceptionistDashboard />}>
+        <Route index element={null} />{" "}
+        {/* Trang chủ sẽ được xử lý trong ReceptionistDashboard */}
+        <Route path="appointment" element={<AppointmentManagement />} />
+        <Route path="test-results" element={<PreTestResult />} />
+        <Route path="patients" element={<PatientList />} />
+        <Route path="doctors" element={<DoctorList />}>
+          <Route path=":id" element={<DoctorDetails />} />
+        </Route>
+      </Route>
       <Route
-        path="health-records"
-        element={
-          <ProtectedRoute requiredRoles={["PATIENT"]}>
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
-    </Route>
-   
-    <Route path="/login" element={<PatientLoginPage />} />
-    <Route path="/register" element={<PatientRegisterPage />} />
-    <Route path="/verify-otp" element={<VerifyOtpPage />} />
-    <Route path="/recep-login" element={<ReceptionistLoginPage />} />
-    <Route path="/doctor-login" element={<DoctorLoginPage />} />
-    <Route path="/admin-login" element={<AdminLoginPage />} />
-    <Route path="/receptionist-dashboard" element={<ReceptionistDashboard />}>
-      <Route index element={null} /> {/* Trang chủ sẽ được xử lý trong ReceptionistDashboard */}
-      <Route path="appointment" element={<AppointmentManagement />} />
-      <Route path="test-results" element={<PreTestResult />} />
-      <Route path="patients" element={<PatientList />} />
-      <Route path="doctors" element={<DoctorList />} />
-      <Route path="doctor/:id" element={<DoctorDetails />} />
-    </Route>
- <Route
         path="/doctor-dashboard"
         element={
-          
-            <DoctorDashboard
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              onPatientSelect={handlePatientSelect}
-            />
-          
+          <DoctorDashboard
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onPatientSelect={handlePatientSelect}
+          />
         }
       />
-
-  </Routes>
+    </Routes>
   );
-}
+};
 
 export default AppRoutes;

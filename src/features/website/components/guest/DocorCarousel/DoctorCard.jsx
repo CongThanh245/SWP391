@@ -20,7 +20,7 @@ const DoctorCard = ({ doctor }) => {
           Kinh nghiệm: {yearsOfExperience} năm
         </p>
         <button className={styles.button}>Tìm hiểu thêm</button>
-      </div>
+      </div>  
     </div>
   );
 };
