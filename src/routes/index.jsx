@@ -19,6 +19,8 @@ import PatientList from "@features/patient/pages/PatientList/PatientList.jsx";
 import DoctorList from "@features/doctor/pages/DoctorList/DoctorList.jsx";
 import React, { useState } from "react";
 import DoctorDashboard from "@features/doctor/pages/DoctorDashboard";
+import ReceptionistHomePage from "@features/dashboard/components/ReceptionistHomePage.jsx";
+import DoctorsPage from "@features/doctor/components/DoctorPage/DoctorPage.jsx";
 
 const AppRoutes = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -31,6 +33,7 @@ const AppRoutes = () => {
       <Route element={<GuestLayout />}>
         <Route path="/" element={<GuestHomePage />} />
         <Route path="/about-us" element={<GuestAboutUs />} />
+        <Route path="/our-doctors" element={<DoctorsPage />}/>
         <Route
           path="health-records"
           element={
@@ -48,7 +51,7 @@ const AppRoutes = () => {
       <Route path="/doctor-login" element={<DoctorLoginPage />} />
       <Route path="/admin-login" element={<AdminLoginPage />} />
       <Route path="/receptionist-dashboard" element={<ReceptionistDashboard />}>
-        <Route index element={null} />{" "}
+        <Route index element={<ReceptionistHomePage/>} />
         {/* Trang chủ sẽ được xử lý trong ReceptionistDashboard */}
         <Route path="appointment" element={<AppointmentManagement />} />
         <Route path="test-results" element={<PreTestResult />} />
