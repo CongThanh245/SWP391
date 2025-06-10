@@ -1,9 +1,10 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useDoctors } from '@hooks/useDoctors';
+import Card from '@components/common/Card/Card';
 import styles from './DoctorDetails.module.css';
 
-const DoctorDetails = () => {
+const DoctorDetails = ({ onClose }) => {
   const { id } = useParams();
   const { doctors, loading, error } = useDoctors();
 
@@ -21,25 +22,81 @@ const DoctorDetails = () => {
     return <div className={styles.error}>Không tìm thấy bác sĩ</div>;
   }
 
-  return (
-    <div className={styles.doctorDetailsModal}>
-      <div className={styles.doctorCard}>
-        <div className={styles.doctorAvatar}>
-          <img src={doctor.image} alt={doctor.name} className={styles.doctorImage} />
+  // Left content - có thể thêm rating, badges, etc.
+  const leftContent = (
+    <div className={styles.doctorStats}>
+      <div className={styles.experience}>
+        <strong>{doctor.yearsOfExperience}</strong>
+        <span>Năm kinh nghiệm</span>
+      </div>
+    </div>
+  );
+
+  // Right content - thông tin chi tiết
+  const rightContent = (
+    <div className={styles.doctorInfo}>
+      <h3 className={styles.doctorName}>{doctor.name}</h3>
+      
+      <div className={styles.infoGrid}>
+        <div className={styles.infoItem}>
+          <span className={styles.infoLabel}>ID:</span>
+          <span className={styles.infoValue}>{doctor.id}</span>
         </div>
-        <div className={styles.doctorInfo}>
-          <h3>{doctor.name}</h3>
-          <p><strong>ID:</strong> {doctor.id}</p>
-          <p><strong>Chuyên môn:</strong> {doctor.specialization}</p>
-          <p><strong>Số điện thoại:</strong> {doctor.phone}</p>
-          <p><strong>Số năm kinh nghiệm:</strong> {doctor.yearsOfExperience}</p>
-          <p><strong>Bằng cấp:</strong> {doctor.degree}</p>
-          <p><strong>Số giấy phép:</strong> {doctor.licenseNumber}</p>
-          <p><strong>Giới tính:</strong> {doctor.gender}</p>
-          <p><strong>Địa chỉ:</strong> {doctor.address}</p>
-          <p><strong>Giới thiệu:</strong> {doctor.about}</p>
+        
+        <div className={styles.infoItem}>
+          <span className={styles.infoLabel}>Chuyên môn:</span>
+          <span className={styles.infoValue}>{doctor.specialization}</span>
+        </div>
+        
+        <div className={styles.infoItem}>
+          <span className={styles.infoLabel}>Số điện thoại:</span>
+          <span className={styles.infoValue}>{doctor.phone}</span>
+        </div>
+        
+        <div className={styles.infoItem}>
+          <span className={styles.infoLabel}>Bằng cấp:</span>
+          <span className={styles.infoValue}>{doctor.degree}</span>
+        </div>
+        
+        <div className={styles.infoItem}>
+          <span className={styles.infoLabel}>Số giấy phép:</span>
+          <span className={styles.infoValue}>{doctor.licenseNumber}</span>
+        </div>
+        
+        <div className={styles.infoItem}>
+          <span className={styles.infoLabel}>Giới tính:</span>
+          <span className={styles.infoValue}>{doctor.gender}</span>
+        </div>
+        
+        <div className={styles.infoItem}>
+          <span className={styles.infoLabel}>Địa chỉ:</span>
+          <span className={styles.infoValue}>{doctor.address}</span>
         </div>
       </div>
+      
+      {doctor.about && (
+        <div className={styles.aboutSection}>
+          <h4 className={styles.aboutTitle}>Giới thiệu:</h4>
+          <p className={styles.aboutText}>{doctor.about}</p>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className={`${styles.doctorDetailsPage} ${onClose ? styles.modalVersion : ''}`}>
+      <div className={styles.pageHeader}>
+        <h2>Thông tin bác sĩ</h2>
+        <p>Chi tiết thông tin bác sĩ</p>
+      </div>
+      
+      <Card
+        avatar={doctor.image ? { src: doctor.image, alt: doctor.name } : null}
+        avatarPlaceholder={doctor.name?.charAt(0)?.toUpperCase() || 'BS'}
+        leftContent={leftContent}
+        rightContent={rightContent}
+        className={styles.doctorCard}
+      />
     </div>
   );
 };

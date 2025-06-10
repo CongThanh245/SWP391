@@ -18,11 +18,6 @@
   cursor: pointer;
 }
 
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px var(--shadow-accent);
-  border-color: var(--card-hover-border);
-}
 
 .card::before {
   content: '';
