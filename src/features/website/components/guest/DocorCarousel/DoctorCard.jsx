@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './DoctorCard.module.css';
 
 const DoctorCard = ({ doctor }) => {
-  const { name, specialization, image, yearsOfExperience, phone } = doctor;
+  const { name, specialization, image, yearsOfExperience, active } = doctor;
 
   return (
     <div className={styles.card}>
@@ -19,11 +19,8 @@ const DoctorCard = ({ doctor }) => {
         <p className={styles.experience}>
           Kinh nghiệm: {yearsOfExperience} năm
         </p>
-        <p className={styles.phone}>
-          SĐT: {phone}
-        </p>
-        <button className={styles.button}>Tư vấn ngay</button>
-      </div>
+        <button className={styles.button}>Tìm hiểu thêm</button>
+      </div>  
     </div>
   );
 };

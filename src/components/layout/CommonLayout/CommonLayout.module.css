@@ -9,7 +9,7 @@
 
 .content {
   flex: 1;
-  padding: 0 var(--spacing-xl);
+  padding: 30px var(--spacing-xl);
   min-height: calc(100vh - 140px);
   background-color: var(--primary-background);
 }
