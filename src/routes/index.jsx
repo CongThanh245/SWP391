@@ -10,7 +10,7 @@ import ProfilePage from "@features/patient/pages/ProfilePage/ProfilePage";
 import ReceptionistLoginPage from "@features/auth/pages/ReceptionistLoginPage/ReceptionistLoginPage";
 import DoctorLoginPage from "@features/auth/pages/DoctorLoginPage/DoctorLoginPage";
 import AdminLoginPage from "@features/auth/pages/AdminLoginPage/AdminLoginPage";
-import ReceptionistDashboard from "@features/dashboard/ReceptionistDashboard/ReceptionistDashboard";
+import ReceptionistDashboard from "@features/dashboard/components/ReceptionistDashboard/ReceptionistDashboard.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import DoctorDetails from "@features/doctor/components/DoctorDetails/DoctorDetails.jsx";
 import AppointmentManagement from "@features/appointment/pages/AppointmentManagement/AppointmentManagement.jsx";
@@ -19,7 +19,7 @@ import PatientList from "@features/patient/pages/PatientList/PatientList.jsx";
 import DoctorList from "@features/doctor/pages/DoctorList/DoctorList.jsx";
 import React, { useState } from "react";
 import DoctorDashboard from "@features/doctor/pages/DoctorDashboard";
-import ReceptionistHomePage from "@features/dashboard/components/ReceptionistHomePage.jsx";
+import ReceptionistHomePage from "@features/dashboard/pages/ReceptionistHomePage/ReceptionistHomePage.jsx";
 import DoctorsPage from "@features/doctor/components/DoctorPage/DoctorPage.jsx";
 
 const AppRoutes = () => {
@@ -37,9 +37,9 @@ const AppRoutes = () => {
         <Route
           path="health-records"
           element={
-            <ProtectedRoute requiredRoles={["PATIENT"]}>
+            // <ProtectedRoute requiredRoles={["PATIENT"]}>
               <ProfilePage />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
       </Route>

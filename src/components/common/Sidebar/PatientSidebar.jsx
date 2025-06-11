@@ -2,22 +2,11 @@ import React from 'react';
 import styles from './PatientSidebar.module.css';
 import classNames from 'classnames';
 
-const Sidebar = ({ menuItems, activeItem, onItemClick, userRole = 'patient' }) => {
-  const getRoleTitle = (role) => {
-    const titles = {
-      patient: 'Hồ sơ bệnh nhân',
-      doctor: 'Quản lý bác sĩ',
-      admin: 'Quản trị hệ thống'
-    };
-    return titles[role];
-  };
-
+const Sidebar = ({ menuItems, activeItem, onItemClick }) => {
   return (
     <div className={styles.sidebar}>
       <div className={styles.header}>
-        <h3 className={styles.title}>
-          {getRoleTitle(userRole)}
-        </h3>
+        <h3 className={styles.title}>Hồ sơ bệnh nhân</h3>
       </div>
       
       <nav className={styles.nav}>
