@@ -1,62 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Badge } from '@components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui/select';
 import { Calendar, Filter, FileText } from 'lucide-react';
 import { Button } from '@components/ui/button';
-
+import { getDoctorAppointments } from '@api/doctorApi';
+import { formatDate } from '@utils/format';
+import { Label } from '@components/ui/label'
 
 interface AppointmentsContentProps {
     onPatientSelect?: (patientId: string) => void;
+}
+
+interface AppointmentFromApi {
+    appointmentDateTime: string;
+    appointmentStatus: string;
+    patientId: string;
+    patientName: string;
+}
+
+interface Appointment {
+    id: number;
+    patientId: string;
+    patientName: string;
+    date: string;
+    time: string;
+    purpose: string;
+    status: string;
+    notes: string;
 }
 
 export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPatientSelect }) => {
     const [viewType, setViewType] = useState<'day' | 'week' | 'month'>('day');
     const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'completed'>('all');
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const appointments = [
-        {
-            id: 1,
-            patientId: 'BN001',
-            patientName: 'Nguyễn Thị A',
-            date: '2024-01-16',
-            time: '08:30',
-            purpose: 'Khám tái khám',
-            status: 'confirmed',
-            notes: 'Kiểm tra kết quả xét nghiệm'
-        },
-        {
-            id: 2,
-            patientId: 'BN002',
-            patientName: 'Trần Văn B',
-            date: '2024-01-16',
-            time: '10:00',
-            purpose: 'Khám lần đầu',
-            status: 'pending',
-            notes: 'Tư vấn phương pháp điều trị'
-        },
-        {
-            id: 3,
-            patientId: 'BN003',
-            patientName: 'Lê Thị C',
-            date: '2024-01-16',
-            time: '14:30',
-            purpose: 'Chọc hút trứng',
-            status: 'confirmed',
-            notes: 'IVF - chu kỳ thứ 2'
-        },
-        {
-            id: 4,
-            patientId: 'BN004',
-            patientName: 'Phạm Thị D',
-            date: '2024-01-16',
-            time: '16:00',
-            purpose: 'Bơm tinh trùng',
-            status: 'completed',
-            notes: 'IUI - hoàn tất'
-        },
-    ];
+    useEffect(() => {
+        const fetchAppointments = async () => {
+            try {
+                const data = await getDoctorAppointments({
+                    filterBy: viewType,
+                    status: statusFilter,
+                    page: currentPage,
+                    size: 4,
+                });
+                console.log(data);
+                setTotalPages(data.totalPages);
+
+                const converted = data.content.map((item, index) => {
+                    const dt = new Date(item.appointmentDateTime);
+                    const dateStr = dt.toISOString().split('T')[0];
+                    const timeStr = dt.toTimeString().split(':').slice(0, 2).join(':');
+
+                    return {
+                        id: currentPage * 4 + index + 1,
+                        patientId: item.patientId,
+                        patientName: item.patientName,
+                        date: formatDate(dateStr),
+                        time: timeStr,
+                        purpose: 'Chưa có dữ liệu',
+                        status: item.appointmentStatus.toLowerCase(),
+                        notes: '...'
+                    };
+                });
+
+                setAppointments(converted);
+            } catch (error) {
+                console.error('Error loading appointments:', error);
+            }
+        };
+
+        fetchAppointments();
+    }, [viewType, statusFilter, currentPage]);
 
     const filteredAppointments = appointments.filter(appointment => {
         if (statusFilter === 'all') return true;
@@ -71,6 +89,8 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
                 return <Badge variant="secondary">Chưa xác nhận</Badge>;
             case 'completed':
                 return <Badge className="bg-blue-100 text-blue-800">Đã khám xong</Badge>;
+            case 'cancelled':
+                return <Badge className="bg-brown-100 text-brown-800">Đã hủy</Badge>;
             default:
                 return <Badge variant="outline">{status}</Badge>;
         }
@@ -121,6 +141,7 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
                                     <SelectItem value="confirmed">Đã xác nhận</SelectItem>
                                     <SelectItem value="pending">Chưa xác nhận</SelectItem>
                                     <SelectItem value="completed">Đã khám xong</SelectItem>
+                                    <SelectItem value="cancelled">Đã hủy</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -185,6 +206,33 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
                         <div className="text-center py-8">
                             <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                             <p className="text-gray-500">Không có lịch hẹn nào phù hợp với bộ lọc.</p>
+                        </div>
+                    )}
+                    {appointments.length > 0 && totalPages > 1 && (
+                        <div className="flex justify-center mt-6 space-x-4">
+                            <Button
+                                disabled={currentPage === 0}
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+                                variant="outline"
+                                size="sm"
+                                className="border-[#D9CAC2] text-[#4D3C2D] hover:bg-[#D9CAC2]"
+                            >
+                                Trước
+                            </Button>
+
+                            <Label className="text-[#4D3C2D] font-medium px-4 py-2 rounded-md border border-[#D9CAC2]">
+                                Trang {currentPage + 1} / {totalPages}
+                            </Label>
+
+                            <Button
+                                disabled={currentPage + 1 >= totalPages}
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
+                                variant="outline"
+                                size="sm"
+                                className="border-[#D9CAC2] text-[#4D3C2D] hover:bg-[#D9CAC2]"
+                            >
+                                Tiếp
+                            </Button>
                         </div>
                     )}
                 </CardContent>

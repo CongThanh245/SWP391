@@ -6,6 +6,7 @@ import { DashboardContent } from '@components/DashboardContent'
 import { SidebarProvider } from '@components/ui/sidebar';
 import { DoctorSidebar } from '@components/DoctorSidebar'
 import { getDoctorsStats } from '@api/doctorApi';
+import Treatment from './Treatment'
 interface DoctorDashBoardProps {
     activeTab: 'dashboard' | 'appointments' | 'patients';
     onTabChange: (tab: 'dashboard' | 'appointments' | 'patients') => void;
@@ -26,6 +27,8 @@ const DoctorDashboard: React.FC<DoctorDashBoardProps> = ({
 }) => {
     const [stats, setStats] = useState<DoctorStats | null>(null);
     const [activeTab, setActiveTab] = useState<'dashboard' | 'appointments' | 'patients'>('dashboard');
+    const [showPatientRecord, setShowPatientRecord] = useState(false);
+    const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -38,12 +41,32 @@ const DoctorDashboard: React.FC<DoctorDashBoardProps> = ({
         };
         fetchStats();
     }, []);
+
+    const handlePatientSelect = (patientId: string) => {
+        setSelectedPatientId(patientId);
+        setShowPatientRecord(true);
+    };
+
+    const handleBackToDashboard = () => {
+        setShowPatientRecord(false);
+        setSelectedPatientId(null);
+    };
     const renderContent = () => {
+        if (showPatientRecord && selectedPatientId) {
+            return (
+                <Treatment
+                    onBackToDashboard={handleBackToDashboard}
+                // Pass selectedPatientId if needed: patientId={selectedPatientId}
+                />
+            );
+        }
+
+
         switch (activeTab) {
             case 'appointments':
-                return <AppointmentsContent onPatientSelect={onPatientSelect} />;
+                return <AppointmentsContent onPatientSelect={handlePatientSelect} />;
             case 'patients':
-                return <PatientsContent onPatientSelect={onPatientSelect} />;
+                return <PatientsContent onPatientSelect={handlePatientSelect} />;
             default:
                 return stats ? (
                     <DashboardContent stats={stats} />
@@ -56,7 +79,10 @@ const DoctorDashboard: React.FC<DoctorDashBoardProps> = ({
     return (
         <SidebarProvider>
             <div className='min-h-screen flex w-full theme-gradient-bg'>
-                <DoctorSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+                {!showPatientRecord && (
+                    <DoctorSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+                )}
+
                 <main className='flex-1'>
                     {renderContent()}
                 </main>

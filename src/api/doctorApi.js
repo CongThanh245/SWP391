@@ -17,3 +17,26 @@ export const getDoctorsStats = async () =>{
   const response = await apiClient.get('/doctors/me/stats');
   return response.data
 }
+export const getDoctorAppointments = async (params = {}) => {
+  const {
+    filterBy = 'all',
+    status = 'all',
+    page = 0,
+    size = 5,
+  } = params;
+
+  try {
+    const response = await apiClient.get('/doctors/appointment_list', {
+      params: {
+        filterBy,
+        status,
+        page,
+        size,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch doctor appointments:', error);
+    throw error;
+  }
+};

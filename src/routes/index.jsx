@@ -22,6 +22,8 @@ import DoctorDashboard from '@features/doctor/pages/DoctorDashboard'
 
 
 
+
+
 const AppRoutes = () => { 
 
   return (
@@ -32,9 +34,9 @@ const AppRoutes = () => {
       <Route
         path="health-records"
         element={
-          <ProtectedRoute requiredRoles={["PATIENT"]}>
+          
             <ProfilePage />
-          </ProtectedRoute>
+         
         }
       />
     </Route>
@@ -61,7 +63,6 @@ const AppRoutes = () => {
           
         }
       />
-
   </Routes>
   );
 }
