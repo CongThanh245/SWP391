@@ -1,8 +1,10 @@
+// src/components/common/Sidebar/PatientSidebar.jsx
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import styles from './PatientSidebar.module.css';
 import classNames from 'classnames';
 
-const Sidebar = ({ menuItems, activeItem, onItemClick }) => {
+const Sidebar = ({ menuItems, userRole }) => {
   return (
     <div className={styles.sidebar}>
       <div className={styles.header}>
@@ -11,17 +13,16 @@ const Sidebar = ({ menuItems, activeItem, onItemClick }) => {
       
       <nav className={styles.nav}>
         {menuItems.map((item) => (
-          <div
+          <NavLink
             key={item.key}
-            className={classNames(
-              styles.menuItem,
-              { [styles.active]: activeItem === item.key }
-            )}
-            onClick={() => onItemClick(item.key)}
+            to={item.path} // Sử dụng path từ menuItems để điều hướng
+            className={({ isActive }) =>
+              classNames(styles.menuItem, { [styles.active]: isActive })
+            }
           >
             <item.icon size={20} className={styles.icon} />
             <span className={styles.label}>{item.label}</span>
-          </div>
+          </NavLink>
         ))}
       </nav>
     </div>

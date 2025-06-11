@@ -6,7 +6,7 @@ import GuestAboutUs from "@features/website/pages/guest/GuestAboutUs.jsx";
 import PatientLoginPage from "@features/auth/pages/PatientLoginPage/PatientLoginPage.jsx";
 import PatientRegisterPage from "@features/auth/pages/PatientRegisterPage/PatientRegisterPage.jsx";
 import VerifyOtpPage from "@features/auth/pages/VerifyOtpPage/VerifyOtpPage.jsx";
-import ProfilePage from "@features/patient/pages/ProfilePage/ProfilePage";
+import ProfilePage from "@features/profile/pages/ProfilePage/ProfilePage.jsx";
 import ReceptionistLoginPage from "@features/auth/pages/ReceptionistLoginPage/ReceptionistLoginPage";
 import DoctorLoginPage from "@features/auth/pages/DoctorLoginPage/DoctorLoginPage";
 import AdminLoginPage from "@features/auth/pages/AdminLoginPage/AdminLoginPage";
@@ -21,6 +21,8 @@ import React, { useState } from "react";
 import DoctorDashboard from "@features/doctor/pages/DoctorDashboard";
 import ReceptionistHomePage from "@features/dashboard/pages/ReceptionistHomePage/ReceptionistHomePage.jsx";
 import DoctorsPage from "@features/doctor/components/DoctorPage/DoctorPage.jsx";
+import ProfileContent from "@features/profile/components/ProfileContent/ProfileContent.jsx";
+import { AppointmentsContent } from "@components/AppointmentsContent.js";
 
 const AppRoutes = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -33,15 +35,22 @@ const AppRoutes = () => {
       <Route element={<GuestLayout />}>
         <Route path="/" element={<GuestHomePage />} />
         <Route path="/about-us" element={<GuestAboutUs />} />
-        <Route path="/our-doctors" element={<DoctorsPage />}/>
+        <Route path="/our-doctors" element={<DoctorsPage />} />
         <Route
           path="health-records"
           element={
             // <ProtectedRoute requiredRoles={["PATIENT"]}>
-              <ProfilePage />
+            <ProfilePage />
             // </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<ProfileContent />} />
+          <Route path="profile" element={<ProfileContent />} />
+          <Route path="medical-records" element={<AppointmentsContent/>} />
+          <Route path="appointments" element={<AppointmentsContent />} />
+          <Route  path="health-monitoring" element={<AppointmentsContent />}/>
+          <Route path="notifications" element={<AppointmentsContent />} />
+        </Route>
       </Route>
 
       <Route path="/login" element={<PatientLoginPage />} />
@@ -51,7 +60,7 @@ const AppRoutes = () => {
       <Route path="/doctor-login" element={<DoctorLoginPage />} />
       <Route path="/admin-login" element={<AdminLoginPage />} />
       <Route path="/receptionist-dashboard" element={<ReceptionistDashboard />}>
-        <Route index element={<ReceptionistHomePage/>} />
+        <Route index element={<ReceptionistHomePage />} />
         {/* Trang chủ sẽ được xử lý trong ReceptionistDashboard */}
         <Route path="appointment" element={<AppointmentManagement />} />
         <Route path="test-results" element={<PreTestResult />} />
