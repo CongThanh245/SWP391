@@ -1,7 +1,7 @@
 // Card.jsx
 import React from 'react';
 import styles from './Card.module.css';
-
+//  Card này bên trái là avatar bên trái, bên phải là nội dung chính của card
 const Card = ({ 
   avatar, 
   avatarPlaceholder, 
