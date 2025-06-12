@@ -23,6 +23,7 @@ import ReceptionistHomePage from "@features/dashboard/pages/ReceptionistHomePage
 import DoctorsPage from "@features/doctor/components/DoctorPage/DoctorPage.jsx";
 import ProfileContent from "@features/profile/components/ProfileContent/ProfileContent.jsx";
 import { AppointmentsContent } from "@components/AppointmentsContent.js";
+import AppointmentSchedulePage from "@features/appointment/pages/AppointmentSchedulePage/AppointmentSchedulePage.jsx";
 
 const AppRoutes = () => {
   return (
@@ -42,7 +43,7 @@ const AppRoutes = () => {
           <Route index element={<ProfileContent />} />
           <Route path="profile" element={<ProfileContent />} />
           <Route path="medical-records" element={<AppointmentsContent />} />
-          <Route path="appointments" element={<AppointmentsContent />} />
+          <Route path="appointments" element={<AppointmentSchedulePage />} />
           <Route path="health-monitoring" element={<AppointmentsContent />} />
           <Route path="notifications" element={<AppointmentsContent />} />
         </Route>

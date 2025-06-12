@@ -1,0 +1,182 @@
+/* AppointmentSchedulePage.module.css */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--primary-background);
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.subtitle {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.content {
+  background: var(--light-background);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+}
+
+.contentHeader {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--card-border);
+  background: linear-gradient(135deg, var(--light-background) 0%, var(--secondary-background) 100%);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-accent);
+  margin: 0;
+}
+
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--warning-red);
+  color: white;
+  border-radius: var(--border-radius-2);
+  font-weight: 500;
+}
+
+.errorIcon {
+  font-size: var(--font-size-lg);
+}
+
+/* AppointmentFilters.module.css */
+.filtersContainer {
+  background: var(--light-background);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--box-shadow);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.filtersRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text-accent);
+  min-width: fit-content;
+}
+
+.filterIcon {
+  font-size: var(--font-size-lg);
+}
+
+.filterGroup {
+  min-width: 150px;
+}
+
+.select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  background: var(--light-background);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  transition: all 0.2s ease;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--deep-taupe);
+  box-shadow: 0 0 0 2px var(--hover-accent);
+}
+
+.resetButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--button-secondary-bg);
+  border: 1px solid var(--button-secondary-border);
+  color: var(--button-secondary-text);
+  border-radius: var(--border-radius-1);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  transition: all 0.2s ease;
+}
+
+.resetButton:hover {
+  background: var(--hover-accent);
+  color: var(--deep-taupe);
+}
+
+.customDateRow {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--card-border);
+  flex-wrap: wrap;
+}
+
+.dateInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 150px;
+}
+
+.dateLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.dateInput {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  background: var(--light-background);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.dateInput:focus {
+  outline: none;
+  border-color: var(--deep-taupe);
+  box-shadow: 0 0 0 2px var(--hover-accent);
+}
+
+.resultsCount {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--card-border);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.resultsCount strong {
+  color: var(--deep-taupe);
+  font-weight: 600;
+}

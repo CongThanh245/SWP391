@@ -1,7 +1,8 @@
+// AppointmentManagement.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import styles from "./AppointmentManagement.module.css";
 import AppointmentFilterTabs from "@features/appointment/components/AppointmentFilterTabs/AppointmentFilterTabs";
-import AppointmentList from "@features/appointment/components/AppointmentList/AppointmentList";
+import AppointmentListReceptionist from "@features/appointment/components/AppointmentListReceptionist/AppointmentListReceptionist";
 import { fetchAppointments } from "@api/appointmentApi";
 
 const AppointmentManagement = () => {
@@ -10,31 +11,25 @@ const AppointmentManagement = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Valid statuses
   const validStatuses = ["pending", "confirmed", "completed", "cancelled"];
 
-  // Fetch appointments on mount
   useEffect(() => {
     const loadAppointments = async () => {
       setIsLoading(true);
       try {
         const data = await fetchAppointments();
-        // Map API data to UI format
         const mappedAppointments = data
-          .filter((appt) => validStatuses.includes(appt.appointment_status)) // Only include valid statuses
+          .filter((appt) => validStatuses.includes(appt.appointment_status))
           .map((appt) => {
-            // Handle invalid appointment_date_time
             let date, time;
             const timestamp = parseInt(appt.appointment_date_time);
             if (!isNaN(timestamp)) {
-              // Valid Unix timestamp
               date = new Date(timestamp * 1000).toISOString().split("T")[0];
               time = new Date(timestamp * 1000).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               });
             } else {
-              // Fallback for invalid date (e.g., "appointment_date_time 1")
               date = "N/A";
               time = "N/A";
             }
@@ -43,7 +38,7 @@ const AppointmentManagement = () => {
               id: appt.id,
               appointmentId: appt.appointment_id,
               patientName: appt.patient_name,
-              phone: "N/A", // Not in API, placeholder
+              phone: "N/A",
               date,
               time,
               status: appt.appointment_status,
@@ -53,7 +48,7 @@ const AppointmentManagement = () => {
           });
         setAppointments(mappedAppointments);
       } catch (err) {
-        console.error("Error loading appointments:", err); // Improved logging
+        console.error("Error loading appointments:", err);
         setError("Không thể tải lịch hẹn. Vui lòng thử lại.");
       } finally {
         setIsLoading(false);
@@ -62,12 +57,10 @@ const AppointmentManagement = () => {
     loadAppointments();
   }, []);
 
-  // Filtered appointments based on active tab
   const filteredAppointments = useMemo(() => {
     return appointments.filter((appointment) => appointment.status === activeTab);
   }, [activeTab, appointments]);
 
-  // Count appointments by status
   const appointmentCounts = useMemo(() => {
     return {
       pending: appointments.filter((app) => app.status === "pending").length,
@@ -97,7 +90,11 @@ const AppointmentManagement = () => {
         appointmentCounts={appointmentCounts}
       />
 
-      <AppointmentList appointments={filteredAppointments} activeTab={activeTab} />
+      <AppointmentListReceptionist
+        appointments={filteredAppointments}
+        isLoading={isLoading}
+        activeTab={activeTab}
+      />
     </div>
   );
 };
