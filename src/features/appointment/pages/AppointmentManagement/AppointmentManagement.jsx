@@ -1,4 +1,4 @@
-// AppointmentManagement.jsx
+// AppointmentManagement.jsx Trang này cho Receptionist duyệt các lịch hẹn
 import React, { useState, useEffect, useMemo } from "react";
 import styles from "./AppointmentManagement.module.css";
 import AppointmentFilterTabs from "@features/appointment/components/AppointmentFilterTabs/AppointmentFilterTabs";

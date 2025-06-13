@@ -3,18 +3,32 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  max-width: 600px; /* Reduced max-width for better fit within modal */
+  max-width: 800px; /* Increased max-width for 2-column layout */
   width: 100%;
   margin: 0 auto;
   padding: var(--spacing-md);
 }
 
-/* Form content as a single column, stretched layout */
+/* Form content as two columns layout */
 .formContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Left column - Doctor and Date */
+.leftColumn {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+}
+
+/* Right column - Time and Notes */
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
 /* Form group for each input/select/textarea */
@@ -80,7 +94,7 @@
 
 /* Textarea specific styling */
 .textarea {
-  min-height: 100px;
+  min-height: 120px;
   resize: vertical;
   font-family: var(--font-family);
 }
@@ -160,6 +174,12 @@
   }
 
   .formContent {
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: var(--spacing-md);
+  }
+
+  .leftColumn,
+  .rightColumn {
     gap: var(--spacing-md);
   }
 

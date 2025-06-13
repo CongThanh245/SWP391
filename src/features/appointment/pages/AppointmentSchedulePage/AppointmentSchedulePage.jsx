@@ -1,4 +1,4 @@
-// AppointmentSchedulePage.jsx
+// AppointmentSchedulePage.jsx trang này cho Patient xem lịch hẹn
 import React, { useState, useMemo } from "react";
 import { useAppointments } from "@hooks/useAppointments";
 import AppointmentFilters from "@features/appointment/components/AppointmentFilters/AppointmentFilters";

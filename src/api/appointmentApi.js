@@ -24,8 +24,6 @@ export const createAppointment = async (appointmentData) => {
 export const fetchAppointments = async () => {
   try {
     const response = await fetch(API_BASE_URL);
-    console.log('Response status:', response.status); // Thêm dòng này
-    console.log('Response data:', await response.clone().json()); // Thêm dòng này
     if (!response.ok) {
       throw new Error('Failed to fetch appointments');
     }
