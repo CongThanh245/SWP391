@@ -19,6 +19,7 @@ import PatientList from "@features/patient/pages/PatientList/PatientList.jsx";
 import DoctorList from "@features/doctor/pages/DoctorList/DoctorList.jsx";
 import React from 'react';
 import DoctorDashboard from '@features/doctor/pages/DoctorDashboard'
+import AdminDashboard from '@features/AdminDashboard.tsx'
 
 
 
@@ -62,6 +63,13 @@ const AppRoutes = () => {
             <DoctorDashboard/>
           
         }
+      />
+      <Route
+        path="/admin-dashboard"
+        element={
+          <AdminDashboard/>
+        } 
+
       />
   </Routes>
   );
