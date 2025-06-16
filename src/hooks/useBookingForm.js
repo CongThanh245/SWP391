@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { createAppointment } from '../api/appointmentApi';
 
 const doctors = [
-  { id: 1, name: 'BS. Nguyễn Thị Hoa', specialty: 'Chuyên khoa Sản Phụ khoa', avatar: 'NH' },
-  { id: 2, name: 'BS. Trần Văn Minh', specialty: 'Chuyên khoa Hiếm muộn', avatar: 'TM' },
-  { id: 3, name: 'BS. Lê Thị Mai', specialty: 'Chuyên khoa IVF', avatar: 'LM' },
-  { id: 4, name: 'BS. Phạm Đức Anh', specialty: 'Chuyên khoa Nam học', avatar: 'PA' },
+  { id: 1, name: 'BS. Nguyễn Thị Hoa', specialty: 'Chuyên khoa Sản Phụ khoa'},
+  { id: 2, name: 'BS. Trần Văn Minh', specialty: 'Chuyên khoa Hiếm muộn'},
+  { id: 3, name: 'BS. Lê Thị Mai', specialty: 'Chuyên khoa IVF'},
+  { id: 4, name: 'BS. Phạm Đức Anh', specialty: 'Chuyên khoa Nam học' },
 ];
 
 const timeSlots = [

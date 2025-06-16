@@ -110,3 +110,32 @@
   color: var(--deep-taupe);
   font-weight: 600;
 }
+
+/* ... Giữ nguyên các style hiện có, chỉ thêm/cập nhật các phần sau ... */
+
+.filtersRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.activeFilter {
+  font-size: var(--font-size-sm);
+  color: var(--deep-taupe);
+  margin-right: var(--spacing-md);
+}
+
+.resultsCount {
+  margin-left: 0; /* Loại bỏ margin-left để đồng nhất trên mobile */
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .filtersRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+}

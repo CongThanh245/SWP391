@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../GuestHeader/GuestHeader.css"; // Adjust the path as necessary
 import logo from "../../../assets/images/LogoFertiCare.svg";
 import apiClient from "@api/axiosConfig";
+import { User, Settings, LogOut } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Header = () => {
+  const dropdownRef = useRef(null);
   const [user, setUser] = useState(null);
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState({
-    services: false,
-    doctors: false,
-  });
+  // Use hover state instead of click state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -18,16 +19,13 @@ const Header = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     localStorage.removeItem("role");
-    setUser(null); // clear frontend state
+    setUser(null);
     navigate("/login");
   };
 
-  const toggleDropdown = (menu) => {
-    setIsDropdownOpen({
-      ...isDropdownOpen,
-      [menu]: !isDropdownOpen[menu],
-    });
-  };
+  // Handle mouse enter and leave for hover effect
+  const handleMouseEnter = () => setIsDropdownOpen(true);
+  const handleMouseLeave = () => setIsDropdownOpen(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -37,23 +35,18 @@ const Header = () => {
     let authToken = localStorage.getItem("authToken");
     let userRole = localStorage.getItem("role");
 
-    // Nếu có token mới từ URL, cập nhật
     if (urlToken && urlRole) {
       localStorage.setItem("authToken", urlToken);
       localStorage.setItem("role", urlRole);
-
-      // Cập nhật biến local
       authToken = urlToken;
       userRole = urlRole;
 
-      // Clean URL
       const cleanUrl = new URL(window.location.href);
       cleanUrl.searchParams.delete("token");
       cleanUrl.searchParams.delete("role");
       window.history.replaceState({}, document.title, cleanUrl.pathname);
     }
 
-    // Gọi API với token (mới hoặc cũ)
     if (authToken && userRole === "PATIENT") {
       apiClient
         .get("/patients/me")
@@ -66,7 +59,7 @@ const Header = () => {
           localStorage.removeItem("authToken");
           localStorage.removeItem("role");
           localStorage.removeItem("user");
-          setUser(null); // Reset user state
+          setUser(null);
         });
     }
   }, []);
@@ -86,9 +79,9 @@ const Header = () => {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="#4D3C2D"
-                strokeWidth={2} // Sửa từ stroke-width thành strokeWidth
-                strokeLinecap="round" // Sửa từ stroke-linecap thành strokeLinecap
-                strokeLinejoin="round" // Sửa từ stroke-linejoin thành strokeLinejoin
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />
               </svg>
@@ -103,9 +96,9 @@ const Header = () => {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="#4D3C2D"
-                strokeWidth={2} // Sửa từ stroke-width thành strokeWidth
-                strokeLinecap="round" // Sửa từ stroke-linecap thành strokeLinecap
-                strokeLinejoin="round" // Sửa từ stroke-linejoin thành strokeLinejoin
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5" />
                 <path d="M16 2v4" />
@@ -126,9 +119,9 @@ const Header = () => {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="#4D3C2D"
-                strokeWidth={2} // Sửa từ stroke-width thành strokeWidth
-                strokeLinecap="round" // Sửa từ stroke-linecap thành strokeLinecap
-                strokeLinejoin="round" // Sửa từ stroke-linejoin thành strokeLinejoin
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
                 <rect x="2" y="4" width="20" height="16" rx="2" />
@@ -195,19 +188,39 @@ const Header = () => {
 
         <div className="auth-buttons">
           {user ? (
-            <div className="user-info">
-              <img
-                src={user.avatarUrl || "/default-avatar.png"} // fallback if missing
-                alt="Avatar"
-                className="avatar"
-                onClick={() => navigate("/profile")}
-              />
-              <span className="username" onClick={() => navigate("/profile")}>
-                {user.patientName}
-              </span>
-              <button className="logout-button" onClick={handleLogout}>
-                Đăng xuất
-              </button>
+            <div
+              className="user-info"
+              ref={dropdownRef}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className="avatar">
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="avatar" />
+                ) : (
+                  <User size={20} color="#fff" />
+                )}
+              </div>
+              <span className="username">{user.patientName}</span>
+              <span className="caret">▼</span>
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    className="dropdown-menu-user"
+                    initial={{ opacity: 0, scale: 0.8, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <a onClick={() => navigate("/health-records/profile")}>
+                      <Settings size={16} /> Hồ sơ
+                    </a>
+                    <button onClick={handleLogout}>
+                      <LogOut size={16} /> Đăng xuất
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ) : (
             <button className="login-button" onClick={() => navigate("/login")}>

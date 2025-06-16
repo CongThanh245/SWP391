@@ -1,54 +1,45 @@
-const API_BASE_URL = 'https://683a7bc143bb370a8672d354.mockapi.io/appointment';
-
+import apiClient from './axiosConfig';
+// chưa sài được hàm createAppointment
 export const createAppointment = async (appointmentData) => {
   try {
-    const response = await fetch(API_BASE_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(appointmentData),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create appointment');
-    }
-
-    return await response.json();
+    const response = await apiClient.post('/create_appointment', appointmentData);
+    return response.data;
   } catch (error) {
     console.error('API Error:', error);
     throw error;
   }
 };
 
-export const fetchAppointments = async () => {
+export const fetchAppointments = async (patientId) => {
   try {
-    const response = await fetch(API_BASE_URL);
-    if (!response.ok) {
-      throw new Error('Failed to fetch appointments');
-    }
-    return await response.json();
+    const response = await apiClient.get('/appointments', {
+      params: { patientId },
+    });
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error('API Error:', error);
     throw error;
   }
 };
-
+// chưa sài được hàm searchAppointments
+export const searchAppointments = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/appointments/search', {
+      params, // Truyền params như date, status
+    });
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+//chưa sài được hàm updateAppointment
 export const updateAppointmentStatus = async (id, status) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ appointment_status: status }),
+    const response = await apiClient.put(`/appointments/${id}`, {
+      appointmentStatus: status.toUpperCase(), // Backend yêu cầu uppercase
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to update appointment status');
-    }
-
-    return await response.json();
+    return response.data;
   } catch (error) {
     console.error('API Error:', error);
     throw error;
