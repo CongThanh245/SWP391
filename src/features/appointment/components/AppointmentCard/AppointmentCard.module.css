@@ -65,6 +65,12 @@
   background: var(--light-background);
   border-radius: var(--border-radius-1);
   margin-top: var(--spacing-sm);
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .statusText {

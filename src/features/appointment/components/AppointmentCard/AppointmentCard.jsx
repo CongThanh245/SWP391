@@ -1,9 +1,8 @@
 // features/appointment/components/AppointmentCard/AppointmentCard.jsx
 import React from "react";
-import { Clock, Calendar } from "lucide-react"; // Giữ icon cần thiết
+import { Clock, Calendar } from "lucide-react";
 import styles from "./AppointmentCard.module.css";
 
-// Định nghĩa trạng thái bằng object
 const statusConfig = {
   pending: { text: "Chờ xác nhận", class: "statusPending" },
   confirmed: { text: "Đã xác nhận", class: "statusConfirmed" },
