@@ -52,7 +52,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                 <option value="">Chọn bác sĩ</option>
                 {doctors.map((doctor) => (
                   <option key={doctor.id} value={doctor.id}>
-                    {doctor.name} - {doctor.specialty}
+                    {doctor.name}
                   </option>
                 ))}
               </select>

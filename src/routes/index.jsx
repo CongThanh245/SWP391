@@ -24,6 +24,7 @@ import DoctorsPage from "@features/doctor/components/DoctorPage/DoctorPage.jsx";
 import ProfileContent from "@features/profile/components/ProfileContent/ProfileContent.jsx";
 import { AppointmentsContent } from "@components/AppointmentsContent.js";
 import AppointmentSchedulePage from "@features/appointment/pages/AppointmentSchedulePage/AppointmentSchedulePage.jsx";
+import ServicesPage from "@features/website/pages/guest/ServicesPage.jsx";
 
 const AppRoutes = () => {
   return (
@@ -32,6 +33,7 @@ const AppRoutes = () => {
         <Route path="/" element={<GuestHomePage />} />
         <Route path="/about-us" element={<GuestAboutUs />} />
         <Route path="/our-doctors" element={<DoctorsPage />} />
+        <Route path="/services" element={<ServicesPage />} />
         <Route
           path="health-records"
           element={

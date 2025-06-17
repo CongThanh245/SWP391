@@ -45,7 +45,6 @@ const GuestHomePage = () => {
       <JourneySection />
       <DoctorsCarousel />
       <TestimonialSection />
-      <BlogSection />
       <FAQ />
     </div>
   );

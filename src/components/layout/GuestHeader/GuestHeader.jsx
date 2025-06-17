@@ -9,8 +9,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const Header = () => {
   const dropdownRef = useRef(null);
   const [user, setUser] = useState(null);
-
-  // Use hover state instead of click state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -23,7 +21,6 @@ const Header = () => {
     navigate("/login");
   };
 
-  // Handle mouse enter and leave for hover effect
   const handleMouseEnter = () => setIsDropdownOpen(true);
   const handleMouseLeave = () => setIsDropdownOpen(false);
 
@@ -159,24 +156,10 @@ const Header = () => {
                 ĐỘI NGŨ CHUYÊN GIA
               </a>
             </li>
-            <li
-              className="nav-item dropdown"
-              onMouseEnter={() => toggleDropdown("services")}
-              onMouseLeave={() => toggleDropdown("services")}
-            >
+            <li className="nav-item">
               <a href="/services" className="nav-link">
-                DỊCH VỤ <i className="dropdown-icon">▼</i>
+                DỊCH VỤ
               </a>
-              {isDropdownOpen.services && (
-                <ul className="dropdown-menu">
-                  <li>
-                    <a href="/services/iui">Điều trị IUI</a>
-                  </li>
-                  <li>
-                    <a href="/services/ivf">Điều trị IVF</a>
-                  </li>
-                </ul>
-              )}
             </li>
             <li className="nav-item">
               <a href="/health-records" className="nav-link">

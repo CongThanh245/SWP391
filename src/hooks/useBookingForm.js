@@ -1,12 +1,6 @@
-import { useState } from 'react';
-import { createAppointment } from '../api/appointmentApi';
-
-const doctors = [
-  { id: 1, name: 'BS. Nguyễn Thị Hoa', specialty: 'Chuyên khoa Sản Phụ khoa'},
-  { id: 2, name: 'BS. Trần Văn Minh', specialty: 'Chuyên khoa Hiếm muộn'},
-  { id: 3, name: 'BS. Lê Thị Mai', specialty: 'Chuyên khoa IVF'},
-  { id: 4, name: 'BS. Phạm Đức Anh', specialty: 'Chuyên khoa Nam học' },
-];
+import { useState, useEffect } from 'react';
+import { createAppointment } from '@api/appointmentApi';
+import { getDoctorList } from '@api/doctorApi';
 
 const timeSlots = [
   { time: '08:00', available: true },
@@ -34,6 +28,26 @@ const useBookingForm = (onClose) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const doctorData = await getDoctorList();
+        console.log('Doctor data from API:', doctorData);
+        // Ánh xạ dữ liệu từ API thành cấu trúc { id, name }
+        const formattedDoctors = doctorData.map((doctor) => ({
+          id: doctor.id,
+          name: doctor.doctorName,
+        }));
+        setDoctors(formattedDoctors);
+      } catch (error) {
+        console.error('Error fetching doctors:', error.message);
+        setErrorMessage('Không thể tải danh sách bác sĩ. Vui lòng thử lại sau.');
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -60,33 +74,27 @@ const useBookingForm = (onClose) => {
     setErrorMessage('');
 
     try {
-      // Convert date and timeSlot to Unix timestamp
       const [hours, minutes] = formData.timeSlot.split(':');
       const appointmentDate = new Date(formData.date);
       appointmentDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
       const appointmentDateTime = Math.floor(appointmentDate.getTime() / 1000);
 
-      // Find doctor name
-      const doctor = doctors.find((doc) => doc.id === parseInt(formData.doctorId));
+      const doctor = doctors.find((doc) => doc.id === formData.doctorId);
       const doctorName = doctor ? doctor.name : '';
 
-      // Generate appointment_id (e.g., timestamp-based)
       const appointmentId = `APPT-${Date.now()}`;
 
-      // Prepare payload for API
       const payload = {
         appointment_date_time: appointmentDateTime,
         notes: formData.notes,
         doctor_name: doctorName,
         appointment_status: 'pending',
-        patient_name: 'Test Patient', // Hardcoded for now
+        patient_name: 'Test Patient',
         appointment_id: appointmentId,
       };
 
-      // Call API to create appointment
       await createAppointment(payload);
 
-      // Show success message
       setShowSuccess(true);
       setTimeout(() => {
         setFormData({ doctorId: '', date: '', timeSlot: '', notes: '' });
@@ -94,6 +102,7 @@ const useBookingForm = (onClose) => {
         onClose();
       }, 2000);
     } catch (error) {
+      console.error('Error creating appointment:', error.message);
       setErrorMessage('Đặt lịch thất bại. Vui lòng thử lại sau.');
     } finally {
       setIsSubmitting(false);
