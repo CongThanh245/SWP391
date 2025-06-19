@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useToast } from '@hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs';
 import GeneralInfo from '@components/GeneralInfo';
@@ -13,35 +13,100 @@ import PatientInfo from '@components/PatientInfo'
 import InterventionWife from '@components/InterventionWife';
 import InterventionHusband from '@components/InterventionHusband';
 import PostIntervention from '@components/PostIntervention';
-
+import {getWifeProfile} from '@api/doctorApi'
+import {formatValue} from '@utils/format'
+import apiClient from '@api/axiosConfig'
 interface TreatmentProps {
   onBackToDashboard?: () => void;
+  patientId: string;
 }
 
-const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard }) => {
+// API Data Types
+interface GeneralInfoData {
+  height: number | null;
+  weight: number | null;
+  bloodPressure: string;
+  bmi: number | null;
+  pulse: number | null;
+  breathing: number | null;
+  temperature: number | null;
+  vaccines?: string;
+}
+
+interface LabTestItem {
+  name: string;
+  protocolType: "MEDICATION" | "TEST";
+}
+
+interface APIPayload {
+  preparationNotes: string;
+  suggestIUI: boolean;
+  suggestIVF: boolean;
+  suggestOther: boolean;
+  wifeHeight: number;
+  wifeWeight: number;
+  wifeBmi: number;
+  wifeTemperature: number;
+  wifeHeartRate: number;
+  wifeBreathingRate: number;
+  wifeBloodPressure: string;
+  wifeVaccinations: string;
+  husbandHeight: number;
+  husbandWeight: number;
+  husbandBmi: number;
+  husbandTemperature: number;
+  husbandHeartRate: number;
+  husbandBreathingRate: number;
+  husbandBloodPressure: string;
+}
+
+interface ProtocolPayload {
+  wifeProtocols: LabTestItem[];
+  husbandProtocols: LabTestItem[];
+  stageId: string;
+}
+
+const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) => {
   const { toast } = useToast();
   const [activeSubTab, setActiveSubTab] = useState('wife');
   const [activeInterventionTab, setActiveInterventionTab] = useState('wife');
+  
+  // Diagnosis states
   const [wifeDiagnosis, setWifeDiagnosis] = useState('');
   const [husbandDiagnosis, setHusbandDiagnosis] = useState('');
   const [generalDiagnosis, setGeneralDiagnosis] = useState('');
+  
+  // Treatment methods
   const [treatmentMethods, setTreatmentMethods] = useState({
     iui: false,
     ivf: false,
     other: false
   });
-  const patientData = {
-    name: 'Nguyễn Thị Lan Anh',
-    patientId: 'BN001234',
-    gender: 'Nữ',
-    birthYear: '1990',
-    city: 'Hà Nội',
-    email: 'lananh.nguyen@email.com',
-    phone: '0987654321'
-  };
 
-  // Lab tests data for wife
-  const wifeLabTests = [
+  // General info for wife and husband
+  const [wifeGeneralInfo, setWifeGeneralInfo] = useState<GeneralInfoData>({
+    height: null,
+    weight: null,
+    bloodPressure: '',
+    bmi: null,
+    pulse: null,
+    breathing: null,
+    temperature: null,
+    vaccines: ''
+  });
+
+  const [husbandGeneralInfo, setHusbandGeneralInfo] = useState<GeneralInfoData>({
+    height: null,
+    weight: null,
+    bloodPressure: '',
+    bmi: null,
+    pulse: null,
+    breathing: null,
+    temperature: null
+  });
+
+  // Lab tests - now managed in parent
+  const [wifeLabTests, setWifeLabTests] = useState([
     { id: 'cbc', name: 'Xét nghiệm máu toàn bộ (CBC)', checked: false },
     { id: 'amh', name: 'Đánh giá dự trữ buồng trứng (AMH)', checked: false },
     { id: 'thyroid', name: 'Xét nghiệm tuyến giáp (TSH, T3, FT4)', checked: false },
@@ -52,21 +117,139 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard }) => {
     { id: 'estrogen', name: 'Xét nghiệm nội tiết Estrogen', checked: false },
     { id: 'lh', name: 'Xét nghiệm nội tiết LH', checked: false },
     { id: 'fsh', name: 'Xét nghiệm nội tiết FSH', checked: false },
-  ];
+  ]);
 
-  const husbandLabTests = [
+  const [husbandLabTests, setHusbandLabTests] = useState([
     { id: 'semen', name: 'Xét nghiệm tinh dịch đồ', checked: false },
     { id: 'hormone', name: 'Xét nghiệm nội tiết tố', checked: false },
     { id: 'genetic', name: 'Xét nghiệm di truyền', checked: false },
     { id: 'immune', name: 'Xét nghiệm miễn dịch', checked: false },
     { id: 'dna', name: 'Độ phân mảnh DNA tinh trùng (Halosperm Test)', checked: false },
-  ];
+  ]);
 
-  const handleSaveRecord = () => {
-    toast({
-      title: "Đã lưu hồ sơ thành công",
-      description: `Hồ sơ bệnh nhân ${patientData.name} đã được cập nhật.`,
-    });
+  // Appointment data
+  const [selectedAppointmentDate, setSelectedAppointmentDate] = useState<Date | null>(null);
+  const [appointmentNotes, setAppointmentNotes] = useState('');
+
+  const [patientData, setPatientData] = useState({
+    name: 'Nguyễn Thị Lan Anh',
+    patientId: 'BN001234',
+    gender: 'Nữ',
+    birthYear: '1990',
+    city: 'Hà Nội',
+    email: 'lananh.nguyen@email.com',
+    phone: '0987654321'
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getWifeProfile(patientId);
+      setPatientData({
+        name: data.patientName,
+        patientId: data.patientId,
+        gender: data.gender,
+        birthYear: data.dateOfBirth,
+        city: formatValue(data.patientAddress),
+        email: data.email,
+        phone: data.patientPhone,
+      })
+    };
+    if(patientId){
+      fetchData();
+    }
+  }, [patientId])
+
+  // API Functions
+  const saveGeneralInfo = async () => {
+    const payload: APIPayload = {
+      preparationNotes: generalDiagnosis,
+      suggestIUI: treatmentMethods.iui,
+      suggestIVF: treatmentMethods.ivf,
+      suggestOther: treatmentMethods.other,
+      wifeHeight: wifeGeneralInfo.height || 0,
+      wifeWeight: wifeGeneralInfo.weight || 0,
+      wifeBmi: wifeGeneralInfo.bmi || 0,
+      wifeTemperature: wifeGeneralInfo.temperature || 0,
+      wifeHeartRate: wifeGeneralInfo.pulse || 0,
+      wifeBreathingRate: wifeGeneralInfo.breathing || 0,
+      wifeBloodPressure: wifeGeneralInfo.bloodPressure || '',
+      wifeVaccinations: wifeGeneralInfo.vaccines || '',
+      husbandHeight: husbandGeneralInfo.height || 0,
+      husbandWeight: husbandGeneralInfo.weight || 0,
+      husbandBmi: husbandGeneralInfo.bmi || 0,
+      husbandTemperature: husbandGeneralInfo.temperature || 0,
+      husbandHeartRate: husbandGeneralInfo.pulse || 0,
+      husbandBreathingRate: husbandGeneralInfo.breathing || 0,
+      husbandBloodPressure: husbandGeneralInfo.bloodPressure || '',
+    };
+
+    try {
+      const response = await apiClient.patch(`/doctors/save_treatment_profile?patientId=${patientId}`, payload)
+      console.log('General Info Payload:', payload);
+      console.log('API Response:', response.data);
+      toast({
+        title: "Đã lưu thông tin chung",
+        description: "Thông tin chung đã được cập nhật thành công.",
+      });
+    } catch (error) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể lưu thông tin chung.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const saveProtocols = async () => {
+    const wifeProtocols: LabTestItem[] = wifeLabTests
+      .filter(test => test.checked)
+      .map(test => ({
+        name: test.name,
+        protocolType: "TEST" as const
+      }));
+
+    const husbandProtocols: LabTestItem[] = husbandLabTests
+      .filter(test => test.checked)
+      .map(test => ({
+        name: test.name,
+        protocolType: "TEST" as const
+      }));
+
+    const payload: ProtocolPayload = {
+      wifeProtocols,
+      husbandProtocols,
+      stageId: "3fa85f64-5717-4562-b3fc-2c963f66afa6" // Replace with actual stage ID
+    };
+
+    try {
+      // Replace with your actual API call
+      // await apiCall('/protocols', payload);
+      console.log('Protocols Payload:', payload);
+      
+      toast({
+        title: "Đã lưu xét nghiệm",
+        description: "Danh sách xét nghiệm đã được cập nhật.",
+      });
+    } catch (error) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể lưu danh sách xét nghiệm.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveRecord = async () => {
+    await saveGeneralInfo();
+    //await saveProtocols();
+    
+    // Save appointment if selected
+    if (selectedAppointmentDate) {
+      console.log('Appointment:', {
+        date: selectedAppointmentDate,
+        notes: appointmentNotes
+      });
+    }
   };
 
   const handleTreatmentMethodChange = (method: string, checked: boolean) => {
@@ -101,8 +284,17 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard }) => {
         </TabsList>
 
         <TabsContent value="wife" className="space-y-6">
-          <GeneralInfo title="Vợ" includeVaccines={true} />
-          <LabTests title="Vợ" tests={wifeLabTests} />
+          <GeneralInfo 
+            title="Vợ" 
+            includeVaccines={true}
+            initialData={wifeGeneralInfo}
+            onDataChange={setWifeGeneralInfo}
+          />
+          <LabTests 
+            title="Vợ" 
+            tests={wifeLabTests}
+            /*onTestsChange={setWifeLabTests}*/
+          />
 
           {/* Chẩn đoán Vợ */}
           <Card className="p-6 bg-white border border-[color:var(--card-border)]">
@@ -125,8 +317,17 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard }) => {
         </TabsContent>
 
         <TabsContent value="husband" className="space-y-6">
-          <GeneralInfo title="Chồng" includeVaccines={false} />
-          <LabTests title="Chồng" tests={husbandLabTests} />
+          <GeneralInfo 
+            title="Chồng" 
+            includeVaccines={false}
+            initialData={husbandGeneralInfo}
+            onDataChange={setHusbandGeneralInfo}
+          />
+          <LabTests 
+            title="Chồng" 
+            tests={husbandLabTests}
+            /*onTestsChange={setHusbandLabTests}*/
+          />
 
           {/* Chẩn đoán Chồng */}
           <Card className="p-6 bg-white border border-[color:var(--card-border)]">
@@ -211,7 +412,12 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard }) => {
         </TabsContent>
 
         <TabsContent value="appointment">
-          <AppointmentCalendar />
+          <AppointmentCalendar 
+            /*selectedDate={selectedAppointmentDate}
+            onDateChange={setSelectedAppointmentDate}
+            notes={appointmentNotes}
+            onNotesChange={setAppointmentNotes}*/
+          />
         </TabsContent>
       </Tabs>
 
@@ -259,7 +465,12 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard }) => {
         </TabsContent>
 
         <TabsContent value="appointment">
-          <AppointmentCalendar />
+          <AppointmentCalendar 
+            /*selectedDate={selectedAppointmentDate}
+            onDateChange={setSelectedAppointmentDate}
+            notes={appointmentNotes}
+            onNotesChange={setAppointmentNotes}*/
+          />
         </TabsContent>
       </Tabs>
 
@@ -344,4 +555,5 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard }) => {
     </div>
   );
 };
+
 export default Treatment;

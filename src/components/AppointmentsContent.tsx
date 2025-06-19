@@ -101,6 +101,7 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
             onPatientSelect(patientId);
         }
     };
+    console.log(appointments);
     return (
         <div className="space-y-6 theme-gradient-bg min-h-screen p-6">
             {/* Header */}

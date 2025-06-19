@@ -56,7 +56,7 @@ const DoctorDashboard: React.FC<DoctorDashBoardProps> = ({
             return (
                 <Treatment
                     onBackToDashboard={handleBackToDashboard}
-                // Pass selectedPatientId if needed: patientId={selectedPatientId}
+                    patientId={selectedPatientId}
                 />
             );
         }
