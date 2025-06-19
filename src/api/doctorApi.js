@@ -66,3 +66,12 @@ export const importDoctors = async (mappedDoctors, options = {}) =>{
     throw new Error(error.response?.data?.message || 'Failed to import doctors');
   }
 }
+export const getWifeProfile = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/doctors/wife_profile?patientId=${patientId}`)
+    return response.data
+  } catch (error) {
+    console.error('Failed to fetch doctor appointments:', error);
+    throw error;
+  }
+}
