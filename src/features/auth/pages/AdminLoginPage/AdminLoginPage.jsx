@@ -11,7 +11,7 @@ const AdminLoginPage = () => {
           title="Đăng nhập Admin"
           subtitle="Chào mừng quản trị viên"
           apiEndpoint="http://localhost:8088/api/v1/auth/login-admin"
-          redirectPath="/admin/dashboard"
+          redirectPath="/admin-dashboard"
         />
       </div>
     </div>

@@ -24,6 +24,8 @@ import DoctorsPage from "@features/doctor/components/DoctorPage/DoctorPage.jsx";
 import ProfileContent from "@features/profile/components/ProfileContent/ProfileContent.jsx";
 import { AppointmentsContent } from "@components/AppointmentsContent.js";
 import AppointmentSchedulePage from "@features/appointment/pages/AppointmentSchedulePage/AppointmentSchedulePage.jsx";
+import React from "react";
+import AdminDashboard from "@features/AdminDashboard.tsx";
 
 const AppRoutes = () => {
   return (
@@ -66,6 +68,7 @@ const AppRoutes = () => {
         </Route>
       </Route>
       <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
     </Routes>
   );
 };
