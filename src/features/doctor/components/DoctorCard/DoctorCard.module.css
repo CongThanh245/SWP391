@@ -1,0 +1,168 @@
+/* DoctorCard.module.css */
+
+
+/* Basic Info - Left content */
+.basicInfo {
+  width: 100%;
+}
+
+.doctorName {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.genderBadge {
+  display: inline-block;
+  background: var(--deep-taupe);
+  color: var(--button-primary-text);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+}
+
+.experience {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+/* Doctor Details - Right content */
+.doctorDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section {
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: var(--spacing-md);
+}
+
+.section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-accent);
+  margin: 0 0 var(--spacing-sm) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.sectionText {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Specialization Tags */
+.specializationTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.specializationTag {
+  background: var(--secondary-background);
+  color: var(--text-accent);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: 1px solid var(--card-border);
+  transition: all 0.2s ease;
+}
+
+.specializationTag:hover {
+  background: var(--deep-taupe);
+  color: var(--button-primary-text);
+}
+
+/* Contact Grid */
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xs);
+}
+
+.contactItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.contactLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.contactValue {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  text-align: right;
+  word-break: break-word;
+}
+
+/* Achievements */
+.achievementsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.achievementsList li {
+  position: relative;
+  padding-left: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.achievementsList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--deep-taupe);
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .doctorName {
+    font-size: var(--font-size-base);
+  }
+  
+  .doctorDetails {
+    gap: var(--spacing-md);
+  }
+  
+  .contactItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .contactValue {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .specializationTags {
+    justify-content: center;
+  }
+}

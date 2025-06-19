@@ -1,65 +1,216 @@
+/* DoctorDetails.module.css */
+
 .doctorDetailsPage {
   padding: 20px;
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
+  min-height: 100vh;
+}
+
+/* Modal version - remove min-height and adjust padding */
+.modalVersion {
+  min-height: auto;
+  padding: 15px 20px;
+  max-width: 100%;
 }
 
 .pageHeader {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .pageHeader h2 {
   font-size: 24px;
-  color: #333;
+  color: var(--text-primary, #333);
+  margin-bottom: 8px;
 }
 
 .pageHeader p {
-  color: #666;
+  color: var(--text-secondary, #666);
+  font-size: 15px;
 }
 
+/* Custom styling cho doctor card */
 .doctorCard {
+  margin-bottom: 0;
+  cursor: default; /* Remove pointer cursor since it's detail view */
+}
+
+.doctorCard:hover {
+  transform: none; /* Remove hover animation for detail view */
+}
+
+/* Left section content */
+.doctorStats {
+  margin-top: 10px;
+}
+
+.experience {
   display: flex;
-  background: #fff;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background: var(--gradient-accent, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  color: white;
+  text-align: center;
+  min-width: 100px;
 }
 
-.doctorAvatar {
-  margin-right: 20px;
+.experience strong {
+  font-size: 24px;
+  font-weight: 700;
+  display: block;
 }
 
-.doctorImage {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
+.experience span {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 3px;
 }
 
+/* Right section content */
 .doctorInfo {
-  flex: 1;
+  width: 100%;
 }
 
-.doctorInfo h3 {
-  margin: 0 0 10px;
-  font-size: 20px;
-  color: #333;
+.doctorName {
+  font-size: 22px;
+  color: var(--text-primary, #333);
+  margin: 0 0 18px 0;
+  font-weight: 600;
 }
 
-.doctorInfo p {
-  margin: 5px 0;
-  color: #555;
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid var(--gradient-accent, #667eea);
+}
+
+.infoLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.infoValue {
+  font-size: 14px;
+  color: var(--text-primary, #333);
+  font-weight: 500;
+}
+
+.aboutSection {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--card-border, #e0e0e0);
+}
+
+.aboutTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+  margin: 0 0 12px 0;
+}
+
+.aboutText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary, #666);
+  margin: 0;
+}
+
+/* Loading and Error states */
+.loading,
+.error {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 18px;
 }
 
 .loading {
-  text-align: center;
-  font-size: 18px;
-  color: #666;
+  color: var(--text-secondary, #666);
 }
 
 .error {
-  text-align: center;
-  font-size: 18px;
-  color: #d32f2f;
+  color: var(--error-color, #d32f2f);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .doctorDetailsPage {
+    padding: 16px;
+  }
+  
+  .modalVersion {
+    padding: 12px 16px;
+  }
+  
+  .pageHeader h2 {
+    font-size: 20px;
+  }
+  
+  .pageHeader {
+    margin-bottom: 20px;
+  }
+  
+  .doctorName {
+    font-size: 18px;
+  }
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .infoItem {
+    padding: 10px;
+  }
+  
+  .infoValue {
+    font-size: 13px;
+  }
+  
+  .experience {
+    padding: 12px;
+    min-width: 80px;
+  }
+  
+  .experience strong {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .doctorDetailsPage {
+    padding: 12px;
+  }
+  
+  .modalVersion {
+    padding: 10px 12px;
+  }
+  
+  .pageHeader h2 {
+    font-size: 18px;
+  }
+  
+  .doctorName {
+    font-size: 16px;
+  }
+  
+  .experience strong {
+    font-size: 18px;
+  }
 }

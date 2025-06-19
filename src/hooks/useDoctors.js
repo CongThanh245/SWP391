@@ -1,5 +1,5 @@
-import { getDoctors } from '@api/doctorApi';
-import { useState, useEffect } from 'react';
+import { getDoctors } from "@api/doctorApi";
+import { useState, useEffect } from "react";
 
 export const useDoctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -20,8 +20,12 @@ export const useDoctors = () => {
           about: doctor.about,
           address: doctor.doctor_address,
           gender: doctor.gender,
-          image: doctor.image || '/assets/images/bacsi.png',
+          image: doctor.image || "/assets/images/bacsi.png",
           yearsOfExperience: doctor.year_of_experience,
+          joinDate: doctor.joinDate,
+          dateOfBirth: doctor.dateOfBirth,
+          active: doctor.active,
+          available: doctor.available,
         }));
         setDoctors(mappedData);
         setLoading(false);

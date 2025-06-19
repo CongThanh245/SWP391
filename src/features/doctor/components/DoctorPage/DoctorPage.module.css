@@ -1,0 +1,324 @@
+/* DoctorsPage.module.css */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--primary-background);
+  margin-top: 125px;
+}
+
+/* Header Section */
+.headerSection {
+  text-align: center;
+  margin-bottom: var(--spacing-xxl);
+  background: var(--card-background);
+  padding: var(--spacing-xxl) var(--spacing-xl);
+  border-radius: var(--border-radius-2);
+  box-shadow: var(--shadow-dark-gray);
+  position: relative;
+  overflow: hidden;
+}
+
+.headerSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-accent);
+}
+
+.titleContainer {
+  margin-bottom: var(--spacing-xl);
+}
+
+.pageTitle {
+  font-size: var(--font-size-xxl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+  position: relative;
+}
+
+.pageTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: var(--gradient-accent);
+  border-radius: 2px;
+}
+
+.pageSubtitle {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Statistics */
+.statsContainer {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xxl);
+  flex-wrap: wrap;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.statNumber {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--deep-taupe);
+}
+
+.statLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Filter Section */
+.filterSection {
+  background: var(--card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-2);
+  box-shadow: var(--shadow-dark-gray);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.searchContainer {
+  position: relative;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 80px 10px 12px;
+  border: 2px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  transition: all 0.3s ease;
+  background: var(--card-background);
+}
+
+/* .searchInput::placeholder {
+  margin-right: 20px;
+} */
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--deep-taupe);
+  box-shadow: 0 0 0 3px var(--hover-accent);
+}
+
+.searchIcon {
+  position: absolute;
+  right: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.filterContainer {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.filterButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--card-border);
+  background: var(--card-background);
+  color: var(--text-secondary);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
+}
+
+.filterButton:hover {
+  border-color: var(--deep-taupe);
+  color: var(--deep-taupe);
+  transform: translateY(-2px);
+}
+
+.filterButton.active {
+  background: var(--deep-taupe);
+  color: var(--button-primary-text);
+  border-color: var(--deep-taupe);
+}
+
+/* Results Info */
+.resultsInfo {
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.resultsInfo p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+/* Doctors Grid */
+.doctorsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xxl);
+}
+/* Loading State */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: var(--spacing-lg);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--card-border);
+  border-top: 4px solid var(--deep-taupe);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error State */
+.errorContainer {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  background: var(--card-background);
+  border-radius: var(--border-radius-2);
+  box-shadow: var(--shadow-dark-gray);
+}
+
+.errorContainer h2 {
+  color: var(--warning-red);
+  margin-bottom: var(--spacing-md);
+}
+
+.errorContainer p {
+  color: var(--text-secondary);
+}
+
+/* No Results */
+.noResults {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  background: var(--card-background);
+  border-radius: var(--border-radius-2);
+  box-shadow: var(--shadow-dark-gray);
+}
+
+.noResultsIcon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.noResults h3 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.noResults p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.clearButton {
+  background: var(--deep-taupe);
+  color: var(--button-primary-text);
+  border: none;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
+}
+
+.clearButton:hover {
+  background: var(--dark-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--hover-accent);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+  
+  .headerSection {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+  
+  .pageTitle {
+    font-size: var(--font-size-xl);
+  }
+  
+  .statsContainer {
+    gap: var(--spacing-lg);
+  }
+  
+  .filterSection {
+    padding: var(--spacing-md);
+  }
+  
+  .searchContainer {
+    max-width: 100%;
+  }
+  
+  .filterContainer {
+    justify-content: flex-start;
+  }
+  
+ .doctorsGrid {
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .statsContainer {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .filterButton {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}

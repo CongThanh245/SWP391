@@ -1,0 +1,193 @@
+/* features/appointment/components/AppointmentCard/AppointmentCard.module.css */
+
+.card {
+  background: var(--secondary-background);
+  border-radius: var(--border-radius-1);
+  padding: var(--spacing-md);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 2px 6px var(--shadow-dark-gray);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  max-width: 400px; /* Giới hạn chiều rộng tối đa */
+}
+
+.card:hover {
+  border-color: var(--card-hover-border);
+  box-shadow: 0 4px 8px var(--shadow-accent);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.patientInfo {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.appointmentInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.infoIcon {
+  font-size: var(--font-size-sm);
+  width: 16px;
+  text-align: center;
+  color: var(--deep-taupe);
+}
+
+.doctorName {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.notesText {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: var(--spacing-xs);
+  background: var(--light-background);
+  border-radius: var(--border-radius-1);
+  margin-top: var(--spacing-sm);
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.statusText {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-1);
+}
+
+.statusPending {
+  color: var(--warning-orange);
+}
+
+.statusConfirmed {
+  color: var(--success-green);
+}
+
+.statusCompleted {
+  color: var(--info-blue);
+}
+
+.statusCancelled {
+  color: var(--warning-red);
+}
+
+.cardActions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+/* Badge trạng thái (chỉ dùng cho Receptionist) */
+.statusBadge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-2);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  display: inline-block;
+  background: none;
+}
+
+.statusPending {
+  color: var(--warning-orange);
+  border: 1px solid var(--warning-orange);
+}
+
+.statusConfirmed {
+  color: var(--success-green);
+  border: 1px solid var(--success-green);
+}
+
+.statusCompleted {
+  color: var(--info-blue);
+  border: 1px solid var(--info-blue);
+}
+
+.statusCancelled {
+  color: var(--warning-red);
+  border: 1px solid var(--warning-red);
+}
+
+/* Buttons (chỉ dùng cho Receptionist) */
+.confirmBtn,
+.cancelBtn,
+.completeBtn,
+.restoreBtn {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: none;
+  border-radius: var(--border-radius-1);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--secondary-background);
+}
+
+.confirmBtn {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-green);
+}
+
+.confirmBtn:hover {
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.cancelBtn {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--warning-red);
+}
+
+.cancelBtn:hover {
+  background: rgba(244, 67, 54, 0.2);
+}
+
+.completeBtn {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-green);
+}
+
+.completeBtn:hover {
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.restoreBtn {
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--warning-orange);
+}
+
+.restoreBtn:hover {
+  background: rgba(255, 152, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .card {
+    max-width: 100%; /* Full width trên màn hình nhỏ */
+    margin-bottom: var(--spacing-md);
+  }
+}

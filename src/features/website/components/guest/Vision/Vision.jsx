@@ -1,13 +1,14 @@
 // components/Vision/Vision.jsx
-import React from 'react';
-import styles from './Vision.module.css';
+import React from "react";
+import styles from "./Vision.module.css";
 
 const Vision = () => {
   const values = [
     {
       title: "Chất lượng",
-      description: "Cam kết cung cấp dịch vụ y tế chất lượng cao với đội ngũ bác sĩ chuyên nghiệp",
-      icon:
+      description:
+        "Cam kết cung cấp dịch vụ y tế chất lượng cao với đội ngũ bác sĩ chuyên nghiệp",
+      icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="50"
@@ -27,11 +28,13 @@ const Vision = () => {
           <path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2" />
           <path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18" />
         </svg>
+      ),
     },
     {
       title: "An toàn",
-      description: "Đảm bảo an toàn tuyệt đối cho bệnh nhân với quy trình khám chữa bệnh chuẩn mực",
-      icon:
+      description:
+        "Đảm bảo an toàn tuyệt đối cho bệnh nhân với quy trình khám chữa bệnh chuẩn mực",
+      icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="50"
@@ -47,11 +50,13 @@ const Vision = () => {
           <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
           <path d="m9 12 2 2 4-4" />
         </svg>
+      ),
     },
     {
       title: "Tận tâm",
-      description: "Luôn đặt sức khỏe và lợi ích của bệnh nhân lên hàng đầu trong mọi hoạt động",
-      icon:
+      description:
+        "Luôn đặt sức khỏe và lợi ích của bệnh nhân lên hàng đầu trong mọi hoạt động",
+      icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="50"
@@ -69,11 +74,13 @@ const Vision = () => {
           <path d="m18 15-2-2" />
           <path d="m15 18-2-2" />
         </svg>
+      ),
     },
     {
       title: "Hiện đại",
-      description: "Ứng dụng công nghệ y tế tiên tiến nhất để nâng cao hiệu quả điều trị",
-      icon:
+      description:
+        "Ứng dụng công nghệ y tế tiên tiến nhất để nâng cao hiệu quả điều trị",
+      icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="50"
@@ -89,7 +96,8 @@ const Vision = () => {
           <rect width="18" height="18" x="3" y="3" rx="2" />
           <path d="M17 12h-2l-2 5-2-10-2 5H7" />
         </svg>
-    }
+      ),
+    },
   ];
 
   return (
@@ -98,9 +106,10 @@ const Vision = () => {
         <h2 className={styles.sectionTitle}>Tầm nhìn của chúng tôi</h2>
         <div className={styles.visionContent}>
           <p className={styles.visionText}>
-            Trở thành phòng khám đa khoa hàng đầu trong khu vực, cung cấp dịch vụ chăm sóc
-            sức khỏe toàn diện, chuyên nghiệp và nhân văn. Chúng tôi hướng tới việc xây dựng
-            một cộng đồng khỏe mạnh thông qua việc áp dụng những tiến bộ y học hiện đại nhất.
+            Trở thành phòng khám đa khoa hàng đầu trong khu vực, cung cấp dịch
+            vụ chăm sóc sức khỏe toàn diện, chuyên nghiệp và nhân văn. Chúng tôi
+            hướng tới việc xây dựng một cộng đồng khỏe mạnh thông qua việc áp
+            dụng những tiến bộ y học hiện đại nhất.
           </p>
         </div>
       </div>

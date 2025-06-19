@@ -1,0 +1,67 @@
+/* features/appointment/components/AppointmentListPatient/AppointmentListPatient.module.css */
+.listContainer {
+  padding: var(--spacing-md); /* Padding chung */
+}
+
+.appointmentGrid {
+  display: grid; /* Sử dụng grid */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Cột tự động, tối thiểu 300px */
+  gap: var(--spacing-lg); /* Khoảng cách giữa các thẻ */
+}
+
+.loadingContainer {
+  text-align: center; /* Căn giữa */
+  padding: var(--spacing-xl); /* Padding */
+  color: var(--text-secondary); /* Màu chữ */
+}
+
+.loadingSpinner {
+  width: 40px; /* Kích thước spinner */
+  height: 40px;
+  border: 4px solid var(--card-border); /* Viền */
+  border-top: 4px solid var(--accent-color); /* Viền trên */
+  border-radius: 50%; /* Hình tròn */
+  animation: spin 1s linear infinite; /* Hiệu ứng quay */
+  margin: 0 auto var(--spacing-md); /* Căn giữa và khoảng cách */
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg); /* Quay 360 độ */
+  }
+}
+
+.loadingText {
+  font-size: var(--font-size-base); /* Kích thước chữ */
+  color: var(--text-primary); /* Màu chữ */
+}
+
+.emptyState {
+  text-align: center; /* Căn giữa */
+  padding: var(--spacing-xxl); /* Padding */
+  color: var(--text-secondary); /* Màu chữ */
+}
+
+.emptyIcon {
+  margin-bottom: var(--spacing-lg); /* Khoảng cách dưới */
+  color: var(--accent-color); /* Màu icon */
+  opacity: 0.5; /* Độ mờ */
+}
+
+.emptyState h3 {
+  font-size: var(--font-size-lg); /* Kích thước tiêu đề */
+  color: var(--text-primary); /* Màu chữ */
+  margin-bottom: var(--spacing-sm); /* Khoảng cách dưới */
+}
+
+.emptyState p {
+  font-size: var(--font-size-base); /* Kích thước chữ */
+  margin: 0; /* Không margin */
+}
+
+/* Responsive */
+@media (max-width: var(--breakpoint-md)) {
+  .appointmentGrid {
+    grid-template-columns: 1fr; /* 1 cột trên thiết bị nhỏ */
+  }
+}

@@ -41,7 +41,15 @@ export const getDoctorAppointments = async (params = {}) => {
   }
 };
 
-export const importDoctors = async (mappedDoctors, options = {}) => {
+export const getDoctorList = async () => {
+  try {
+    const response = await apiClient.get('/doctors');
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to fetch doctor list: ' + error.message);
+  }
+};
+export const importDoctors = async (mappedDoctors, options = {}) =>{
   try {
     const response = await apiClient.post('/admin/import-doctor-csv', {
       data: mappedDoctors,
@@ -56,15 +64,5 @@ export const importDoctors = async (mappedDoctors, options = {}) => {
   } catch (error) {
     console.error('Import failed:', error.response?.data || error.message);
     throw new Error(error.response?.data?.message || 'Failed to import doctors');
-  }
-}
-
-export const getWifeProfile = async (patientId) => {
-  try {
-    const response = await apiClient.get(`/doctors/wife_profile?patientId=${patientId}`)
-    return response.data
-  } catch (error) {
-    console.error('Failed to fetch doctor appointments:', error);
-    throw error;
   }
 }
