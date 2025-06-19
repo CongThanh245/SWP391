@@ -49,3 +49,20 @@ export const getDoctorList = async () => {
     throw new Error('Failed to fetch doctor list: ' + error.message);
   }
 };
+export const importDoctors = async (mappedDoctors, options = {}) =>{
+  try {
+    const response = await apiClient.post('/admin/import-doctor-csv', {
+      data: mappedDoctors,
+      options: {
+        updateExisting: false,
+        skipDuplicates: true,
+        validateOnly: false,
+        ...options,
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Import failed:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to import doctors');
+  }
+}
