@@ -1,7 +1,7 @@
 /* Sidebar.module.css - Updated */
 .sidebar {
   width: 200px; /* Thu nhỏ từ 280px xuống 200px */
-  height: 350px; /* Trừ đi chiều cao header */
+  height: fit-content;
   background-color: var(--light-background);
   border-right: 1px solid var(--card-border);
   padding: var(--spacing-md); /* Giảm padding */
@@ -30,6 +30,7 @@
 .nav {
   display: flex;
   flex-direction: column;
+  gap:10px;
 }
 
 .menuItem {

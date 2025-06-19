@@ -19,6 +19,18 @@ const StaffSidebar = ({
     return names[role] || "Nhân viên";
   };
 
+  // Function to render icon, handling both components and JSX
+  const renderIcon = (icon) => {
+    if (React.isValidElement(icon)) {
+      // If icon is a JSX element (e.g., <svg>), render it directly
+      return icon;
+    } else if (typeof icon === "function") {
+      // If icon is a component, render it with size prop
+      return React.createElement(icon, { size: 20 });
+    }
+    return null; // Fallback for invalid icons
+  };
+
   return (
     <div className={styles.staffSidebar}>
       {/* User Info Section */}
@@ -49,9 +61,7 @@ const StaffSidebar = ({
             onClick={() => onItemClick(item.key)}
           >
             {item.icon && (
-              <div className={styles.menuItemIcon}>
-                <item.icon size={20} />
-              </div>
+              <div className={styles.menuItemIcon}>{renderIcon(item.icon)}</div>
             )}
             <span className={styles.menuItemLabel}>{item.label}</span>
           </div>

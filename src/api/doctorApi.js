@@ -41,6 +41,14 @@ export const getDoctorAppointments = async (params = {}) => {
   }
 };
 
+export const getDoctorList = async () => {
+  try {
+    const response = await apiClient.get('/doctors');
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to fetch doctor list: ' + error.message);
+  }
+};
 export const importDoctors = async (mappedDoctors, options = {}) =>{
   try {
     const response = await apiClient.post('/admin/import-doctor-csv', {
