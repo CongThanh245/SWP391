@@ -1,23 +1,32 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useAppointments } from "@hooks/useAppointments";
 import AppointmentFilters from "@features/appointment/components/AppointmentFilters/AppointmentFilters";
 import AppointmentTable from "@features/appointment/components/AppointmentTable/AppointmentTable";
-import { updateAppointmentStatus } from "@api/appointmentApi";
+import { updateAppointmentStatus } from "@api/appointmentApi"; // Ensure correct import
 import styles from "./AppointmentSchedulePage.module.css";
 
-const AppointmentSchedulePage = ({ patientId }) => {
+const AppointmentSchedulePage = () => {
   const [filters, setFilters] = useState({
     dateFilter: "all",
     fromDate: "",
     toDate: "",
   });
   const [activeTab, setActiveTab] = useState("all");
-  const [showNoteModal, setShowNoteModal] = useState({ open: false, content: "" });
-
-  const { appointments, isLoading, error } = useAppointments({
-    filterByPatientId: patientId,
-    filters,
+  const [showNoteModal, setShowNoteModal] = useState({
+    open: false,
+    content: "",
   });
+
+  const { appointments, isLoading, error, refetchAppointments } = useAppointments({
+    filters,
+    role: "patient", // Specify Patient role
+  });
+  const [localAppointments, setLocalAppointments] = useState(appointments);
+
+  // Sync localAppointments with appointments
+  useEffect(() => {
+    setLocalAppointments(appointments);
+  }, [appointments]);
 
   const dateFilterOptions = [
     { value: "all", label: "Tất cả" },
@@ -29,15 +38,27 @@ const AppointmentSchedulePage = ({ patientId }) => {
 
   const statusTabs = [
     { value: "all", label: "Tất cả", count: appointments.length },
-    { value: "pending", label: "Chờ xác nhận", count: appointments.filter(a => a.status === "pending").length },
-    { value: "confirmed", label: "Đã xác nhận", count: appointments.filter(a => a.status === "confirmed").length },
-    { value: "cancelled", label: "Đã hủy", count: appointments.filter(a => a.status === "cancelled").length },
+    {
+      value: "pending",
+      label: "Chờ xác nhận",
+      count: appointments.filter((a) => a.status === "pending").length,
+    },
+    {
+      value: "confirmed",
+      label: "Đã xác nhận",
+      count: appointments.filter((a) => a.status === "confirmed").length,
+    },
+    {
+      value: "cancelled",
+      label: "Đã hủy",
+      count: appointments.filter((a) => a.status === "cancelled").length,
+    },
   ];
 
   const isDateInRange = (appointmentDate, filterType, fromDate, toDate) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const apptDate = new Date(appointmentDate);
     apptDate.setHours(0, 0, 0, 0);
 
@@ -67,11 +88,18 @@ const AppointmentSchedulePage = ({ patientId }) => {
   const filteredAppointments = useMemo(() => {
     return appointments.filter((appointment) => {
       if (filters.dateFilter !== "all") {
-        const appointmentDate = appointment.rawDateTime 
+        const appointmentDate = appointment.rawDateTime
           ? new Date(appointment.rawDateTime)
           : new Date(`${appointment.date}T${appointment.time || "00:00"}`);
-        
-        if (!isDateInRange(appointmentDate, filters.dateFilter, filters.fromDate, filters.toDate)) {
+
+        if (
+          !isDateInRange(
+            appointmentDate,
+            filters.dateFilter,
+            filters.fromDate,
+            filters.toDate
+          )
+        ) {
           return false;
         }
       }
@@ -79,7 +107,10 @@ const AppointmentSchedulePage = ({ patientId }) => {
     });
   }, [appointments, filters]);
 
-  const filteredByTab = activeTab === "all" ? filteredAppointments : filteredAppointments.filter(a => a.status === activeTab);
+  const filteredByTab =
+    activeTab === "all"
+      ? filteredAppointments
+      : filteredAppointments.filter((a) => a.status === activeTab);
 
   const handleFilterChange = (newFilters) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -87,10 +118,20 @@ const AppointmentSchedulePage = ({ patientId }) => {
 
   const handleCancelAppointment = async (appointmentId) => {
     try {
-      await updateAppointmentStatus(appointmentId, "cancelled");
-      window.location.reload();
+      // Optimistic update
+      setLocalAppointments((prevAppointments) =>
+        prevAppointments.map((appt) =>
+          appt.id === appointmentId ? { ...appt, status: "cancelled" } : appt
+        )
+      );
+      // Call API to cancel appointment
+      await updateAppointmentStatus(appointmentId);
+      // Refresh data from server
+      await refetchAppointments();
     } catch (error) {
       console.error("Error cancelling appointment:", error);
+      // Revert optimistic update on error
+      setLocalAppointments(appointments);
       throw error;
     }
   };
@@ -120,9 +161,14 @@ const AppointmentSchedulePage = ({ patientId }) => {
           {statusTabs.map((tab) => (
             <button
               key={tab.value}
-              className={`${styles.tabButton} ${activeTab === tab.value ? styles.tabActive : ""}`}
+              className={`${styles.tabButton} ${
+                activeTab === tab.value ? styles.tabActive : ""
+              }`}
               onClick={() => setActiveTab(tab.value)}
-              style={{ "--tab-color": statusConfig[tab.value]?.color || "var(--deep-taupe)" }}
+              style={{
+                "--tab-color":
+                  statusConfig[tab.value]?.color || "var(--deep-taupe)",
+              }}
             >
               <span className={styles.tabLabel}>{tab.label}</span>
               <span className={styles.tabCount}>{tab.count}</span>

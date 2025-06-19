@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import BaseModal from '@components/common/BaseModal/BaseModal';
-import styles from './BookingForm.module.css';
-import useBookingForm from '@hooks/useBookingForm';
+import React from "react";
+import BaseModal from "@components/common/BaseModal/BaseModal";
+import styles from "./BookingForm.module.css";
+import useBookingForm from "@hooks/useBookingForm";
 
 const BookingModal = ({ isOpen, onClose }) => {
   const {
@@ -16,6 +16,7 @@ const BookingModal = ({ isOpen, onClose }) => {
     handleInputChange,
     handleClose,
     today,
+    loadingSlots,
   } = useBookingForm(onClose);
 
   return (
@@ -46,7 +47,7 @@ const BookingModal = ({ isOpen, onClose }) => {
               <select
                 className={styles.select}
                 value={formData.doctorId}
-                onChange={(e) => handleInputChange('doctorId', e.target.value)}
+                onChange={(e) => handleInputChange("doctorId", e.target.value)}
                 disabled={isSubmitting}
               >
                 <option value="">Chọn bác sĩ</option>
@@ -71,7 +72,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                 className={styles.input}
                 value={formData.date}
                 min={today}
-                onChange={(e) => handleInputChange('date', e.target.value)}
+                onChange={(e) => handleInputChange("date", e.target.value)}
                 disabled={isSubmitting}
               />
               {errors.date && (
@@ -90,20 +91,17 @@ const BookingModal = ({ isOpen, onClose }) => {
               <select
                 className={styles.select}
                 value={formData.timeSlot}
-                onChange={(e) => handleInputChange('timeSlot', e.target.value)}
-                disabled={isSubmitting}
+                onChange={(e) => handleInputChange("timeSlot", e.target.value)}
+                disabled={isSubmitting || loadingSlots}
               >
                 <option value="">Chọn giờ khám</option>
-                {timeSlots.map((slot) => (
-                  <option
-                    key={slot.time}
-                    value={slot.time}
-                    disabled={!slot.available}
-                  >
-                    {slot.time}
-                    {!slot.available && ' (Đã đặt)'}
-                  </option>
-                ))}
+                {timeSlots
+                  .filter((slot) => slot.available)
+                  .map((slot) => (
+                    <option key={slot.id} value={slot.time}>
+                      {slot.time}
+                    </option>
+                  ))}
               </select>
               {errors.timeSlot && (
                 <span className={styles.errorMessage}>{errors.timeSlot}</span>
@@ -117,7 +115,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                 className={styles.textarea}
                 placeholder="Mô tả triệu chứng hoặc yêu cầu đặc biệt..."
                 value={formData.notes}
-                onChange={(e) => handleInputChange('notes', e.target.value)}
+                onChange={(e) => handleInputChange("notes", e.target.value)}
                 disabled={isSubmitting}
               />
             </div>
@@ -139,7 +137,7 @@ const BookingModal = ({ isOpen, onClose }) => {
             className={styles.submitButton}
             disabled={isSubmitting || showSuccess}
           >
-            {isSubmitting ? 'Đang xử lý...' : 'Đặt lịch'}
+            {isSubmitting ? "Đang xử lý..." : "Đặt lịch"}
           </button>
         </div>
       </form>

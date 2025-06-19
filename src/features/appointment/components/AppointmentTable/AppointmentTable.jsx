@@ -2,7 +2,12 @@ import React from "react";
 import { Calendar, Clock, User, FileText, X, AlertCircle } from "lucide-react";
 import styles from "./AppointmentTable.module.css";
 
-const AppointmentTable = ({ appointments = [], isLoading = false, onCancelAppointment, setShowNoteModal }) => {
+const AppointmentTable = ({
+  appointments = [],
+  isLoading = false,
+  onCancelAppointment,
+  setShowNoteModal,
+}) => {
   const [cancellingId, setCancellingId] = React.useState(null);
 
   const statusConfig = {
@@ -12,9 +17,11 @@ const AppointmentTable = ({ appointments = [], isLoading = false, onCancelAppoin
   };
 
   const handleCancelClick = async (appointmentId) => {
+    console.log("Hủy lịch hẹn với ID:", appointmentId);
     if (window.confirm("Bạn có chắc chắn muốn hủy lịch hẹn này?")) {
       setCancellingId(appointmentId);
       try {
+        // Call the passed onCancelAppointment function
         await onCancelAppointment(appointmentId);
       } catch (error) {
         console.error("Error cancelling appointment:", error);
@@ -27,19 +34,21 @@ const AppointmentTable = ({ appointments = [], isLoading = false, onCancelAppoin
 
   const formatDateTime = (date, time) => {
     if (!date || date === "N/A") return "Chưa xác định";
-    
+
     const dateObj = new Date(date);
     const formattedDate = dateObj.toLocaleDateString("vi-VN", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
-    
+
     return `${formattedDate} ${time !== "N/A" ? time : ""}`.trim();
   };
 
   const canCancel = (appointment) => {
-    return appointment.status === "pending" || appointment.status === "confirmed";
+    return (
+      appointment.status === "pending" || appointment.status === "confirmed"
+    );
   };
 
   if (isLoading) {
@@ -100,8 +109,9 @@ const AppointmentTable = ({ appointments = [], isLoading = false, onCancelAppoin
           </thead>
           <tbody className={styles.tableBody}>
             {appointments.map((appointment) => {
-              const statusInfo = statusConfig[appointment.status] || statusConfig.pending;
-              
+              const statusInfo =
+                statusConfig[appointment.status] || statusConfig.pending;
+
               return (
                 <tr key={appointment.id} className={styles.tableRow}>
                   <td className={styles.tableCell}>
@@ -111,7 +121,7 @@ const AppointmentTable = ({ appointments = [], isLoading = false, onCancelAppoin
                       </div>
                     </div>
                   </td>
-                  
+
                   <td className={styles.tableCell}>
                     <div className={styles.doctorCell}>
                       <div className={styles.doctorName}>
@@ -119,10 +129,10 @@ const AppointmentTable = ({ appointments = [], isLoading = false, onCancelAppoin
                       </div>
                     </div>
                   </td>
-                  
+
                   <td className={styles.tableCell}>
                     <div className={styles.statusCell}>
-                      <span 
+                      <span
                         className={styles.statusBadge}
                         style={{
                           color: statusInfo.color,
@@ -133,20 +143,28 @@ const AppointmentTable = ({ appointments = [], isLoading = false, onCancelAppoin
                       </span>
                     </div>
                   </td>
-                  
+
                   <td className={styles.tableCell}>
                     <div className={styles.notesCell}>
                       {appointment.notes ? (
                         <>
-                          <span className={styles.notes} title={appointment.notes}>
-                            {appointment.notes.length > 50 
-                              ? `${appointment.notes.substring(0, 50)}...` 
+                          <span
+                            className={styles.notes}
+                            title={appointment.notes}
+                          >
+                            {appointment.notes.length > 50
+                              ? `${appointment.notes.substring(0, 50)}...`
                               : appointment.notes}
                           </span>
                           {appointment.notes.length > 50 && (
                             <button
                               className={styles.viewMoreButton}
-                              onClick={() => setShowNoteModal({ open: true, content: appointment.notes })}
+                              onClick={() =>
+                                setShowNoteModal({
+                                  open: true,
+                                  content: appointment.notes,
+                                })
+                              }
                             >
                               Xem thêm
                             </button>
@@ -157,7 +175,7 @@ const AppointmentTable = ({ appointments = [], isLoading = false, onCancelAppoin
                       )}
                     </div>
                   </td>
-                  
+
                   <td className={styles.tableCell}>
                     <div className={styles.actionCell}>
                       {canCancel(appointment) ? (

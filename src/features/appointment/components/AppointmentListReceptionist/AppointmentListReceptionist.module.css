@@ -1,4 +1,42 @@
 /* AppointmentListReceptionist.module.css */
+.appointmentPage {
+  padding: var(--spacing-xl);
+  background: var(--primary-background);
+  min-height: 100vh;
+  font-family: var(--font-family);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.pageHeader h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-accent);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.pageHeader p {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: var(--breakpoint-md)) {
+  .appointmentPage {
+    padding: var(--spacing-lg);
+  }
+  
+  .pageHeader h2 {
+    font-size: var(--font-size-lg);
+  }
+}
+
 .appointmentList {
   background: var(--card-background);
   border-radius: 12px;
@@ -9,7 +47,7 @@
 
 .tableHeader {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr; /* Adjusted for notes and actions */
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   background: var(--secondary-background);
@@ -22,16 +60,19 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
 }
 
 .appointmentRow {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr; /* Match tableHeader */
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   border-bottom: 1px solid var(--card-border);
   transition: all 0.3s ease;
   position: relative;
+  align-items: center; /* Ensure vertical alignment */
 }
 
 .appointmentRow:last-child {
@@ -77,7 +118,8 @@
 }
 
 .doctorInfo,
-.patientInfo {
+.patientInfo,
+.notesInfo {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
@@ -88,6 +130,40 @@
   font-size: var(--font-size-base);
   color: var(--text-primary);
   font-weight: 600;
+}
+
+.notesInfo {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.notes {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--font-size-sm);
+}
+
+.noNotes {
+  color: var(--gray-500);
+  font-style: italic;
+  font-size: var(--font-size-sm);
+}
+
+.viewMoreButton {
+  background: none;
+  border: none;
+  color: var(--primary-600);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  text-decoration: underline;
+  padding: 0;
+  margin-top: var(--spacing-xs);
+}
+
+.viewMoreButton:hover {
+  color: var(--primary-700);
 }
 
 .statusBadge {
@@ -124,6 +200,8 @@
   display: flex;
   gap: var(--spacing-xs);
   align-items: center;
+  justify-content: flex-start; /* Prevent stretching */
+  min-width: 80px; /* Ensure enough space for buttons */
 }
 
 .actionBtn {
@@ -221,33 +299,115 @@
   margin: 0;
 }
 
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.modalText {
+  font-size: 14px;
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+}
+
+.modalCloseButton {
+  background: var(--primary-600);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modalCloseButton:hover {
+  background: var(--primary-700);
+}
+
 /* Responsive */
 @media (max-width: var(--breakpoint-lg)) {
   .tableHeader,
   .appointmentRow {
-    grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr;
+    grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr; /* Keep all columns */
   }
 }
 
 @media (max-width: var(--breakpoint-md)) {
   .tableHeader {
-    display: none;
+    grid-template-columns: 1.5fr 1fr 1.5fr 0.8fr 1.2fr 0.8fr; /* Adjust proportions */
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-md);
   }
-  
+
   .appointmentRow {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
+    grid-template-columns: 1.5fr 1fr 1.5fr 0.8fr 1.2fr 0.8fr;
+    padding: var(--spacing-md);
   }
-  
-  .timeInfo {
-    flex-direction: row;
-    gap: var(--spacing-lg);
+
+  .headerCell,
+  .timeInfo,
+  .doctorInfo,
+  .patientInfo,
+  .statusBadge,
+  .notesInfo {
+    font-size: var(--font-size-xs);
   }
-  
+
   .actions {
-    justify-content: center;
-    padding-top: var(--spacing-sm);
-    border-top: 1px solid var(--card-border);
+    min-width: 60px;
+  }
+
+  .actionBtn {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: var(--breakpoint-sm)) {
+  .tableHeader {
+    display: grid; /* Keep header visible */
+    grid-template-columns: 1fr 1fr 1fr 0.8fr 1fr 0.8fr;
+  }
+
+  .appointmentRow {
+    grid-template-columns: 1fr 1fr 1fr 0.8fr 1fr 0.8fr;
+    padding: var(--spacing-sm);
+  }
+
+  .timeInfo {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .actions {
+    justify-content: flex-start;
+    gap: var(--spacing-xxs);
+  }
+
+  .actionBtn {
+    width: 24px;
+    height: 24px;
   }
 }

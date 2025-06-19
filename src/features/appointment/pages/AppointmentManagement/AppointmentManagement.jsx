@@ -1,61 +1,19 @@
-// AppointmentManagement.jsx Trang này cho Receptionist duyệt các lịch hẹn
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import styles from "./AppointmentManagement.module.css";
 import AppointmentFilterTabs from "@features/appointment/components/AppointmentFilterTabs/AppointmentFilterTabs";
 import AppointmentListReceptionist from "@features/appointment/components/AppointmentListReceptionist/AppointmentListReceptionist";
-import { fetchAppointments } from "@api/appointmentApi";
+import { useAppointments } from "@hooks/useAppointments";
 
 const AppointmentManagement = () => {
   const [activeTab, setActiveTab] = useState("pending");
-  const [appointments, setAppointments] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const validStatuses = ["pending", "confirmed", "completed", "cancelled"];
+  const filters = useMemo(() => ({
+    dateFilter: "all",
+    fromDate: "",
+    toDate: "",
+  }), []);
 
-  useEffect(() => {
-    const loadAppointments = async () => {
-      setIsLoading(true);
-      try {
-        const data = await fetchAppointments();
-        const mappedAppointments = data
-          .filter((appt) => validStatuses.includes(appt.appointment_status))
-          .map((appt) => {
-            let date, time;
-            const timestamp = parseInt(appt.appointment_date_time);
-            if (!isNaN(timestamp)) {
-              date = new Date(timestamp * 1000).toISOString().split("T")[0];
-              time = new Date(timestamp * 1000).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              });
-            } else {
-              date = "N/A";
-              time = "N/A";
-            }
-
-            return {
-              id: appt.id,
-              appointmentId: appt.appointment_id,
-              patientName: appt.patient_name,
-              phone: "N/A",
-              date,
-              time,
-              status: appt.appointment_status,
-              doctorName: appt.doctor_name,
-              notes: appt.notes,
-            };
-          });
-        setAppointments(mappedAppointments);
-      } catch (err) {
-        console.error("Error loading appointments:", err);
-        setError("Không thể tải lịch hẹn. Vui lòng thử lại.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadAppointments();
-  }, []);
+  const { appointments, isLoading, error, refetchAppointments } = useAppointments({ filters });
 
   const filteredAppointments = useMemo(() => {
     return appointments.filter((appointment) => appointment.status === activeTab);
@@ -94,6 +52,7 @@ const AppointmentManagement = () => {
         appointments={filteredAppointments}
         isLoading={isLoading}
         activeTab={activeTab}
+        refetchAppointments={refetchAppointments} // Truyền hàm làm mới
       />
     </div>
   );

@@ -1,10 +1,8 @@
-// features/appointment/components/AppointmentListReceptionist/AppointmentListReceptionist.jsx
-import React from "react";
+import React, { useState } from "react";
 import { Clock, Calendar, Eye, Trash2, CheckCircle } from "lucide-react";
 import styles from "./AppointmentListReceptionist.module.css";
-import { updateAppointmentStatus } from "@api/appointmentApi";
+import { confirmAppointment, completeAppointment, cancelAppointment } from "@api/appointmentApi";
 
-// Cấu hình trạng thái
 const statusConfig = {
   pending: "Chờ xác nhận",
   confirmed: "Đã xác nhận",
@@ -16,13 +14,26 @@ const AppointmentListReceptionist = ({
   appointments = [],
   isLoading = false,
   activeTab = "all",
+  refetchAppointments,
 }) => {
-  const handleStatusUpdate = async (id, newStatus) => {
+  const [showNoteModal, setShowNoteModal] = useState({
+    open: false,
+    content: "",
+  });
+
+  const handleStatusUpdate = async (id, action) => {
     try {
-      await updateAppointmentStatus(id, newStatus);
-      window.location.reload(); // Có thể thay bằng callback sau
+      if (action === "confirm") {
+        await confirmAppointment(id);
+      } else if (action === "complete") {
+        await completeAppointment(id);
+      } else if (action === "cancel") {
+        await cancelAppointment(id);
+      }
+      refetchAppointments();
     } catch (error) {
       alert("Cập nhật trạng thái thất bại. Vui lòng thử lại.");
+      console.error("Error updating appointment:", error);
     }
   };
 
@@ -48,8 +59,7 @@ const AppointmentListReceptionist = ({
         </div>
         <h3>Không có lịch hẹn nào</h3>
         <p>
-          {`Chưa có lịch hẹn ${statusConfig[activeTab] || "chờ xác nhận"
-            .toLowerCase()} nào`}
+          {`Chưa có lịch hẹn ${statusConfig[activeTab] || "chờ xác nhận"}`}
         </p>
       </div>
     );
@@ -62,6 +72,7 @@ const AppointmentListReceptionist = ({
         <div className={styles.headerCell}>Bác sĩ</div>
         <div className={styles.headerCell}>Bệnh nhân</div>
         <div className={styles.headerCell}>Trạng thái</div>
+        <div className={styles.headerCell}>Ghi chú</div>
         <div className={styles.headerCell}>Hành động</div>
       </div>
       {filteredAppointments.map((appointment) => (
@@ -88,20 +99,49 @@ const AppointmentListReceptionist = ({
           <div className={`${styles.statusBadge} ${styles[appointment.status]}`}>
             <span>{statusConfig[appointment.status] || "Chờ xác nhận"}</span>
           </div>
+          <div className={styles.notesInfo}>
+            {appointment.notes ? (
+              <>
+                <span
+                  className={styles.notes}
+                  title={appointment.notes}
+                >
+                  {appointment.notes.length > 50
+                    ? `${appointment.notes.substring(0, 50)}...`
+                    : appointment.notes}
+                </span>
+                {appointment.notes.length > 50 && (
+                  <button
+                    className={styles.viewMoreButton}
+                    onClick={() =>
+                      setShowNoteModal({
+                        open: true,
+                        content: appointment.notes,
+                      })
+                    }
+                  >
+                    Xem thêm
+                  </button>
+                )}
+              </>
+            ) : (
+              <span className={styles.noNotes}>Không có ghi chú</span>
+            )}
+          </div>
           <div className={styles.actions}>
             {appointment.status === "pending" && (
               <>
                 <button
                   className={`${styles.actionBtn} ${styles.complete}`}
                   title="Xác nhận"
-                  onClick={() => handleStatusUpdate(appointment.id, "confirmed")}
+                  onClick={() => handleStatusUpdate(appointment.id, "confirm")}
                 >
                   <CheckCircle size={16} />
                 </button>
                 <button
                   className={`${styles.actionBtn} ${styles.cancel}`}
                   title="Hủy"
-                  onClick={() => handleStatusUpdate(appointment.id, "cancelled")}
+                  onClick={() => handleStatusUpdate(appointment.id, "cancel")}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -112,14 +152,14 @@ const AppointmentListReceptionist = ({
                 <button
                   className={`${styles.actionBtn} ${styles.complete}`}
                   title="Hoàn thành"
-                  onClick={() => handleStatusUpdate(appointment.id, "completed")}
+                  onClick={() => handleStatusUpdate(appointment.id, "complete")}
                 >
                   <CheckCircle size={16} />
                 </button>
                 <button
                   className={`${styles.actionBtn} ${styles.cancel}`}
                   title="Hủy"
-                  onClick={() => handleStatusUpdate(appointment.id, "cancelled")}
+                  onClick={() => handleStatusUpdate(appointment.id, "cancel")}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -141,6 +181,20 @@ const AppointmentListReceptionist = ({
           </div>
         </div>
       ))}
+      {showNoteModal.open && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h3 className={styles.modalTitle}>Ghi chú đầy đủ</h3>
+            <p className={styles.modalText}>{showNoteModal.content}</p>
+            <button
+              className={styles.modalCloseButton}
+              onClick={() => setShowNoteModal({ open: false, content: "" })}
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
