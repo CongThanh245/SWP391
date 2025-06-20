@@ -25,7 +25,6 @@ import ProfileContent from "@features/profile/components/ProfileContent/ProfileC
 import { AppointmentsContent } from "@components/AppointmentsContent.js";
 import AppointmentSchedulePage from "@features/appointment/pages/AppointmentSchedulePage/AppointmentSchedulePage.jsx";
 import ServicesPage from "@features/website/pages/guest/ServicesPage.jsx";
-import React from "react";
 import AdminDashboard from "@features/AdminDashboard.tsx";
 
 const AppRoutes = () => {

@@ -2,6 +2,7 @@
 import axios from 'axios';
 import apiClient from './axiosConfig';
 
+
 const API_URL = 'https://683a7bc143bb370a8672d354.mockapi.io/doctors';
 
 export const getDoctors = async () => {
@@ -41,6 +42,27 @@ export const getDoctorAppointments = async (params = {}) => {
   }
 };
 
+export const getPatientList = async (params = {}) => {
+  const {
+    name = '',
+    page = 0,
+    size = 5,
+  } = params;
+  try {
+    const response = await apiClient.get('/doctors/patient_list', {
+      params: {
+        name,
+        page,
+        size,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch patient list:', error);
+    throw error;
+  }
+}
+
 export const getDoctorList = async () => {
   try {
     const response = await apiClient.get('/doctors');
@@ -49,7 +71,7 @@ export const getDoctorList = async () => {
     throw new Error('Failed to fetch doctor list: ' + error.message);
   }
 };
-export const importDoctors = async (mappedDoctors, options = {}) =>{
+export const importDoctors = async (mappedDoctors, options = {}) => {
   try {
     const response = await apiClient.post('/admin/import-doctor-csv', {
       data: mappedDoctors,
@@ -70,6 +92,36 @@ export const getWifeProfile = async (patientId) => {
   try {
     const response = await apiClient.get(`/doctors/wife_profile?patientId=${patientId}`)
     return response.data
+  } catch (error) {
+    console.error('Failed to fetch doctor appointments:', error);
+    throw error;
+  }
+}
+
+export const getWifeVital = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/doctors/treatment-profile/wife-vital-signs?patientId=${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch doctor appointments:', error);
+    throw error;
+  }
+}
+
+export const getHusbandVital = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/doctors/treatment-profile/husband-vital-signs?patientId=${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch doctor appointments:', error);
+    throw error;
+  }
+}
+
+export const getProtocolList = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/doctors/treatment-profile/protocols-list?patientId=${patientId}`);
+    return response.data;
   } catch (error) {
     console.error('Failed to fetch doctor appointments:', error);
     throw error;

@@ -13,8 +13,8 @@ import PatientInfo from '@components/PatientInfo'
 import InterventionWife from '@components/InterventionWife';
 import InterventionHusband from '@components/InterventionHusband';
 import PostIntervention from '@components/PostIntervention';
-import {getWifeProfile} from '@api/doctorApi'
-import {formatValue} from '@utils/format'
+import { getWifeProfile, getWifeVital, getHusbandVital, getProtocolList } from '@api/doctorApi'
+import { formatValue } from '@utils/format'
 import apiClient from '@api/axiosConfig'
 interface TreatmentProps {
   onBackToDashboard?: () => void;
@@ -70,12 +70,12 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   const { toast } = useToast();
   const [activeSubTab, setActiveSubTab] = useState('wife');
   const [activeInterventionTab, setActiveInterventionTab] = useState('wife');
-  
+
   // Diagnosis states
   const [wifeDiagnosis, setWifeDiagnosis] = useState('');
   const [husbandDiagnosis, setHusbandDiagnosis] = useState('');
   const [generalDiagnosis, setGeneralDiagnosis] = useState('');
-  
+
   // Treatment methods
   const [treatmentMethods, setTreatmentMethods] = useState({
     iui: false,
@@ -143,6 +143,43 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
 
   useEffect(() => {
     const fetchData = async () => {
+      const data = await getWifeVital(patientId);
+      setWifeGeneralInfo({
+        height: data.wifeHeight,
+        weight: data.wifeWeight,
+        bloodPressure: data.wifeBloodPressure,
+        bmi: data.wifeBmi,
+        pulse: data.wifeHeartRate,
+        breathing: data.wifeBreathingRate,
+        temperature: data.wifeTemperature,
+        vaccines: data.wifeVaccinations
+      })
+    };
+    if (patientId) {
+      fetchData();
+    }
+  }, [patientId])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getHusbandVital(patientId);
+      setHusbandGeneralInfo({
+        height: data.husbandHeight,
+        weight: data.husbandWeight,
+        bloodPressure: data.husbandBloodPressure,
+        bmi: data.husbandBmi,
+        pulse: data.husbandHeartRate,
+        breathing: data.husbandBreathingRate,
+        temperature: data.husbandTemperature
+      })
+    };
+    if (patientId) {
+      fetchData();
+    }
+  }, [patientId])
+
+  useEffect(() => {
+    const fetchData = async () => {
       const data = await getWifeProfile(patientId);
       setPatientData({
         name: data.patientName,
@@ -154,7 +191,17 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         phone: data.patientPhone,
       })
     };
-    if(patientId){
+    if (patientId) {
+      fetchData();
+    }
+  }, [patientId])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getProtocolList(patientId);
+     console.log(data);
+    };
+    if (patientId) {
       fetchData();
     }
   }, [patientId])
@@ -184,7 +231,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     };
 
     try {
-      const response = await apiClient.patch(`/doctors/save_treatment_profile?patientId=${patientId}`, payload)
+      const response = await apiClient.patch(`/doctors/save-treatment-profile?patientId=${patientId}`, payload)
       console.log('General Info Payload:', payload);
       console.log('API Response:', response.data);
       toast({
@@ -225,7 +272,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
       // Replace with your actual API call
       // await apiCall('/protocols', payload);
       console.log('Protocols Payload:', payload);
-      
+
       toast({
         title: "Đã lưu xét nghiệm",
         description: "Danh sách xét nghiệm đã được cập nhật.",
@@ -242,7 +289,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   const handleSaveRecord = async () => {
     await saveGeneralInfo();
     //await saveProtocols();
-    
+
     // Save appointment if selected
     if (selectedAppointmentDate) {
       console.log('Appointment:', {
@@ -284,69 +331,36 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsList>
 
         <TabsContent value="wife" className="space-y-6">
-          <GeneralInfo 
-            title="Vợ" 
+          <GeneralInfo
+            title="Vợ"
             includeVaccines={true}
             initialData={wifeGeneralInfo}
             onDataChange={setWifeGeneralInfo}
           />
-          <LabTests 
-            title="Vợ" 
+          <LabTests
+            title="Vợ"
             tests={wifeLabTests}
-            /*onTestsChange={setWifeLabTests}*/
+          /*onTestsChange={setWifeLabTests}*/
           />
 
           {/* Chẩn đoán Vợ */}
-          <Card className="p-6 bg-white border border-[color:var(--card-border)]">
-            <h3 className="text-lg font-semibold mb-4 text-[color:var(--text-accent)]">
-              Chẩn đoán
-            </h3>
-            <div className="space-y-2">
-              <Label htmlFor="wifeDiagnosis" className="text-sm font-medium text-[color:var(--text-secondary)]">
-                Chẩn đoán chi tiết
-              </Label>
-              <Textarea
-                id="wifeDiagnosis"
-                value={wifeDiagnosis}
-                onChange={(e) => setWifeDiagnosis(e.target.value)}
-                placeholder="Nhập chẩn đoán cho vợ..."
-                className="min-h-[100px] border-[color:var(--card-border)] focus:border-[color:var(--deep-taupe)]"
-              />
-            </div>
-          </Card>
+          
         </TabsContent>
 
         <TabsContent value="husband" className="space-y-6">
-          <GeneralInfo 
-            title="Chồng" 
+          <GeneralInfo
+            title="Chồng"
             includeVaccines={false}
             initialData={husbandGeneralInfo}
             onDataChange={setHusbandGeneralInfo}
           />
-          <LabTests 
-            title="Chồng" 
+          <LabTests
+            title="Chồng"
             tests={husbandLabTests}
-            /*onTestsChange={setHusbandLabTests}*/
+          /*onTestsChange={setHusbandLabTests}*/
           />
 
-          {/* Chẩn đoán Chồng */}
-          <Card className="p-6 bg-white border border-[color:var(--card-border)]">
-            <h3 className="text-lg font-semibold mb-4 text-[color:var(--text-accent)]">
-              Chẩn đoán
-            </h3>
-            <div className="space-y-2">
-              <Label htmlFor="husbandDiagnosis" className="text-sm font-medium text-[color:var(--text-secondary)]">
-                Chẩn đoán chi tiết
-              </Label>
-              <Textarea
-                id="husbandDiagnosis"
-                value={husbandDiagnosis}
-                onChange={(e) => setHusbandDiagnosis(e.target.value)}
-                placeholder="Nhập chẩn đoán cho chồng..."
-                className="min-h-[100px] border-[color:var(--card-border)] focus:border-[color:var(--deep-taupe)]"
-              />
-            </div>
-          </Card>
+         
 
           {/* Chẩn đoán chung - Đề xuất từ bác sĩ */}
           <Card className="p-6 bg-white border border-[color:var(--card-border)]">
@@ -412,11 +426,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsContent>
 
         <TabsContent value="appointment">
-          <AppointmentCalendar 
-            /*selectedDate={selectedAppointmentDate}
-            onDateChange={setSelectedAppointmentDate}
-            notes={appointmentNotes}
-            onNotesChange={setAppointmentNotes}*/
+          <AppointmentCalendar
+          /*selectedDate={selectedAppointmentDate}
+          onDateChange={setSelectedAppointmentDate}
+          notes={appointmentNotes}
+          onNotesChange={setAppointmentNotes}*/
           />
         </TabsContent>
       </Tabs>
@@ -465,11 +479,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsContent>
 
         <TabsContent value="appointment">
-          <AppointmentCalendar 
-            /*selectedDate={selectedAppointmentDate}
-            onDateChange={setSelectedAppointmentDate}
-            notes={appointmentNotes}
-            onNotesChange={setAppointmentNotes}*/
+          <AppointmentCalendar
+          /*selectedDate={selectedAppointmentDate}
+          onDateChange={setSelectedAppointmentDate}
+          notes={appointmentNotes}
+          onNotesChange={setAppointmentNotes}*/
           />
         </TabsContent>
       </Tabs>
@@ -514,7 +528,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </div>
 
         {/* Patient Info */}
-       <PatientInfo patient={patientData} />
+        <PatientInfo patient={patientData} />
 
         {/* Tabs */}
         <Tabs defaultValue="specialty" className="w-full">
