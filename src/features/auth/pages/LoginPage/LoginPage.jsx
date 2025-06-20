@@ -1,35 +1,31 @@
-import React from 'react';
-import LoginForm from '@features/auth/components/LoginForm/LoginForm';
+import React from "react";
+import LoginForm from "@features/auth/components/LoginForm/LoginForm";
 import { FcGoogle } from "react-icons/fc";
-import styles from './PatientLoginPage.module.css';
+import styles from "./LoginPage.module.css";
 
-const PatientLoginPage = () => {
+const LoginPage = () => {
   const handleGoogleLogin = () => {
     window.location.href = `http://localhost:8088/api/v1/oauth2/authorization/google`;
   };
 
   return (
-    <div className={styles.patientContainer}>
+    <div className={styles.loginContainer}>
       <div className={styles.backToHome}>
         <a href="/">Quay lại trang chủ</a>
       </div>
 
-      {/* Wrapper chung */}
       <div className={styles.formWrapper}>
         <LoginForm
-          userType="patient"
-          title="Đăng nhập Bệnh nhân"
+          title="Đăng nhập"
           subtitle="Chào mừng bạn trở lại"
-          apiEndpoint="http://localhost:8088/api/v1/auth/authenticate"
-          redirectPath="/"
         />
 
         <div className={styles.additionalOptions}>
           <div className={styles.divider}>
             <span>Hoặc</span>
           </div>
-          <button 
-            type="button" 
+          <button
+            type="button"
             className={styles.googleLoginButton}
             onClick={handleGoogleLogin}
           >
@@ -37,7 +33,7 @@ const PatientLoginPage = () => {
             Đăng nhập với Google
           </button>
           <div className={styles.formOptions}>
-            <a href="/forgot-password/patient" className={styles.forgotPassword}>
+            <a href="/forgot-password" className={styles.forgotPassword}>
               Quên mật khẩu?
             </a>
           </div>
@@ -52,4 +48,4 @@ const PatientLoginPage = () => {
   );
 };
 
-export default PatientLoginPage;
+export default LoginPage;

@@ -3,11 +3,8 @@ import styles from "./LoginForm.module.css";
 import { useNavigate } from 'react-router-dom';
 
 const LoginForm = ({ 
-  userType = 'PATIENT', 
   title = 'Đăng nhập',
   subtitle = 'Chào mừng bạn trở lại',
-  apiEndpoint,
-  redirectPath = '/',
 }) => {
   const [credentials, setCredentials] = useState({
     username: "",
@@ -20,6 +17,13 @@ const LoginForm = ({
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+
+  const roleRedirectMap = {
+    patient: '/',
+    receptionist: '/receptionist-dashboard',
+    doctor: '/doctor-dashboard',
+    admin: '/admin-dashboard',
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,19 +40,19 @@ const LoginForm = ({
     setLoading(true);
     
     try {
-      if(!credentials.username || !credentials.password){
+      if (!credentials.username || !credentials.password) {
         throw new Error('Vui lòng nhập đầy đủ email và mật khẩu');
       }
 
-      const response = await fetch(apiEndpoint, {
+      const response = await fetch('http://localhost:8088/api/v1/auth/authenticate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           email: credentials.username,
-          password: credentials.password
-        })
+          password: credentials.password,
+        }),
       });
 
       if (!response.ok) {
@@ -57,13 +61,18 @@ const LoginForm = ({
 
       const result = await response.json();
       console.log("Đăng nhập thành công:", result);
-      console.log(result);
+      
       if (result.token) {
         localStorage.setItem('authToken', result.token);
         localStorage.setItem('role', result.accountType ?? '');
       }
 
       setSuccessMessage('Đăng nhập thành công!');
+
+      // Navigate to the appropriate dashboard
+      const storedRole = localStorage.getItem('role')?.toLowerCase() || 'patient';
+      const redirectPath = roleRedirectMap[storedRole] || '/';
+      
       setTimeout(() => {
         navigate(redirectPath);
       }, 1000);

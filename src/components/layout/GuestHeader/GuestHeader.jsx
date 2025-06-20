@@ -1,25 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "../GuestHeader/GuestHeader.css"; // Adjust the path as necessary
+import "../GuestHeader/GuestHeader.css";
 import logo from "../../../assets/images/LogoFertiCare.svg";
 import apiClient from "@api/axiosConfig";
 import { User, Settings, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { logout } from "@utils/authUtils";
 
 const Header = () => {
   const dropdownRef = useRef(null);
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-    setUser(null);
-    navigate("/login");
-  };
 
   const handleMouseEnter = () => setIsDropdownOpen(true);
   const handleMouseLeave = () => setIsDropdownOpen(false);
@@ -198,7 +190,7 @@ const Header = () => {
                     <a onClick={() => navigate("/health-records/profile")}>
                       <Settings size={16} /> Hồ sơ
                     </a>
-                    <button onClick={handleLogout}>
+                    <button onClick={() => logout(navigate, setUser)}>
                       <LogOut size={16} /> Đăng xuất
                     </button>
                   </motion.div>
