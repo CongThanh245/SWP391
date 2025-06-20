@@ -1,57 +1,102 @@
-// useAppointments.js
-import { useEffect, useState } from "react";
-import { fetchAppointments } from "@api/appointmentApi";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { fetchAppointments, fetchAppointmentPatient, searchAppointments } from "@api/appointmentApi";
 
-export const useAppointments = ({ filterByPatientId } = {}) => {
+const DEFAULT_FILTERS = { dateFilter: "all", fromDate: "", toDate: "" };
+
+export const useAppointments = ({ filterByPatientId, filters = DEFAULT_FILTERS, role = "receptionist" } = {}) => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const loadAppointments = async () => {
-      setIsLoading(true);
-      try {
-        const data = await fetchAppointments();
+  // Memoize filters
+  const normalizedFilters = useMemo(() => ({
+    dateFilter: filters.dateFilter || "all",
+    fromDate: filters.fromDate || "",
+    toDate: filters.toDate || "",
+  }), [filters]);
 
-        const filtered = data.filter((appt) => {
-          const isValidStatus = ["pending", "confirmed", "completed", "cancelled"].includes(appt.appointment_status);
-          const isForPatient = !filterByPatientId || appt.patient_id === filterByPatientId;
-          return isValidStatus && isForPatient;
-        });
-
-        const mapped = filtered.map((appt) => {
-          let date = "N/A", time = "N/A";
-          const ts = parseInt(appt.appointment_date_time);
-          if (!isNaN(ts)) {
-            const d = new Date(ts * 1000);
-            date = d.toISOString().split("T")[0];
-            time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-          }
-
-          return {
-            id: appt.id,
-            appointmentId: appt.appointment_id,
-            patientId: appt.patient_id,
-            patientName: appt.patient_name,
-            doctorName: appt.doctor_name,
-            status: appt.appointment_status,
-            date,
-            time,
-            notes: appt.notes,
-          };
-        });
-
-        setAppointments(mapped);
-      } catch (err) {
-        setError("Không thể tải lịch hẹn.");
-        console.error(err);
-      } finally {
-        setIsLoading(false);
+  // Hàm lấy lịch hẹn, dùng useCallback để tránh tạo mới
+  const loadAppointments = useCallback(async () => {  
+    setIsLoading(true);
+    try {
+      let data;
+      if (role === "patient") {
+        console.log('Gọi API /my_appointments cho bệnh nhân');
+        data = await fetchAppointmentPatient();
+      } else if (normalizedFilters.dateFilter !== "all") {
+        console.log('Gọi API /appointments/search với bộ lọc ngày:', normalizedFilters);
+        const searchParams = {};
+        if (normalizedFilters.dateFilter === "custom" && normalizedFilters.fromDate && normalizedFilters.toDate) {
+          searchParams.date = `${normalizedFilters.fromDate},${normalizedFilters.toDate}`;
+        } else {
+          const today = new Date().toISOString().split("T")[0];
+          searchParams.date = today;
+        }
+        data = await searchAppointments(searchParams);
+      } else {
+        console.log('Gọi API /receptionists/appointments cho lễ tân', { filterByPatientId });
+        data = await fetchAppointments(filterByPatientId);
       }
-    };
 
+      // Ensure data is an array
+      const appointmentData = Array.isArray(data) ? data : data ? [data] : [];
+
+      const mapped = appointmentData.map((appt) => {
+        const appointmentDate = new Date(appt.appointmentDateTime);
+        const date = appointmentDate.toISOString().split("T")[0];
+        const time = appointmentDate.toLocaleTimeString([], { 
+          hour: "2-digit", 
+          minute: "2-digit" 
+        });
+        const status = (appt.appointmentStatus || "").toLowerCase();
+        return {
+          id: appt.appointmentId,
+          appointmentId: appt.appointmentId,
+          patientName: appt.patientName,
+          doctorName: appt.doctorName,
+          status,
+          date,
+          time,
+          notes: appt.notes || "",
+          rawDateTime: appt.appointmentDateTime,
+          receptionistId: appt.receptionistId,
+          receptionistName: appt.receptionistName,
+        };
+      });
+
+      const sorted = mapped.sort((a, b) => {
+        const dateA = new Date(a.rawDateTime);
+        const dateB = new Date(b.rawDateTime);
+        if ((a.status === "pending" || a.status === "confirmed") && 
+            (b.status === "pending" || b.status === "confirmed")) {
+          return dateA - dateB;
+        }
+        return dateB - dateA;
+      });
+
+      setAppointments(sorted);
+    } catch (err) {
+      setError("Không thể tải lịch hẹn. Vui lòng thử lại sau.");
+      console.error("Error loading appointments:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [filterByPatientId, normalizedFilters, role]);
+
+  useEffect(() => {
+    console.log('useEffect chạy với:', { filterByPatientId, normalizedFilters, role });
     loadAppointments();
-  }, [filterByPatientId]);
+  }, [loadAppointments]);
 
-  return { appointments, isLoading, error };
+  // Hàm làm mới dữ liệu
+  const refetchAppointments = useCallback(() => {
+    console.log('Làm mới lịch hẹn');
+    loadAppointments();
+  }, [loadAppointments]);
+
+  return { appointments, isLoading, error, refetchAppointments };
 };

@@ -29,7 +29,7 @@ interface Appointment {
     status: string;
     notes: string;
 }
-
+  
 export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPatientSelect }) => {
     const [viewType, setViewType] = useState<'day' | 'week' | 'month'>('day');
     const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'completed'>('all');
@@ -195,7 +195,7 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
                                         }}
                                     >
                                         <FileText className="h-4 w-4 mr-1" />
-                                        Xem hồ sơ
+                                        Xem hồ sơ 
                                     </Button>
                                 </div>
                             </div>

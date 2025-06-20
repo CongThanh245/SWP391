@@ -13,7 +13,8 @@ import {
 } from '@components/ui/sidebar';
 import { Button } from '@components/ui/button';
 import { BarChart3, Calendar, Users, LogOut, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '@utils/authUtils';
 
 interface DoctorSidebarProps {
   activeTab: 'dashboard' | 'appointments' | 'patients';
@@ -39,10 +40,7 @@ const menuItems = [
 ];
 
 export const DoctorSidebar: React.FC<DoctorSidebarProps> = ({ activeTab, onTabChange }) => {
-  const handleLogout = () => {
-    // Handle logout logic here
-    console.log('Logging out...');
-  };
+  const navigate = useNavigate();
 
   return (
     <Sidebar className="w-64 border-r theme-primary-bg">
@@ -92,7 +90,7 @@ export const DoctorSidebar: React.FC<DoctorSidebarProps> = ({ activeTab, onTabCh
         <Button 
           variant="ghost" 
           className="w-full justify-start text-[#EAE4E1] hover:text-white hover:bg-[#3a2a1f]"
-          onClick={handleLogout}
+          onClick={() => logout(navigate)}
         >
           <LogOut className="mr-2 h-4 w-4" />
           Log out

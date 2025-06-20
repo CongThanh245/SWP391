@@ -1,0 +1,392 @@
+/* AppointmentTable.module.css */
+
+.tableContainer {
+  background: var(--light-background);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+/* Header Styles */
+.tableHeader {
+  background: linear-gradient(135deg, var(--light-background) 0%, var(--secondary-background) 100%);
+  border-bottom: 2px solid var(--card-border);
+}
+
+.headerCell {
+  padding: var(--spacing-lg) var(--spacing-md);
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-accent);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.headerContent svg {
+  color: var(--deep-taupe);
+  opacity: 0.8;
+}
+
+/* Body Styles */
+.tableBody {
+  background: var(--light-background);
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--card-border);
+  transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+  background-color: var(--secondary-background);
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableCell {
+  padding: var(--spacing-md);
+  vertical-align: middle;
+  border-right: 1px solid var(--card-border);
+}
+
+.tableCell:last-child {
+  border-right: none;
+}
+
+/* Cell Content Styles */
+.dateTimeCell {
+  min-width: 150px;
+}
+
+.dateTime {
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.doctorCell {
+  min-width: 120px;
+}
+
+.doctorName {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.statusCell {
+  min-width: 120px;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.notesCell {
+  max-width: 200px;
+}
+
+.notes {
+  color: var(--text-secondary);
+  line-height: 1.4;
+  cursor: help;
+}
+
+.noNotes {
+  color: var(--text-secondary);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.actionCell {
+  min-width: 100px;
+  text-align: center;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-1);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cancelButton {
+  background: var(--warning-red);
+  color: white;
+  border-color: var(--warning-red);
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: #dc2626;
+  border-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+}
+
+.cancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.noAction {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Loading States */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: var(--spacing-xl);
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--card-border);
+  border-top: 3px solid var(--deep-taupe);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loadingText {
+  margin-top: var(--spacing-md);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.buttonSpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.emptyIcon {
+  color: var(--text-secondary);
+  opacity: 0.5;
+  margin-bottom: var(--spacing-md);
+}
+
+.emptyState h3 {
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-lg);
+}
+
+.emptyState p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* Animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .table {
+    font-size: var(--font-size-xs);
+  }
+  
+  .headerCell,
+  .tableCell {
+    padding: var(--spacing-sm);
+  }
+  
+  .dateTimeCell {
+    min-width: 120px;
+  }
+  
+  .doctorCell {
+    min-width: 100px;
+  }
+  
+  .statusCell {
+    min-width: 100px;
+  }
+  
+  .notesCell {
+    max-width: 150px;
+  }
+  
+  .actionCell {
+    min-width: 80px;
+  }
+  
+  .actionButton {
+    padding: var(--spacing-xs);
+    font-size: 10px;
+  }
+  
+  .actionButton span {
+    display: none;
+  }
+  
+  .statusBadge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tableWrapper {
+    border-radius: 0;
+  }
+  
+  .headerContent span {
+    display: none;
+  }
+  
+  .headerContent {
+    justify-content: center;
+  }
+  
+  .notes {
+    font-size: var(--font-size-xs);
+  }
+  
+  .dateTime {
+    font-size: var(--font-size-xs);
+    line-height: 1.3;
+  }
+  
+  .doctorName {
+    font-size: var(--font-size-xs);
+  }
+}
+/* ... Giữ nguyên các style hiện có, chỉ thêm/cập nhật các phần sau ... */
+
+.notesCell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewMoreButton {
+  font-size: var(--font-size-xs);
+  color: var(--deep-taupe);
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: var(--spacing-sm);
+  text-decoration: underline;
+}
+
+.viewMoreButton:hover {
+  color: #4b5563;
+}
+
+.tableRow:hover {
+  background-color: var(--secondary-background);
+  border-left: 3px solid var(--deep-taupe);
+}
+
+.headerCell {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .notesCell {
+    display: none; /* Ẩn cột ghi chú trên mobile */
+  }
+}
+
+/* ... Giữ nguyên các style hiện có, chỉ thêm/cập nhật các phần sau ... */
+
+.notesCell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewMoreButton {
+  font-size: var(--font-size-xs);
+  color: var(--deep-taupe);
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: var(--spacing-sm);
+  text-decoration: underline;
+}
+
+.viewMoreButton:hover {
+  color: #4b5563;
+}
+
+.tableRow:hover {
+  background-color: var(--secondary-background);
+  border-left: 3px solid var(--deep-taupe);
+}
+
+.headerCell {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .notesCell {
+    display: none; /* Ẩn cột ghi chú trên mobile */
+  }
+}

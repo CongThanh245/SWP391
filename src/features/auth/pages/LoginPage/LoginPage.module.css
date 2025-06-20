@@ -1,8 +1,54 @@
-body {
-  font-family: 'Inter', 'Roboto', sans-serif;
-  background-color: var(--primary-background);
-  color: var(--text-primary);
-  line-height: 1.6;
+/* Assuming custom properties are defined in a global stylesheet */
+:root {
+  --primary-background: #f5f5f5;
+  --secondary-background: rgba(255, 255, 255, 0.15);
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b7280;
+  --accent-color: #007bff;
+  --button-secondary-bg: #ffffff;
+  --button-secondary-border: #e5e7eb;
+  --hover-accent: #f3f4f6;
+  --shadow-accent: rgba(0, 0, 0, 0.1);
+  --shadow-dark: rgba(0, 0, 0, 0.05);
+  --gradient-circle: radial-gradient(circle, rgba(0, 123, 255, 0.1) 0%, rgba(0, 123, 255, 0) 70%);
+}
+
+/* Container chính */
+.loginContainer {
+  position: relative;
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--primary-background);
+  overflow: hidden;
+}
+
+/* Tạo hiệu ứng gradient circle */
+.loginContainer::before {
+  content: '';
+  position: absolute;
+  width: 150vw;
+  height: 150vw;
+  top: -75vw;
+  right: -75vw;
+  background: var(--gradient-circle);
+  z-index: 0;
+  border-radius: 50%;
+}
+
+.loginContainer::after {
+  content: '';
+  position: absolute;
+  width: 130vw;
+  height: 130vw;
+  bottom: -65vw;
+  left: -65vw;
+  background: var(--gradient-circle);
+  z-index: 0;
+  border-radius: 50%;
 }
 
 /* Back to home link */
@@ -44,44 +90,6 @@ body {
 
 .backToHome a:hover::before {
   transform: translateX(-2px);
-}
-
-/* Container chính */
-.patientContainer {
-  position: relative;
-  min-height: 100vh;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: var(--primary-background);
-  overflow: hidden;
-}
-
-/* Tạo hiệu ứng gradient circle */
-.patientContainer::before {
-  content: '';
-  position: absolute;
-  width: 150vw;
-  height: 150vw;
-  top: -75vw;
-  right: -75vw;
-  background: var(--gradient-circle);
-  z-index: 0;
-  border-radius: 50%;
-}
-
-.patientContainer::after {
-  content: '';
-  position: absolute;
-  width: 130vw;
-  height: 130vw;
-  bottom: -65vw;
-  left: -65vw;
-  background: var(--gradient-circle);
-  z-index: 0;
-  border-radius: 50%;
 }
 
 /* Wrapper chung cho form + các tùy chọn bổ sung */
@@ -224,7 +232,7 @@ body {
     font-size: 0.9rem;
   }
   
-  .patientContainer {
+  .loginContainer {
     padding: 1rem;
   }
   
@@ -233,14 +241,14 @@ body {
     max-width: 100%;
   }
 
-  .patientContainer::before {
+  .loginContainer::before {
     width: 180vw;
     height: 180vw;
     top: -90vw;
     right: -90vw;
   }
 
-  .patientContainer::after {
+  .loginContainer::after {
     width: 160vw;
     height: 160vw;
     bottom: -80vw;

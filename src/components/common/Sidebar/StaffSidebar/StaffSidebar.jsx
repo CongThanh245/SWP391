@@ -1,6 +1,9 @@
 import React from "react";
 import styles from "./StaffSidebar.module.css";
 import classNames from "classnames";
+import { LogOut } from "lucide-react";
+import { logout } from "@utils/authUtils";
+import { useNavigate } from "react-router-dom";
 
 const StaffSidebar = ({
   menuItems,
@@ -9,6 +12,8 @@ const StaffSidebar = ({
   userRole = "staff",
   userInfo,
 }) => {
+  const navigate = useNavigate();
+
   const getRoleDisplayName = (role) => {
     const names = {
       receptionist: "Receptionist",
@@ -22,13 +27,11 @@ const StaffSidebar = ({
   // Function to render icon, handling both components and JSX
   const renderIcon = (icon) => {
     if (React.isValidElement(icon)) {
-      // If icon is a JSX element (e.g., <svg>), render it directly
       return icon;
     } else if (typeof icon === "function") {
-      // If icon is a component, render it with size prop
       return React.createElement(icon, { size: 20 });
     }
-    return null; // Fallback for invalid icons
+    return null;
   };
 
   return (
@@ -71,8 +74,9 @@ const StaffSidebar = ({
       {/* Footer */}
       <div className={styles.sidebarFooter}>
         <div className={styles.footerInfo}>
-          <p className={styles.clinicName}>FertiCare</p>
-          <p className={styles.clinicSubtitle}>Điều trị hiếm muộn</p>
+          <button onClick={() => logout(navigate)}>
+            <LogOut size={16} /> Đăng xuất
+          </button>
         </div>
       </div>
     </div>
