@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Calendar, Clock, User, FileText, X, AlertCircle } from "lucide-react";
+import ConfirmationDialog from "@components/common/ConfirmationDialog/ConfirmationDialog"; // Import the reusable dialog
 import styles from "./AppointmentTable.module.css";
 
 const AppointmentTable = ({
@@ -8,7 +9,11 @@ const AppointmentTable = ({
   onCancelAppointment,
   setShowNoteModal,
 }) => {
-  const [cancellingId, setCancellingId] = React.useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    appointmentId: null,
+  });
 
   const statusConfig = {
     pending: { label: "Chờ xác nhận", color: "#f59e0b", bgColor: "#fef3c7" },
@@ -16,20 +21,30 @@ const AppointmentTable = ({
     cancelled: { label: "Đã hủy", color: "#ef4444", bgColor: "#fee2e2" },
   };
 
-  const handleCancelClick = async (appointmentId) => {
-    console.log("Hủy lịch hẹn với ID:", appointmentId);
-    if (window.confirm("Bạn có chắc chắn muốn hủy lịch hẹn này?")) {
-      setCancellingId(appointmentId);
-      try {
-        // Call the passed onCancelAppointment function
-        await onCancelAppointment(appointmentId);
-      } catch (error) {
-        console.error("Error cancelling appointment:", error);
-        alert("Không thể hủy lịch hẹn. Vui lòng thử lại sau.");
-      } finally {
-        setCancellingId(null);
-      }
+  const handleCancelClick = (appointmentId) => {
+    // Open the confirmation dialog instead of window.confirm
+    setConfirmDialog({
+      open: true,
+      appointmentId,
+    });
+  };
+
+  const handleConfirmCancel = async () => {
+    const { appointmentId } = confirmDialog;
+    setCancellingId(appointmentId);
+    try {
+      await onCancelAppointment(appointmentId);
+    } catch (error) {
+      console.error("Error cancelling appointment:", error);
+      alert("Không thể hủy lịch hẹn. Vui lòng thử lại sau.");
+    } finally {
+      setCancellingId(null);
+      setConfirmDialog({ open: false, appointmentId: null });
     }
+  };
+
+  const handleCloseDialog = () => {
+    setConfirmDialog({ open: false, appointmentId: null });
   };
 
   const formatDateTime = (date, time) => {
@@ -205,6 +220,16 @@ const AppointmentTable = ({
           </tbody>
         </table>
       </div>
+
+      <ConfirmationDialog
+        open={confirmDialog.open}
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirmCancel}
+        title="Xác nhận hủy lịch hẹn"
+        content="Bạn có chắc chắn muốn hủy lịch hẹn này? Hành động này không thể hoàn tác."
+        confirmText="Hủy lịch hẹn"
+        cancelText="Quay lại"
+      />
     </div>
   );
 };
