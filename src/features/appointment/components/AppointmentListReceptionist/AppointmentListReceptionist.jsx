@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Clock, Calendar, Eye, Trash2, CheckCircle } from "lucide-react";
+import ConfirmationDialog from "@components/common/ConfirmationDialog/ConfirmationDialog"; // Adjust path as needed
 import styles from "./AppointmentListReceptionist.module.css";
 import { confirmAppointment, completeAppointment, cancelAppointment } from "@api/appointmentApi";
 
@@ -20,21 +21,89 @@ const AppointmentListReceptionist = ({
     open: false,
     content: "",
   });
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    appointmentId: null,
+    action: null,
+    title: "",
+    content: "",
+    confirmText: "",
+  });
 
-  const handleStatusUpdate = async (id, action) => {
+  const handleActionClick = (id, action) => {
+    let dialogConfig = {
+      open: true,
+      appointmentId: id,
+      action,
+    };
+
+    switch (action) {
+      case "confirm":
+        dialogConfig = {
+          ...dialogConfig,
+          title: "Xác nhận lịch hẹn",
+          content: "Bạn đã gọi điện xác nhận với bệnh nhân chưa?",
+          confirmText: "Xác nhận",
+        };
+        break;
+      case "complete":
+        dialogConfig = {
+          ...dialogConfig,
+          title: "Hoàn thành lịch hẹn",
+          content: "Bạn có chắc chắn muốn đánh dấu lịch hẹn này là đã hoàn thành?",
+          confirmText: "Hoàn thành",
+        };
+        break;
+      case "cancel":
+        dialogConfig = {
+          ...dialogConfig,
+          title: "Hủy lịch hẹn",
+          content: "Bạn có chắc chắn muốn hủy lịch hẹn này? Hành động này không thể hoàn tác.",
+          confirmText: "Hủy",
+        };
+        break;
+      default:
+        return;
+    }
+
+    setConfirmDialog(dialogConfig);
+  };
+
+  const handleConfirmAction = async () => {
+    const { appointmentId, action } = confirmDialog;
     try {
       if (action === "confirm") {
-        await confirmAppointment(id);
+        await confirmAppointment(appointmentId);
       } else if (action === "complete") {
-        await completeAppointment(id);
+        await completeAppointment(appointmentId);
       } else if (action === "cancel") {
-        await cancelAppointment(id);
+        await cancelAppointment(appointmentId);
       }
       refetchAppointments();
     } catch (error) {
       alert("Cập nhật trạng thái thất bại. Vui lòng thử lại.");
       console.error("Error updating appointment:", error);
+    } finally {
+      setConfirmDialog({
+        open: false,
+        appointmentId: null,
+        action: null,
+        title: "",
+        content: "",
+        confirmText: "",
+      });
     }
+  };
+
+  const handleCloseDialog = () => {
+    setConfirmDialog({
+      open: false,
+      appointmentId: null,
+      action: null,
+      title: "",
+      content: "",
+      confirmText: "",
+    });
   };
 
   const filteredAppointments =
@@ -134,14 +203,14 @@ const AppointmentListReceptionist = ({
                 <button
                   className={`${styles.actionBtn} ${styles.complete}`}
                   title="Xác nhận"
-                  onClick={() => handleStatusUpdate(appointment.id, "confirm")}
+                  onClick={() => handleActionClick(appointment.id, "confirm")}
                 >
                   <CheckCircle size={16} />
                 </button>
                 <button
                   className={`${styles.actionBtn} ${styles.cancel}`}
                   title="Hủy"
-                  onClick={() => handleStatusUpdate(appointment.id, "cancel")}
+                  onClick={() => handleActionClick(appointment.id, "cancel")}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -152,14 +221,14 @@ const AppointmentListReceptionist = ({
                 <button
                   className={`${styles.actionBtn} ${styles.complete}`}
                   title="Hoàn thành"
-                  onClick={() => handleStatusUpdate(appointment.id, "complete")}
+                  onClick={() => handleActionClick(appointment.id, "complete")}
                 >
                   <CheckCircle size={16} />
                 </button>
                 <button
                   className={`${styles.actionBtn} ${styles.cancel}`}
                   title="Hủy"
-                  onClick={() => handleStatusUpdate(appointment.id, "cancel")}
+                  onClick={() => handleActionClick(appointment.id, "cancel")}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -195,6 +264,15 @@ const AppointmentListReceptionist = ({
           </div>
         </div>
       )}
+      <ConfirmationDialog
+        open={confirmDialog.open}
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirmAction}
+        title={confirmDialog.title}
+        content={confirmDialog.content}
+        confirmText={confirmDialog.confirmText}
+        cancelText="Hủy bỏ"
+      />
     </div>
   );
 };

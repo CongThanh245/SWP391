@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useAppointments } from "@hooks/useAppointments";
 import AppointmentFilters from "@features/appointment/components/AppointmentFilters/AppointmentFilters";
 import AppointmentTable from "@features/appointment/components/AppointmentTable/AppointmentTable";
-import { updateAppointmentStatus } from "@api/appointmentApi"; // Ensure correct import
+import { updateAppointmentStatus } from "@api/appointmentApi";
 import styles from "./AppointmentSchedulePage.module.css";
 
 const AppointmentSchedulePage = () => {
@@ -19,11 +19,10 @@ const AppointmentSchedulePage = () => {
 
   const { appointments, isLoading, error, refetchAppointments } = useAppointments({
     filters,
-    role: "patient", // Specify Patient role
+    role: "patient",
   });
   const [localAppointments, setLocalAppointments] = useState(appointments);
 
-  // Sync localAppointments with appointments
   useEffect(() => {
     setLocalAppointments(appointments);
   }, [appointments]);
@@ -118,19 +117,15 @@ const AppointmentSchedulePage = () => {
 
   const handleCancelAppointment = async (appointmentId) => {
     try {
-      // Optimistic update
       setLocalAppointments((prevAppointments) =>
         prevAppointments.map((appt) =>
           appt.id === appointmentId ? { ...appt, status: "cancelled" } : appt
         )
       );
-      // Call API to cancel appointment
       await updateAppointmentStatus(appointmentId);
-      // Refresh data from server
       await refetchAppointments();
     } catch (error) {
       console.error("Error cancelling appointment:", error);
-      // Revert optimistic update on error
       setLocalAppointments(appointments);
       throw error;
     }
