@@ -1,11 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import { getDoctorList } from "@api/doctorApi";
 import apiClient from "@api/axiosConfig";
 import { createAppointment } from "@api/appointmentApi";
 
-// Custom hook for booking with debouncing and optimized slot fetching
 const useBookingForm = (onClose) => {
-  const [count, setCount] = useState(0); // For debugging purposes
   const [formData, setFormData] = useState({
     doctorId: "",
     date: "",
@@ -19,203 +17,138 @@ const useBookingForm = (onClose) => {
   const [doctors, setDoctors] = useState([]);
   const [timeSlots, setTimeSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
-  
-  // Cache để tránh gọi API trùng lặp
-  const slotsCache = useRef(new Map());
-  const debounceTimer = useRef(null);
-  const abortController = useRef(null);
 
   const today = new Date().toISOString().split("T")[0];
 
-  // 1. Fetch doctors for dropdown
+  // Fetch doctors
   useEffect(() => {
-    (async () => {
+    const fetchDoctors = async () => {
       try {
         const list = await getDoctorList();
-        setDoctors(
-          list.map((d) => ({ id: d.id, name: d.doctorName || d.name }))
-        );
+        setDoctors(list.map((d) => ({ id: d.id, name: d.doctorName || d.name })));
       } catch (err) {
         console.error("Error fetching doctors:", err);
         setErrorMessage("Không thể tải danh sách bác sĩ.");
       }
-    })();
+    };
+    fetchDoctors();
   }, []);
 
-  // 2. Optimized slot fetching với duplicate prevention
-  const fetchSlotsDebounced = useCallback(async (doctorId, date) => {
-    // Clear previous timer
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-
-    // Cancel previous request
-    if (abortController.current) {
-      abortController.current.abort();
-    }
-
-    debounceTimer.current = setTimeout(async () => {
-      // Kiểm tra cache trước
-      const cacheKey = `${doctorId}-${date}`;
-      if (slotsCache.current.has(cacheKey)) {
-        console.log('Using cached slots for:', cacheKey);
-        const cachedSlots = slotsCache.current.get(cacheKey);
-        setTimeSlots(cachedSlots);
-        setLoadingSlots(false);
+  // Fetch slots when doctor & date change
+  useEffect(() => {
+    const fetchSlots = async () => {
+      const { doctorId, date } = formData;
+      
+      if (!doctorId || !date) {
+        setTimeSlots([]);
         return;
       }
 
       setLoadingSlots(true);
-      setErrorMessage('');
+      setErrorMessage("");
       setTimeSlots([]);
-      
-      // Tạo AbortController mới cho request này
-      abortController.current = new AbortController();
 
       try {
         console.log(`Fetching slots for doctorId: ${doctorId}, date: ${date}`);
         
-        // STRATEGY: Luôn fetch existing slots trước
-        let resp = await apiClient.get('/slot', { 
-          params: { doctorId, date },
-          signal: abortController.current.signal 
+        // Lấy slots hiện có
+        let response = await apiClient.get('/slot', { 
+          params: { doctorId, date } 
         });
         
-        // Nếu không có slots hoặc có ít slots, generate thêm
-        if (!resp.data || resp.data.length === 0) {
-          console.log('No existing slots found, generating new ones...');
-          try {
-            await apiClient.post('/slot/generate', null, { 
-              params: { doctorId, date },
-              signal: abortController.current.signal 
-            });
-            
-            // Fetch lại sau khi generate
-            resp = await apiClient.get('/slot', { 
-              params: { doctorId, date },
-              signal: abortController.current.signal 
-            });
-          } catch (generateError) {
-            console.log('Generate error (possibly duplicate):', generateError.message);
-            // Nếu generate fail, vẫn dùng data hiện tại
-            if (generateError.response?.status !== 409) {
-              throw generateError; // Re-throw nếu không phải lỗi duplicate
-            }
-            // Với lỗi 409, fetch lại existing slots
-            resp = await apiClient.get('/slot', { 
-              params: { doctorId, date },
-              signal: abortController.current.signal 
-            });
-          }
-        } else {
-          console.log(`Found ${resp.data.length} existing slots, using them directly`);
-        }
-
-        if (Array.isArray(resp.data)) {
-          // Xử lí duplicate slots từ backend
-          const slotsMap = new Map();
-          resp.data.forEach(slot => {
-            const key = `${slot.startTime}`;
-            if (!slotsMap.has(key)) {
-              slotsMap.set(key, {
-                id: slot.id,
-                time: slot.startTime,
-                available: !slot.booked,
-                // Lưu thêm info để debug
-                slotId: slot.id,
-                isBooked: slot.booked
-              });
-            } else {
-              // Nếu có duplicate, ưu tiên slot chưa book
-              const existing = slotsMap.get(key);
-              if (existing.isBooked && !slot.booked) {
-                slotsMap.set(key, {
-                  id: slot.id,
-                  time: slot.startTime,
-                  available: !slot.booked,
-                  slotId: slot.id,
-                  isBooked: slot.booked
-                });
-              }
-              console.warn(`Duplicate slot found for time ${slot.startTime}:`, {
-                existing: existing,
-                duplicate: slot
-              });
-            }
+        // Nếu không có slots thì generate
+        if (!response.data || response.data.length === 0) {
+          console.log('No slots found, generating...');
+          await apiClient.post('/slot/generate', null, { 
+            params: { doctorId, date } 
           });
           
-          // Convert Map to Array và sort theo thời gian
-          const uniqueSlots = Array.from(slotsMap.values())
-            .sort((a, b) => a.time.localeCompare(b.time));
-          
-          console.log(`Processed ${resp.data.length} slots → ${uniqueSlots.length} unique slots`);
-          
-          // Lưu vào cache với expiry time (5 phút)
-          const cacheData = {
-            slots: uniqueSlots,
-            timestamp: Date.now(),
-            expiry: Date.now() + (5 * 60 * 1000) // 5 phút
-          };
-          slotsCache.current.set(cacheKey, uniqueSlots);
+          // Fetch lại sau khi generate
+          response = await apiClient.get('/slot', { 
+            params: { doctorId, date } 
+          });
+        }
+
+        if (Array.isArray(response.data)) {
+          // Xử lý duplicate slots - chỉ giữ lại 1 slot cho mỗi thời gian
+          const uniqueSlots = response.data.reduce((acc, slot) => {
+            const existingSlot = acc.find(s => s.time === slot.startTime);
+            
+            if (!existingSlot) {
+              // Chưa có slot này, thêm vào
+              acc.push({
+                id: slot.id,
+                time: slot.startTime,
+                available: !slot.booked
+              });
+            } else if (existingSlot.available && !slot.booked) {
+              // Nếu có duplicate và cả 2 đều available, ưu tiên slot đầu tiên
+              // (không làm gì)
+            } else if (!existingSlot.available && !slot.booked) {
+              // Nếu slot cũ đã booked mà slot mới chưa booked, thay thế
+              const index = acc.findIndex(s => s.time === slot.startTime);
+              acc[index] = {
+                id: slot.id,
+                time: slot.startTime,
+                available: true
+              };
+            }
+            
+            return acc;
+          }, []);
+
+          // Sort theo thời gian
+          uniqueSlots.sort((a, b) => a.time.localeCompare(b.time));
           
           setTimeSlots(uniqueSlots);
-          if (!uniqueSlots.length) {
+          console.log(`Loaded ${uniqueSlots.length} unique slots`);
+          
+          if (uniqueSlots.length === 0) {
             setErrorMessage('Không có khung giờ khả dụng.');
           }
         } else {
           setErrorMessage('Dữ liệu khung giờ không hợp lệ.');
-          setTimeSlots([]);
         }
+        
       } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Error fetching slots:', err.response?.status, err.response?.data);
-          
-          // Xử lý các lỗi cụ thể
-          if (err.response?.status === 409) {
-            setErrorMessage('Khung giờ đã tồn tại. Đang tải lại...');
-          } else if (err.response?.data?.message?.includes('unique result')) {
-            setErrorMessage('Dữ liệu bị trùng lặp trong hệ thống. Vui lòng liên hệ admin.');
-          } else {
+        console.error('Error fetching slots:', err);
+        if (err.response?.status === 409) {
+          // Conflict - có thể do generate duplicate, thử fetch lại
+          try {
+            const response = await apiClient.get('/slot', { 
+              params: { doctorId, date } 
+            });
+            if (response.data && response.data.length > 0) {
+              const uniqueSlots = response.data
+                .filter((slot, index, arr) => 
+                  arr.findIndex(s => s.startTime === slot.startTime) === index
+                )
+                .map(slot => ({
+                  id: slot.id,
+                  time: slot.startTime,
+                  available: !slot.booked
+                }))
+                .sort((a, b) => a.time.localeCompare(b.time));
+              
+              setTimeSlots(uniqueSlots);
+            } else {
+              setErrorMessage('Không có khung giờ khả dụng.');
+            }
+          } catch (retryErr) {
             setErrorMessage('Không thể tải khung giờ. Vui lòng thử lại.');
           }
-          setTimeSlots([]);
+        } else {
+          setErrorMessage('Không thể tải khung giờ. Vui lòng thử lại.');
         }
       } finally {
         setLoadingSlots(false);
       }
-    }, 800); // Debounce 800ms
-  }, []);
-
-  // 3. Effect để fetch slots khi doctor & date thay đổi
-  useEffect(() => {
-    const { doctorId, date } = formData;
-
-    if (!doctorId || !date) {
-      setTimeSlots([]);
-      if (doctorId && !date) {
-        setErrorMessage('Vui lòng chọn ngày khám');
-      } else if (!doctorId && date) {
-        setErrorMessage('Vui lòng chọn bác sĩ');
-      } else {
-        setErrorMessage('');
-      }
-      return;
-    }
-
-    fetchSlotsDebounced(doctorId, date);
-
-    // Cleanup function
-    return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-      if (abortController.current) {
-        abortController.current.abort();
-      }
     };
-  }, [formData.doctorId, formData.date, fetchSlotsDebounced]);
 
-  // Validate form for submit
+    fetchSlots();
+  }, [formData.doctorId, formData.date]);
+
+  // Validate form
   const validate = () => {
     const errs = {};
     if (!formData.doctorId) errs.doctorId = "Chọn bác sĩ";
@@ -225,7 +158,28 @@ const useBookingForm = (onClose) => {
     return Object.keys(errs).length === 0;
   };
 
-  // Handle final form submit with better error handling
+  // Handle time slot focus - check if doctor and date are selected
+  const handleTimeSlotFocus = (e) => {
+    if (!formData.doctorId || !formData.date) {
+      e.target.blur(); 
+      
+      // Set specific error messages
+      const newErrors = {};
+      if (!formData.doctorId && !formData.date) {
+        setErrorMessage("Vui lòng chọn bác sĩ và ngày khám trước khi chọn giờ khám.");
+      } else if (!formData.doctorId) {
+        newErrors.doctorId = "Vui lòng chọn bác sĩ trước";
+        setErrorMessage("Vui lòng chọn bác sĩ trước khi chọn giờ khám.");
+      } else if (!formData.date) {
+        newErrors.date = "Vui lòng chọn ngày trước";
+        setErrorMessage("Vui lòng chọn ngày khám trước khi chọn giờ khám.");
+      }
+      
+      setErrors(prev => ({ ...prev, ...newErrors }));
+    }
+  };
+
+  // Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -240,126 +194,53 @@ const useBookingForm = (onClose) => {
         appointmentTime: formData.timeSlot,
         note: formData.notes || "",
       };
-      setCount(count => count + 1); // Increment count for debugging
-      console.log("Creating appointment with payload:", payload);
-      const response = await createAppointment(payload);
-      console.log("Appointment created:", response);
-
-      // Xóa cache để refresh slots sau khi đặt lịch thành công
-      const cacheKey = `${formData.doctorId}-${formData.date}`;
-      slotsCache.current.delete(cacheKey);
-
+      
+      console.log("Creating appointment:", payload);
+      await createAppointment(payload);
+      
       setShowSuccess(true);
-      setTimeout(handleClose, 2000);
+      (handleClose, 1000);
+      
     } catch (err) {
-      console.error("Create appointment error:", err.response?.status, err.response?.data);
+      console.error("Create appointment error:", err);
       
-      // Xử lý các lỗi cụ thể từ backend
       let errorMsg = "Đặt lịch thất bại: ";
-      
       if (err.response?.status === 409) {
-        errorMsg += "Lịch hẹn đã tồn tại hoặc khung giờ đã được đặt.";
-      } else if (err.response?.data?.message?.includes('unique result')) {
-        errorMsg += "Dữ liệu bị trùng lặp. Vui lòng chọn lại khung giờ.";
+        errorMsg += "Khung giờ đã được đặt.";
       } else if (err.response?.data?.message?.includes('maximum')) {
-        errorMsg += "Bạn đã đạt giới hạn số lịch hẹn (tối đa 3 lịch).";
-      } else if (err.response?.data?.message) {
-        errorMsg += err.response.data.message;
+        errorMsg += "Bạn đã đạt giới hạn số lịch hẹn.";
       } else {
-        errorMsg += "Lỗi không xác định. Vui lòng thử lại.";
+        errorMsg += err.response?.data?.message || "Lỗi không xác định.";
       }
       
       setErrorMessage(errorMsg);
-      
-      // Nếu lỗi liên quan đến slots, refresh lại slots
-      if (err.response?.status === 409 || err.response?.data?.message?.includes('unique')) {
-        setTimeout(() => {
-          refreshSlots();
-        }, 1000);
-      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Handle field changes
+  // Handle input change
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [field]: value,
-      // Chỉ reset timeSlot khi thay đổi doctor hoặc date
+      // Reset timeSlot khi đổi doctor hoặc date
       ...(field === "doctorId" || field === "date" ? { timeSlot: "" } : {}),
     }));
     
-    setErrors((prev) => ({ ...prev, [field]: "" }));
+    setErrors(prev => ({ ...prev, [field]: "" }));
     setErrorMessage("");
   };
 
-  // Reset and close
+  // Handle close
   const handleClose = () => {
-    // Cancel any pending requests
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-    if (abortController.current) {
-      abortController.current.abort();
-    }
-
     setFormData({ doctorId: "", date: "", timeSlot: "", notes: "" });
     setErrors({});
     setShowSuccess(false);
     setErrorMessage("");
     setTimeSlots([]);
-    
-    // Clear cache nếu cần
-    // slotsCache.current.clear();
-    
     onClose();
   };
-
-  // Function để clear cache và refresh slots
-  const refreshSlots = useCallback((clearAll = false) => {
-    const { doctorId, date } = formData;
-    
-    if (clearAll) {
-      // Clear toàn bộ cache
-      slotsCache.current.clear();
-      console.log('Cleared all slots cache');
-    } else if (doctorId && date) {
-      // Clear cache cho combination cụ thể
-      const cacheKey = `${doctorId}-${date}`;
-      slotsCache.current.delete(cacheKey);
-      console.log('Cleared cache for:', cacheKey);
-    }
-    
-    // Fetch lại nếu có đủ thông tin
-    if (doctorId && date) {
-      fetchSlotsDebounced(doctorId, date);
-    }
-  }, [formData.doctorId, formData.date, fetchSlotsDebounced]);
-
-  // Function để check và clean expired cache
-  const cleanExpiredCache = useCallback(() => {
-    const now = Date.now();
-    const keysToDelete = [];
-    
-    slotsCache.current.forEach((value, key) => {
-      if (value.expiry && now > value.expiry) {
-        keysToDelete.push(key);
-      }
-    });
-    
-    keysToDelete.forEach(key => {
-      slotsCache.current.delete(key);
-      console.log('Cleaned expired cache:', key);
-    });
-  }, []);
-
-  // Clean expired cache mỗi 2 phút
-  useEffect(() => {
-    const cleanupInterval = setInterval(cleanExpiredCache, 2 * 60 * 1000);
-    return () => clearInterval(cleanupInterval);
-  }, [cleanExpiredCache]);
 
   return {
     formData,
@@ -374,8 +255,7 @@ const useBookingForm = (onClose) => {
     handleInputChange,
     handleSubmit,
     handleClose,
-    refreshSlots, // Export để có thể refresh manual
-    cleanExpiredCache, // Export để có thể clean cache manual
+    handleTimeSlotFocus, 
   };
 };
 

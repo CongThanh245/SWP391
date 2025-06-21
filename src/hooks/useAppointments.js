@@ -1,9 +1,9 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { fetchAppointments, fetchAppointmentPatient, searchAppointments } from "@api/appointmentApi";
 
-const DEFAULT_FILTERS = { dateFilter: "all", fromDate: "", toDate: "" };
+const DEFAULT_FILTERS = { dateFilter: "all", specificDate: "" };
 
-export const useAppointments = ({ filterByPatientId, filters = DEFAULT_FILTERS, role = "receptionist" } = {}) => {
+export const useAppointments = ({ filterByPatientId, filters = DEFAULT_FILTERS, role = "receptionist", activeTab = "all" } = {}) => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -11,26 +11,23 @@ export const useAppointments = ({ filterByPatientId, filters = DEFAULT_FILTERS, 
   // Memoize filters
   const normalizedFilters = useMemo(() => ({
     dateFilter: filters.dateFilter || "all",
-    fromDate: filters.fromDate || "",
-    toDate: filters.toDate || "",
-  }), [filters]);
+    specificDate: filters.specificDate || "",
+    status: activeTab !== "all" ? activeTab : undefined,
+  }), [filters, activeTab]);
 
-  // Hàm lấy lịch hẹn, dùng useCallback để tránh tạo mới
+  // Hàm lấy lịch hẹn
   const loadAppointments = useCallback(async () => {  
     setIsLoading(true);
     try {
       let data;
       if (role === "patient") {
-        console.log('Gọi API /my_appointments cho bệnh nhân');
-        data = await fetchAppointmentPatient();
-      } else if (normalizedFilters.dateFilter !== "all") {
-        console.log('Gọi API /appointments/search với bộ lọc ngày:', normalizedFilters);
+        console.log('Gọi API /my_appointments/search cho bệnh nhân với bộ lọc:', normalizedFilters);
         const searchParams = {};
-        if (normalizedFilters.dateFilter === "custom" && normalizedFilters.fromDate && normalizedFilters.toDate) {
-          searchParams.date = `${normalizedFilters.fromDate},${normalizedFilters.toDate}`;
-        } else {
-          const today = new Date().toISOString().split("T")[0];
-          searchParams.date = today;
+        if (normalizedFilters.status) {
+          searchParams.status = normalizedFilters.status;
+        }
+        if (normalizedFilters.dateFilter === "specific" && normalizedFilters.specificDate) {
+          searchParams.date = normalizedFilters.specificDate;
         }
         data = await searchAppointments(searchParams);
       } else {

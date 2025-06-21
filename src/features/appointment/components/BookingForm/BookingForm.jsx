@@ -2,8 +2,9 @@ import React from "react";
 import BaseModal from "@components/common/BaseModal/BaseModal";
 import styles from "./BookingForm.module.css";
 import useBookingForm from "@hooks/useBookingForm";
+import { useEffect } from "react";
 
-const BookingModal = ({ isOpen, onClose }) => {
+const BookingModal = ({ isOpen, onClose, onSuccess }) => {
   const {
     formData,
     errors,
@@ -15,9 +16,18 @@ const BookingModal = ({ isOpen, onClose }) => {
     handleSubmit,
     handleInputChange,
     handleClose,
+    handleTimeSlotFocus, // Thêm handler này
     today,
     loadingSlots,
   } = useBookingForm(onClose);
+
+  // Khi booking thành công:
+  useEffect(() => {
+    if (showSuccess) {
+      handleClose(); // 1. Đóng modal
+      onSuccess?.(); // 2. Báo lên parent để show toast
+    }
+  }, [showSuccess]);
 
   return (
     <BaseModal
@@ -27,11 +37,6 @@ const BookingModal = ({ isOpen, onClose }) => {
       className="booking-modal"
     >
       <form className={styles.bookingForm} onSubmit={handleSubmit}>
-        {showSuccess && (
-          <div className={styles.successMessage}>
-            🎉 Đặt lịch hẹn thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.
-          </div>
-        )}
         {errorMessage && (
           <div className={styles.errorMessage}>{errorMessage}</div>
         )}
@@ -92,6 +97,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                 className={styles.select}
                 value={formData.timeSlot}
                 onChange={(e) => handleInputChange("timeSlot", e.target.value)}
+                onFocus={handleTimeSlotFocus} // Thêm handler này
                 disabled={isSubmitting || loadingSlots}
               >
                 <option value="">Chọn giờ khám</option>

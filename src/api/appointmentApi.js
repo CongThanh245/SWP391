@@ -2,9 +2,7 @@ import apiClient from "./axiosConfig";
 // chưa sài được hàm createAppointment
 export const createAppointment = async (appointmentData) => {
   try {
-    console.log("Payload sent:", JSON.stringify(appointmentData, null, 2));
     const response = await apiClient.post("/create_appointment", appointmentData);
-    console.log("Response:", response.data);
     return response.data;
   } catch (error) {
     console.error("API Error:", error.response?.data || error.message);
@@ -39,8 +37,8 @@ export const fetchAppointments = async (patientId) => {
 // chưa sài được hàm searchAppointments
 export const searchAppointments = async (params = {}) => {
   try {
-    const response = await apiClient.get("/appointments/search", {
-      params, // Truyền params như date, status
+    const response = await apiClient.get("/my_appointments/search", {
+      params,
     });
     return response.data;
   } catch (error) {

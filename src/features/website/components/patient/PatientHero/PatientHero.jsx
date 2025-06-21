@@ -2,9 +2,17 @@ import React, { useState } from "react";
 import styles from "./PatientHero.module.css";
 import BookingForm from "@features/appointment/components/BookingForm/BookingForm";
 import { Link } from "react-router-dom";
+import { useToast } from "@hooks/use-toast";
+import {
+  Toast,
+  ToastTitle,
+  ToastDescription,
+  ToastClose,
+} from "@components/ui/toast";
 
 const PatientHero = () => {
   const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
+  const { toasts, toast } = useToast();
 
   const handleBookAppointment = () => {
     setIsBookingFormOpen(true);
@@ -14,12 +22,11 @@ const PatientHero = () => {
     setIsBookingFormOpen(false);
   };
 
-  const handleViewSchedule = () => {
-    console.log("Xem lịch khám clicked");
-  };
-
-  const handleViewMedicalRecord = () => {
-    console.log("Hồ sơ bệnh án clicked");
+  const handleBookingSuccess = () => {
+    toast({
+      title: "🎉 Đặt lịch thành công",
+      description: "Chúng tôi sẽ liên hệ với bạn sớm nhất.",
+    });
   };
 
   return (
@@ -45,7 +52,10 @@ const PatientHero = () => {
             đại.
           </p>
 
-          <button className={styles.primaryButton} onClick={handleBookAppointment}>
+          <button
+            className={styles.primaryButton}
+            onClick={handleBookAppointment}
+          >
             Đặt lịch hẹn ngay
           </button>
         </div>
@@ -56,7 +66,6 @@ const PatientHero = () => {
           <Link
             to="/health-records/appointments"
             className={styles.featureCard}
-            onClick={handleViewSchedule}
           >
             <svg
               className={styles.icon}
@@ -92,7 +101,6 @@ const PatientHero = () => {
           <Link
             to="/health-records/medical-records"
             className={styles.featureCard}
-            onClick={handleViewMedicalRecord}
           >
             <svg
               className={styles.icon}
@@ -122,7 +130,22 @@ const PatientHero = () => {
       </div>
 
       {/* Booking Modal */}
-      <BookingForm isOpen={isBookingFormOpen} onClose={handleCloseBookingForm} />
+      <BookingForm
+        isOpen={isBookingFormOpen}
+        onClose={handleCloseBookingForm}
+        onSuccess={handleBookingSuccess} // ← truyền callback
+      />
+      {/* Render tất cả toast */}
+      {toasts.map((t) => (
+        <Toast key={t.id} {...t}>
+          {t.title && <ToastTitle>{t.title}</ToastTitle>}
+          {t.description && (
+            <ToastDescription>{t.description}</ToastDescription>
+          )}
+          {t.action}
+          <ToastClose />
+        </Toast>
+      ))}
     </section>
   );
 };
