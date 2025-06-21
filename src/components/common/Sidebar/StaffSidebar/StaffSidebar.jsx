@@ -46,7 +46,7 @@ const StaffSidebar = ({
         <div className={styles.userInfo}>
           <h4 className={styles.userName}>
             {userInfo?.name || "Nguyễn Thị Lan"}
-          </h4>
+          </h4> 
           <span className={styles.userRole}>
             {getRoleDisplayName(userRole)}
           </span>

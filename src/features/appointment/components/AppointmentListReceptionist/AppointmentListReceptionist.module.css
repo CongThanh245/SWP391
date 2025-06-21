@@ -411,3 +411,179 @@
     height: 24px;
   }
 }
+/* Thêm các CSS class này vào file AppointmentListReceptionist.module.css của bạn */
+
+/* Prevent body scroll when modal is open */
+body.modalOpen {
+  overflow: hidden;
+}
+
+/* Details Modal Styles */
+.detailsModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(77, 60, 45, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(1px);
+}
+
+.detailsModalContent {
+  background: var(--light-background);
+  border-radius: var(--card-border-radius);
+  box-shadow: 0 25px 50px -12px var(--shadow-accent);
+  max-width: 500px;
+  width: 90%;
+  overflow: hidden;
+  border: 2px solid var(--card-border);
+}
+
+.detailsModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
+  border-bottom: 2px solid var(--card-border);
+  background: linear-gradient(135deg, var(--secondary-background) 0%, #ddd4d0 100%);
+}
+
+.detailsModalTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--deep-taupe);
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.detailsCloseButton {
+  color: var(--deep-taupe);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.detailsCloseButton:hover {
+  color: var(--light-background);
+  background: var(--deep-taupe);
+  border-color: var(--deep-taupe);
+  transform: scale(1.05);
+}
+
+.detailsModalBody {
+  padding: var(--spacing-xl);
+  background: var(--light-background);
+}
+
+.detailsInfo {
+  margin-bottom: var(--spacing-lg);
+}
+
+.detailsInfo p {
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  padding: var(--spacing-sm) 0;
+}
+
+.detailsInfo p:last-child {
+  margin-bottom: 0;
+}
+
+.detailsInfo strong {
+  color: var(--deep-taupe);
+  font-weight: 700;
+  display: inline-block;
+  min-width: 120px;
+}
+
+.detailsModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+  border-top: 2px solid var(--card-border);
+  background: linear-gradient(135deg, #f8f5f2 0%, var(--secondary-background) 100%);
+}
+
+.detailsCancelButton {
+  background: var(--light-background);
+  color: var(--text-secondary);
+  border: 2px solid var(--card-border);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-2);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detailsCancelButton:hover {
+  background: var(--text-secondary);
+  color: var(--light-background);
+  border-color: var(--text-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.detailsConfirmButton {
+  background: var(--deep-taupe);
+  color: var(--light-background);
+  border: 2px solid var(--deep-taupe);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-2);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px var(--shadow-accent);
+}
+
+.detailsConfirmButton:hover {
+  background: var(--dark-accent);
+  border-color: var(--dark-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px var(--shadow-accent);
+}
+
+/* Responsive cho details modal */
+@media (max-width: var(--breakpoint-sm)) {
+  .detailsModalContent {
+    width: 95%;
+    margin: var(--spacing-md);
+  }
+  
+  .detailsModalHeader,
+  .detailsModalBody,
+  .detailsModalActions {
+    padding: var(--spacing-md);
+  }
+  
+  .detailsModalTitle {
+    font-size: var(--font-size-base);
+  }
+  
+  .detailsInfo p {
+    font-size: var(--font-size-sm);
+  }
+  
+  .detailsCancelButton,
+  .detailsConfirmButton {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+}

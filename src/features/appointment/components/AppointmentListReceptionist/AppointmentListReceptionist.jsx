@@ -1,8 +1,13 @@
 import React, { useState } from "react";
-import { Clock, Calendar, Eye, Trash2, CheckCircle } from "lucide-react";
-import ConfirmationDialog from "@components/common/ConfirmationDialog/ConfirmationDialog"; // Adjust path as needed
+import { Clock, Calendar, Eye, Trash2, CheckCircle, X } from "lucide-react";
+import ConfirmationDialog from "@components/common/ConfirmationDialog/ConfirmationDialog";
 import styles from "./AppointmentListReceptionist.module.css";
-import { confirmAppointment, completeAppointment, cancelAppointment } from "@api/appointmentApi";
+
+import {
+  confirmAppointment,
+  completeAppointment,
+  cancelAppointment,
+} from "@api/appointmentApi";
 
 const statusConfig = {
   pending: "Chờ xác nhận",
@@ -29,28 +34,26 @@ const AppointmentListReceptionist = ({
     content: "",
     confirmText: "",
   });
+  const [detailsModal, setDetailsModal] = useState({
+    open: false,
+    appointment: null,
+  });
 
-  const handleActionClick = (id, action) => {
-    let dialogConfig = {
-      open: true,
-      appointmentId: id,
-      action,
-    };
+  const handleActionClick = (id, action, appointment = null) => {
+    if (action === "confirm") {
+      setDetailsModal({ open: true, appointment });
+      return;
+    }
+
+    let dialogConfig = { open: true, appointmentId: id, action };
 
     switch (action) {
-      case "confirm":
-        dialogConfig = {
-          ...dialogConfig,
-          title: "Xác nhận lịch hẹn",
-          content: "Bạn đã gọi điện xác nhận với bệnh nhân chưa?",
-          confirmText: "Xác nhận",
-        };
-        break;
       case "complete":
         dialogConfig = {
           ...dialogConfig,
           title: "Hoàn thành lịch hẹn",
-          content: "Bạn có chắc chắn muốn đánh dấu lịch hẹn này là đã hoàn thành?",
+          content:
+            "Bạn có chắc chắn muốn đánh dấu lịch hẹn này là đã hoàn thành?",
           confirmText: "Hoàn thành",
         };
         break;
@@ -58,7 +61,8 @@ const AppointmentListReceptionist = ({
         dialogConfig = {
           ...dialogConfig,
           title: "Hủy lịch hẹn",
-          content: "Bạn có chắc chắn muốn hủy lịch hẹn này? Hành động này không thể hoàn tác.",
+          content:
+            "Bạn có chắc chắn muốn hủy lịch hẹn này? Hành động này không thể hoàn tác.",
           confirmText: "Hủy",
         };
         break;
@@ -67,6 +71,18 @@ const AppointmentListReceptionist = ({
     }
 
     setConfirmDialog(dialogConfig);
+  };
+
+  const handleDetailsConfirm = () => {
+    if (!detailsModal.appointment) return;
+    setConfirmDialog({
+      open: true,
+      appointmentId: detailsModal.appointment.id,
+      action: "confirm",
+      title: "Xác nhận liên hệ",
+      content: "Trước khi xác nhận lịch hẹn, hãy đảm bảo đã liên hệ với bệnh nhân.",
+      confirmText: "Xác nhận",
+    });
   };
 
   const handleConfirmAction = async () => {
@@ -92,6 +108,7 @@ const AppointmentListReceptionist = ({
         content: "",
         confirmText: "",
       });
+      setDetailsModal({ open: false, appointment: null });
     }
   };
 
@@ -104,6 +121,10 @@ const AppointmentListReceptionist = ({
       content: "",
       confirmText: "",
     });
+  };
+
+  const handleDetailsClose = () => {
+    setDetailsModal({ open: false, appointment: null });
   };
 
   const filteredAppointments =
@@ -127,9 +148,7 @@ const AppointmentListReceptionist = ({
           <Calendar size={48} />
         </div>
         <h3>Không có lịch hẹn nào</h3>
-        <p>
-          {`Chưa có lịch hẹn ${statusConfig[activeTab] || "chờ xác nhận"}`}
-        </p>
+        <p>{`Chưa có lịch hẹn ${statusConfig[activeTab] || "chờ xác nhận"}`}</p>
       </div>
     );
   }
@@ -151,12 +170,10 @@ const AppointmentListReceptionist = ({
         >
           <div className={styles.timeInfo}>
             <div className={styles.date}>
-              <Calendar size={16} />
-              <span>{appointment.date}</span>
+              <Calendar size={16} /> <span>{appointment.date}</span>
             </div>
             <div className={styles.time}>
-              <Clock size={16} />
-              <span>{appointment.time}</span>
+              <Clock size={16} /> <span>{appointment.time}</span>
             </div>
           </div>
           <div className={styles.doctorInfo}>
@@ -165,21 +182,20 @@ const AppointmentListReceptionist = ({
           <div className={styles.patientInfo}>
             <span>{appointment.patientName}</span>
           </div>
-          <div className={`${styles.statusBadge} ${styles[appointment.status]}`}>
+          <div
+            className={`${styles.statusBadge} ${styles[appointment.status]}`}
+          >
             <span>{statusConfig[appointment.status] || "Chờ xác nhận"}</span>
           </div>
           <div className={styles.notesInfo}>
             {appointment.notes ? (
               <>
-                <span
-                  className={styles.notes}
-                  title={appointment.notes}
-                >
+                <span className={styles.notes} title={appointment.notes}>
                   {appointment.notes.length > 50
-                    ? `${appointment.notes.substring(0, 50)}...`
+                    ? `${appointment.notes.substring(0, 20)}...`
                     : appointment.notes}
                 </span>
-                {appointment.notes.length > 50 && (
+                {appointment.notes.length > 20 && (
                   <button
                     className={styles.viewMoreButton}
                     onClick={() =>
@@ -203,7 +219,9 @@ const AppointmentListReceptionist = ({
                 <button
                   className={`${styles.actionBtn} ${styles.complete}`}
                   title="Xác nhận"
-                  onClick={() => handleActionClick(appointment.id, "confirm")}
+                  onClick={() =>
+                    handleActionClick(appointment.id, "confirm", appointment)
+                  }
                 >
                   <CheckCircle size={16} />
                 </button>
@@ -238,11 +256,7 @@ const AppointmentListReceptionist = ({
               <button
                 className={`${styles.actionBtn} ${styles.view}`}
                 title="Xem chi tiết"
-                onClick={() =>
-                  alert(
-                    `Chi tiết: Bác sĩ: ${appointment.doctorName}, Bệnh nhân: ${appointment.patientName}, Ghi chú: ${appointment.notes}`
-                  )
-                }
+                onClick={() => setDetailsModal({ open: true, appointment })}
               >
                 <Eye size={16} />
               </button>
@@ -250,6 +264,7 @@ const AppointmentListReceptionist = ({
           </div>
         </div>
       ))}
+
       {showNoteModal.open && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -264,6 +279,68 @@ const AppointmentListReceptionist = ({
           </div>
         </div>
       )}
+
+      {detailsModal.open && detailsModal.appointment && (
+        <div className={styles.detailsModal}>
+          <div className={styles.detailsModalContent}>
+            <div className={styles.detailsModalHeader}>
+              <h3 className={styles.detailsModalTitle}>Chi tiết lịch hẹn</h3>
+              <button
+                className={styles.detailsCloseButton}
+                onClick={() =>
+                  setDetailsModal({ open: false, appointment: null })
+                }
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className={styles.detailsModalBody}>
+              <div className={styles.detailsInfo}>
+                <p>
+                  <strong>Bác sĩ:</strong> {detailsModal.appointment.doctorName}
+                </p>
+                <p>
+                  <strong>Bệnh nhân:</strong>{" "}
+                  {detailsModal.appointment.patientName}
+                </p>
+                <p>
+                  <strong>Số điện thoại:</strong>{" "}
+                  {detailsModal.appointment.patientPhone || "Không có"}
+                </p>
+                <p>
+                  <strong>Ngày giờ:</strong> {detailsModal.appointment.date}{" "}
+                  {detailsModal.appointment.time}
+                </p>
+                <p>
+                  <strong>Ghi chú:</strong>{" "}
+                  {detailsModal.appointment.notes || "Không có"}
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.detailsModalActions}>
+              <button
+                className={styles.detailsCancelButton}
+                onClick={() =>
+                  setDetailsModal({ open: false, appointment: null })
+                }
+              >
+                Hủy
+              </button>
+              {detailsModal.appointment.status === "pending" && (
+                <button
+                  className={styles.detailsConfirmButton}
+                  onClick={() => handleDetailsConfirm()}
+                >
+                  Xác nhận lịch hẹn
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <ConfirmationDialog
         open={confirmDialog.open}
         onClose={handleCloseDialog}
@@ -272,6 +349,7 @@ const AppointmentListReceptionist = ({
         content={confirmDialog.content}
         confirmText={confirmDialog.confirmText}
         cancelText="Hủy bỏ"
+        zIndex={1100} // đảm bảo nằm trên modal chi tiết
       />
     </div>
   );
