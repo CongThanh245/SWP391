@@ -2,8 +2,11 @@
 import React from "react";
 import Button from "@components/common/Button/Button";
 import styles from "../../components/ReceptionistDashboard/ReceptionistDashboard.module.css";
+import { useNavigate } from "react-router-dom"; // Fixed: removed 'navigate' from import
 
 const ReceptionistHomePage = () => {
+  const navigate = useNavigate(); // Fixed: properly use the hook
+
   return (
     <div className={styles.dashboard}>
       {/* Header với thông tin user */}
@@ -174,28 +177,6 @@ const ReceptionistHomePage = () => {
               color: "green",
               path: "/receptionist-dashboard/appointment",
             },
-            // {
-            //   title: "Tìm kiếm bệnh nhân",
-            //   description: "Tìm kiếm thông tin bệnh nhân",
-            //   icon: (
-            //     <svg
-            //       xmlns="http://www.w3.org/2000/svg"
-            //       width="32"
-            //       height="32"
-            //       viewBox="0 0 24 24"
-            //       fill="none"
-            //       stroke="#4D3C2D"
-            //       strokeWidth="2"
-            //       strokeLinecap="round"
-            //       strokeLinejoin="round"
-            //     >
-            //       <circle cx="11" cy="11" r="8" />
-            //       <path d="m21 21-4.3-4.3" />
-            //     </svg>
-            //   ),
-            //   color: "purple",
-            //   path: "/receptionist-dashboard/patients",
-            // },
             {
               title: "Nhập kết quả xét nghiệm",
               description: "Nhập kết quả xét nghiệm mới",
