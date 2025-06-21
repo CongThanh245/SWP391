@@ -2,8 +2,8 @@ import React from "react";
 import BaseModal from "@components/common/BaseModal/BaseModal";
 import styles from "./BookingForm.module.css";
 import useBookingForm from "@hooks/useBookingForm";
-
-const BookingModal = ({ isOpen, onClose }) => {
+import { useEffect } from "react";
+const BookingModal = ({ isOpen, onClose, onSuccess }) => {
   const {
     formData,
     errors,
@@ -19,6 +19,13 @@ const BookingModal = ({ isOpen, onClose }) => {
     loadingSlots,
   } = useBookingForm(onClose);
 
+  // Khi booking thành công:
+  useEffect(() => {
+    if (showSuccess) {
+      handleClose(); // 1. Đóng modal
+      onSuccess?.(); // 2. Báo lên parent để show toast
+    }
+  }, [showSuccess]);
   return (
     <BaseModal
       isOpen={isOpen}
@@ -27,11 +34,6 @@ const BookingModal = ({ isOpen, onClose }) => {
       className="booking-modal"
     >
       <form className={styles.bookingForm} onSubmit={handleSubmit}>
-        {showSuccess && (
-          <div className={styles.successMessage}>
-            🎉 Đặt lịch hẹn thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.
-          </div>
-        )}
         {errorMessage && (
           <div className={styles.errorMessage}>{errorMessage}</div>
         )}
