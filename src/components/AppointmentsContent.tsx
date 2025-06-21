@@ -56,6 +56,7 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
                     const timeStr = dt.toTimeString().split(':').slice(0, 2).join(':');
 
                     return {
+                        appoinmentId: item.appointmentId,
                         id: currentPage * 4 + index + 1,
                         patientId: item.patientId,
                         patientName: item.patientName,

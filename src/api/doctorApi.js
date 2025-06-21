@@ -118,9 +118,19 @@ export const getHusbandVital = async (patientId) => {
   }
 }
 
-export const getProtocolList = async (patientId) => {
+export const getProtocolList = async (appoimnetId) => {
   try {
-    const response = await apiClient.get(`/doctors/treatment-profile/protocols-list?patientId=${patientId}`);
+    const response = await apiClient.get(`/doctors/treatment-profile/protocols-list?patientId=${appoimnetId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch doctor appointments:', error);
+    throw error;
+  }
+}
+
+export const getPreparation_notes = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/doctors/treatment-profile/preparation_notes?patientId=${patientId}`);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch doctor appointments:', error);
