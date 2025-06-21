@@ -23,7 +23,6 @@ interface TreatmentProps {
   patientId: string;
 }
 
-// API Data Types
 interface GeneralInfoData {
   height: number | null;
   weight: number | null;
@@ -44,10 +43,9 @@ interface TestItem {
   id: string;
   name: string;
   checked: boolean;
-  // Add a status for lab tests (e.g., 'pending', 'completed', 'ordered', 'failed')
-  status?: 'ordered' | 'pending' | 'completed' | 'failed' | 'not-ordered';
-  // You might want to store the actual result URL/data here or an ID to fetch it
+  status: 'ordered' | 'pending' | 'completed' | 'failed' | 'not-ordered';
   resultData?: any;
+  protocolId?: string; // Add protocol ID for tracking
 }
 
 interface PatientData {
@@ -60,10 +58,8 @@ interface PatientData {
   phone: string;
 }
 
-// Change to single selected method, not multiple booleans
 type TreatmentMethod = 'iui' | 'ivf' | 'other' | 'none';
 
-// API Response Types
 interface WifeVitalResponse {
   wifeHeight: number;
   wifeWeight: number;
@@ -99,10 +95,10 @@ interface ProtocolResponse {
   protocolId: string;
   name: string;
   targetSubject: 'WIFE' | 'HUSBAND';
-  protocolType: 'MEDICATION' | 'TEST'; // Ensure protocolType is present if needed for status
+  protocolType: 'MEDICATION' | 'TEST';
   visibleToUI: boolean;
-  status?: 'ordered' | 'pending' | 'completed' | 'failed'; // Assuming API might return status
-  resultUrl?: string; // Assuming API might return a result URL
+  status?: 'ordered' | 'pending' | 'completed' | 'failed';
+  resultUrl?: string;
 }
 
 interface PreparationNotesResponse {
@@ -110,8 +106,6 @@ interface PreparationNotesResponse {
   suggestIUI: boolean;
   suggestIVF: boolean;
   suggestOther: boolean;
-  // You might need a field here to determine 'none'
-  // For simplicity, we'll infer 'none' if all are false
 }
 
 interface APIPayload {
@@ -147,15 +141,9 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   const [activeSubTab, setActiveSubTab] = useState('wife');
   const [activeInterventionTab, setActiveInterventionTab] = useState('wife');
 
-  // Diagnosis states
-  const [wifeDiagnosis, setWifeDiagnosis] = useState(''); // This seems unused, consider removing if not used
-  const [husbandDiagnosis, setHusbandDiagnosis] = useState(''); // This seems unused, consider removing if not used
   const [generalDiagnosis, setGeneralDiagnosis] = useState('');
-
-  // Treatment methods - now a single string for radio buttons
   const [selectedTreatmentMethod, setSelectedTreatmentMethod] = useState<TreatmentMethod>('none');
 
-  // General info for wife and husband
   const [wifeGeneralInfo, setWifeGeneralInfo] = useState<GeneralInfoData>({
     height: null,
     weight: null,
@@ -177,7 +165,10 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     temperature: null,
   });
 
-  // Lab tests - now managed in parent
+  // Track original lab tests state to identify changes
+  const [originalWifeLabTests, setOriginalWifeLabTests] = useState<TestItem[]>([]);
+  const [originalHusbandLabTests, setOriginalHusbandLabTests] = useState<TestItem[]>([]);
+
   const [wifeLabTests, setWifeLabTests] = useState<TestItem[]>([
     { id: 'cbc', name: 'Xét nghiệm máu toàn bộ (CBC)', checked: false, status: 'not-ordered' },
     { id: 'amh', name: 'Đánh giá dự trữ buồng trứng (AMH)', checked: false, status: 'not-ordered' },
@@ -199,7 +190,6 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     { id: 'dna', name: 'Độ phân mảnh DNA tinh trùng (Halosperm Test)', checked: false, status: 'not-ordered' },
   ]);
 
-  // Appointment data
   const [selectedAppointmentDate, setSelectedAppointmentDate] = useState<Date | null>(null);
   const [appointmentNotes, setAppointmentNotes] = useState('');
 
@@ -286,7 +276,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     }
   }, [patientId]);
 
-  // Fetch protocol list and update lab tests with existing protocols/statuses
+  // Fixed: Fetch protocol list and update lab tests with proper status logic
   useEffect(() => {
     const fetchProtocolData = async () => {
       try {
@@ -301,12 +291,13 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
             .forEach(protocol => {
               const existingTest = newTestsMap.get(protocol.name);
               if (existingTest) {
-                // Update existing test with status from backend
+                // Update existing test with backend data
                 newTestsMap.set(protocol.name, {
                   ...existingTest,
-                  checked: true,
-                  status: protocol.status || existingTest.status, // Use backend status or keep existing
-                  resultData: protocol.resultUrl || existingTest.resultData, // Use backend result URL/data
+                  checked: true, // If protocol exists in backend, it should be checked
+                  status: protocol.status || 'pending', // Use backend status or default to pending
+                  resultData: protocol.resultUrl || existingTest.resultData,
+                  protocolId: protocol.protocolId, // Store protocol ID for reference
                 });
               } else {
                 // Add new protocol if it doesn't exist in the default list
@@ -314,16 +305,25 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
                   id: protocol.protocolId,
                   name: protocol.name,
                   checked: true,
-                  status: protocol.status || 'completed', // Default to completed if no status from backend for new ones
+                  status: protocol.status || 'pending',
                   resultData: protocol.resultUrl,
+                  protocolId: protocol.protocolId,
                 });
               }
             });
+
           return Array.from(newTestsMap.values());
         };
 
-        setWifeLabTests(prev => updateLabTests(prev, data, 'WIFE'));
-        setHusbandLabTests(prev => updateLabTests(prev, data, 'HUSBAND'));
+        const updatedWifeTests = updateLabTests(wifeLabTests, data, 'WIFE');
+        const updatedHusbandTests = updateLabTests(husbandLabTests, data, 'HUSBAND');
+
+        setWifeLabTests(updatedWifeTests);
+        setHusbandLabTests(updatedHusbandTests);
+
+        // Store original state for comparison
+        setOriginalWifeLabTests(JSON.parse(JSON.stringify(updatedWifeTests)));
+        setOriginalHusbandLabTests(JSON.parse(JSON.stringify(updatedHusbandTests)));
 
       } catch (error) {
         console.error('Error fetching protocol data:', error);
@@ -341,7 +341,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
       try {
         const data: PreparationNotesResponse = await getPreparation_notes(patientId);
         setGeneralDiagnosis(data.preparationNotes);
-        // Determine the selected radio button based on backend flags
+
         if (data.suggestIUI) {
           setSelectedTreatmentMethod('iui');
         } else if (data.suggestIVF) {
@@ -349,7 +349,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         } else if (data.suggestOther) {
           setSelectedTreatmentMethod('other');
         } else {
-          setSelectedTreatmentMethod('none'); // Default if none are true
+          setSelectedTreatmentMethod('none');
         }
       } catch (error) {
         console.error('Error fetching preparation notes:', error);
@@ -361,11 +361,29 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     }
   }, [patientId]);
 
-  // API Functions
+  // Fixed: Helper function to identify which tests have changed
+  const getChangedTests = (currentTests: TestItem[], originalTests: TestItem[]) => {
+    const originalMap = new Map(originalTests.map(test => [test.name, test]));
+
+    return currentTests.filter(currentTest => {
+      const originalTest = originalMap.get(currentTest.name);
+
+      if (!originalTest) {
+        // New test that was added
+        return currentTest.checked && currentTest.status === 'not-ordered';
+      }
+
+      // Check if checked status or status changed
+      return (
+        currentTest.checked !== originalTest.checked ||
+        (currentTest.checked && currentTest.status !== originalTest.status)
+      );
+    });
+  };
+
   const saveGeneralInfo = async (): Promise<void> => {
     const payload: APIPayload = {
       preparationNotes: generalDiagnosis,
-      // Map the single selected method back to boolean flags for the API
       suggestIUI: selectedTreatmentMethod === 'iui',
       suggestIVF: selectedTreatmentMethod === 'ivf',
       suggestOther: selectedTreatmentMethod === 'other',
@@ -404,37 +422,67 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     }
   };
 
+  // Fixed: Save only changed protocols
   const saveProtocols = async (): Promise<void> => {
-    const wifeProtocols: LabTestItem[] = wifeLabTests
-      .filter(test => test.checked && test.status === 'ordered') // Only send newly ordered/changed tests
+    const changedWifeTests = getChangedTests(wifeLabTests, originalWifeLabTests);
+    const changedHusbandTests = getChangedTests(husbandLabTests, originalHusbandLabTests);
+
+    // Only include newly checked tests (newly ordered)
+    const wifeProtocols: LabTestItem[] = changedWifeTests
+      .filter(test => test.checked && !originalWifeLabTests.find(orig => orig.name === test.name && orig.checked))
       .map(test => ({
         name: test.name,
-        protocolType: 'TEST' as const,
+        protocolType: 'MEDICATION' as const,
       }));
 
-    const husbandProtocols: LabTestItem[] = husbandLabTests
-      .filter(test => test.checked && test.status === 'ordered') // Only send newly ordered/changed tests
+    const husbandProtocols: LabTestItem[] = changedHusbandTests
+      .filter(test => test.checked && !originalHusbandLabTests.find(orig => orig.name === test.name && orig.checked))
       .map(test => ({
         name: test.name,
-        protocolType: 'TEST' as const,
+        protocolType: 'MEDICATION' as const,
       }));
+
+    // Only send API call if there are actual changes
+    if (wifeProtocols.length === 0 && husbandProtocols.length === 0) {
+      console.log('No protocol changes detected');
+      return;
+    }
 
     const payload: ProtocolPayload = {
       wifeProtocols,
       husbandProtocols,
-      stageId: '3fa85f64-5717-4562-b3fc-2c963f66afa6', // Replace with actual stage ID
+      stageId: '3555beb0-6221-4237-be0b-0dca4e59ca5c',
     };
 
     try {
-      // Assuming a PUT/PATCH endpoint to update protocols, not POST for every save
-      // You'll need to confirm your backend API for this part
-      // Example: await apiClient.put(`/doctors/save-protocols?patientId=${patientId}`, payload);
+      // Update the tests status to 'ordered' when sending to backend
+      const updatedWifeTests = wifeLabTests.map(test => {
+        const isNewlyOrdered = wifeProtocols.some(protocol => protocol.name === test.name);
+        return isNewlyOrdered ? { ...test, status: 'ordered' as const } : test;
+      });
+
+      const updatedHusbandTests = husbandLabTests.map(test => {
+        const isNewlyOrdered = husbandProtocols.some(protocol => protocol.name === test.name);
+        return isNewlyOrdered ? { ...test, status: 'ordered' as const } : test;
+      });
+
+      setWifeLabTests(updatedWifeTests);
+      setHusbandLabTests(updatedHusbandTests);
+
       console.log('Protocols Payload:', payload);
+
+      // Uncomment when you have the actual API endpoint
+      await apiClient.post(`/doctors/treatment-profile/create-protocols`, payload);
 
       toast({
         title: 'Đã lưu xét nghiệm',
         description: 'Danh sách xét nghiệm đã được cập nhật.',
       });
+
+      // Update original state after successful save
+      setOriginalWifeLabTests(JSON.parse(JSON.stringify(updatedWifeTests)));
+      setOriginalHusbandLabTests(JSON.parse(JSON.stringify(updatedHusbandTests)));
+
     } catch (error) {
       console.error('Error saving protocols:', error);
       toast({
@@ -447,15 +495,13 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
 
   const handleSaveRecord = async (): Promise<void> => {
     await saveGeneralInfo();
-    //await saveProtocols(); // Call saveProtocols as well
+    await saveProtocols();
 
-    // Save appointment if selected
     if (selectedAppointmentDate) {
       console.log('Appointment:', {
         date: selectedAppointmentDate,
-        notes: appointmentNotes, // Make sure appointmentNotes is updated from AppointmentCalendar
+        notes: appointmentNotes,
       });
-      // Add API call to save appointment here if needed
     }
   };
 
@@ -580,6 +626,13 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
                     </Label>
                   </div>
                 </RadioGroup>
+
+                <Button
+                  onClick={handleSaveRecord}
+                  className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
+                >
+                  Hoàn thành giai đoạn chuyên khoa
+                </Button>
               </div>
             </div>
           </Card>
@@ -663,12 +716,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold text-[color:var(--text-accent)]">Hồ sơ bệnh nhân</h1>
-          <Button
-            onClick={handleSaveRecord}
-            className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
-          >
-            Lưu hồ sơ
-          </Button>
+
         </div>
 
         {/* Patient Info */}
