@@ -199,7 +199,7 @@ const useBookingForm = (onClose) => {
       await createAppointment(payload);
       
       setShowSuccess(true);
-      setTimeout(handleClose, 2000);
+      (handleClose, 1000);
       
     } catch (err) {
       console.error("Create appointment error:", err);

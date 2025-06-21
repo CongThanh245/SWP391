@@ -22,13 +22,6 @@ const PatientHero = () => {
     setIsBookingFormOpen(false);
   };
 
-  const handleViewSchedule = () => {
-    console.log("Xem lịch khám clicked");
-  };
-
-  const handleViewMedicalRecord = () => {
-    console.log("Hồ sơ bệnh án clicked");
-  };
   const handleBookingSuccess = () => {
     toast({
       title: "🎉 Đặt lịch thành công",
@@ -73,7 +66,6 @@ const PatientHero = () => {
           <Link
             to="/health-records/appointments"
             className={styles.featureCard}
-            onClick={handleViewSchedule}
           >
             <svg
               className={styles.icon}
@@ -109,7 +101,6 @@ const PatientHero = () => {
           <Link
             to="/health-records/medical-records"
             className={styles.featureCard}
-            onClick={handleViewMedicalRecord}
           >
             <svg
               className={styles.icon}
