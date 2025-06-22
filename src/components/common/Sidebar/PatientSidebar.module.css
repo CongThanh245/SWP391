@@ -1,6 +1,6 @@
 /* Sidebar.module.css - Updated */
 .sidebar {
-  width: 200px; /* Thu nhỏ từ 280px xuống 200px */
+  width: 210px; /* Thu nhỏ từ 280px xuống 200px */
   height: fit-content;
   background-color: var(--light-background);
   border-right: 1px solid var(--card-border);

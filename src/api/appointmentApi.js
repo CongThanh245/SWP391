@@ -5,7 +5,7 @@ export const createAppointment = async (appointmentData) => {
     const response = await apiClient.post("/create_appointment", appointmentData);
     return response.data;
   } catch (error) {
-    console.error("API Error:", error.response?.data || error.message);
+    console.error("API Error:" +  error.message);
     throw error;
   }
 };
