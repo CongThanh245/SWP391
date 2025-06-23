@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Search, User, Phone, Calendar, X, Heart, Users } from "lucide-react";
-import { getPatients, getEvaluationCriteria } from "@api/patientApi";
+import { Search, User, Phone, Calendar, X } from "lucide-react";
+import { getPatients, getEvaluationCriteria, updateEvaluationCriteria } from "@api/patientApi";
 import styles from "./PreTestResult.module.css";
 
 const PreTestResult = () => {
@@ -35,29 +35,43 @@ const PreTestResult = () => {
       setEvaluationCriteria(data);
       setFormData(
         data.reduce((acc, criterion) => {
-          acc[criterion.id] = "";
+          acc[criterion.id] = { currentValue: criterion.currentValue || 0, note: criterion.note || "" };
           return acc;
         }, {})
       );
       setIsModalOpen(true);
     } catch (err) {
-      setError("Không thể tải tiêu chí đánh giá");
+      setError("Bệnh nhân chưa được bác sĩ chỉ định");
     }
   };
 
   const handlePatientClick = (patient) => {
     setSelectedPatient(patient);
-    const appointmentId = patient.latestAppointmentId; // Giả sử appointmentId có trong dữ liệu patient
+    const appointmentId = patient.latestAppointmentId;
     fetchEvaluationCriteria(appointmentId, patient.id);
   };
 
-  const handleInputChange = (criterionId, value) => {
-    setFormData((prev) => ({ ...prev, [criterionId]: value }));
+  const handleInputChange = (criterionId, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [criterionId]: { ...prev[criterionId], [field]: value }
+    }));
   };
 
   const handleSubmit = async () => {
-    console.log("Kết quả đã nhập:", formData);
-    setIsModalOpen(false);
+    try {
+      const updateData = Object.entries(formData).map(([criteriaId, { currentValue, note }]) => ({
+        criteriaId,
+        currentValue: parseFloat(currentValue) || 0,
+        note
+      }));
+
+      await updateEvaluationCriteria(updateData);
+      setIsModalOpen(false);
+      await fetchPatients();
+    } catch (err) {
+      setError("Không thể cập nhật tiêu chí đánh giá");
+    }
   };
 
   const filteredPatients = patients.filter((patient) => {
@@ -85,10 +99,7 @@ const PreTestResult = () => {
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
     return age;
@@ -100,8 +111,7 @@ const PreTestResult = () => {
   return (
     <div className={styles.patientListPage}>
       <div className={styles.pageHeader}>
-        <h2>Danh sách Bệnh nhân</h2>
-        <p>Quản lý thông tin bệnh nhân</p>
+        <h2>Nhập kết quả xét nghiệm</h2>
         <div className={styles.stats}>
           <span>Tổng số: {patients.length}</span>
         </div>
@@ -149,11 +159,11 @@ const PreTestResult = () => {
 
               <div className={styles.patientDetails}>
                 <div className={styles.detailRow}>
-                  <Phone size={16} />
+                  <Phone size={22} />
                   <span>{patient.patientPhone}</span>
                 </div>
                 <div className={styles.detailRow}>
-                  <Calendar size={16} />
+                  <Calendar size={22} />
                   <span>Ngày tham gia: {formatDate(patient.joinDate)}</span>
                 </div>
               </div>
@@ -170,23 +180,56 @@ const PreTestResult = () => {
       </div>
 
       {isModalOpen && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h3>Nhập kết quả cho {selectedPatient.patientName}</h3>
-            {evaluationCriteria.map((criterion) => (
-              <div key={criterion.id} className={styles.criterion}>
-                <label>{criterion.name}</label>
-                <input
-                  type="text"
-                  value={formData[criterion.id]}
-                  onChange={(e) =>
-                    handleInputChange(criterion.id, e.target.value)
-                  }
-                />
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalTitle}>
+                <h3>Nhập kết quả cho {selectedPatient.patientName}</h3>
               </div>
-            ))}
-            <button onClick={handleSubmit}>Lưu kết quả</button>
-            <button onClick={() => setIsModalOpen(false)}>Đóng</button>
+              <button
+                className={styles.closeButton}
+                onClick={() => setIsModalOpen(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className={styles.modalContent}>
+              {evaluationCriteria.map((criterion) => (
+                <div key={criterion.id} className={styles.criterion}>
+                  <label>{criterion.name}</label>
+                  <input
+                    type="number"
+                    value={formData[criterion.id]?.currentValue || ""}
+                    onChange={(e) =>
+                      handleInputChange(criterion.id, "currentValue", e.target.value)
+                    }
+                    placeholder="Nhập giá trị"
+                  />
+                  <input
+                    type="text"
+                    value={formData[criterion.id]?.note || ""}
+                    onChange={(e) =>
+                      handleInputChange(criterion.id, "note", e.target.value)
+                    }
+                    placeholder="Ghi chú"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.modalCloseButton}
+                onClick={handleSubmit}
+              >
+                Lưu kết quả
+              </button>
+              <button
+                className={styles.modalCloseButton}
+                onClick={() => setIsModalOpen(false)}
+              >
+                Đóng
+              </button>
+            </div>
           </div>
         </div>
       )}

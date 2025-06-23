@@ -21,3 +21,8 @@ export const getEvaluationCriteria = async (appointmentId, patientId) => {
   });
   return response.data;
 };
+
+export const updateEvaluationCriteria = async (data) => {
+  const response = await apiClient.put(`/receptionists/evaluation-criteria`, data);
+  return response.data;
+};
