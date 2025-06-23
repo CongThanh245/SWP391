@@ -33,7 +33,6 @@ interface TestParameter {
 }
 
 interface DetailedTestResult {
-  testName: string;
   parameters: TestParameter[];
 }
 
@@ -69,13 +68,23 @@ const LabTests: React.FC<LabTestsProps> = ({ title, tests, onTestsChange }) => {
       setCurrentDetailedResult(null); // Xóa dữ liệu cũ trong modal
 
       try {
-        const result = await getDetailedTestResult(test.protocolId); // GỌI API MỚI
-        setCurrentDetailedResult(result);
+        const rawResult: TestParameter = await getDetailedTestResult(test.protocolId); // GỌI API MỚI
+        let formattedParameters: TestParameter[] = [];
+        if (rawResult && typeof rawResult === 'object' && rawResult.name) {
+          formattedParameters = [rawResult]; // Gói TestParameter đơn lẻ vào một mảng
+        } else if (Array.isArray(rawResult)) {
+            // Trường hợp getDetailedTestResult trả về thẳng một mảng TestParameter (nếu có)
+            formattedParameters = rawResult;
+        } else {
+            console.warn("API getDetailedTestResult trả về dữ liệu không hợp lệ hoặc không có thông số.");
+        }
+
+        // Set currentDetailedResult với mảng parameters
+        setCurrentDetailedResult({ parameters: formattedParameters });
       } catch (error) {
         console.error('Failed to fetch detailed test result:', error);
         // Hiển thị thông báo lỗi trong modal
         setCurrentDetailedResult({
-          testName: test.name,
           parameters: [{
             name: "Lỗi",
             targetValue: 0,
