@@ -17,6 +17,13 @@ import PostIntervention from '@components/PostIntervention';
 import { getWifeProfile, getWifeVital, getHusbandVital, getProtocolList, getPreparation_notes } from '@api/doctorApi';
 import { formatValue } from '@utils/format';
 import apiClient from '@api/axiosConfig';
+import {
+  Toast,
+  ToastTitle,
+  ToastDescription,
+  ToastClose,
+} from "@components/ui/toast";
+import {useTreatmentProgress} from '@components/TreatmentProgress';
 
 interface TreatmentProps {
   onBackToDashboard?: () => void;
@@ -36,7 +43,7 @@ interface GeneralInfoData {
 
 interface LabTestItem {
   name: string;
-  protocolType: 'MEDICATION' | 'TEST';
+  protocolType: 'MEDICATION' | 'MONITORING';
 }
 
 interface TestItem {
@@ -46,6 +53,7 @@ interface TestItem {
   status: 'ordered' | 'pending' | 'completed' | 'failed' | 'not-ordered';
   resultData?: any;
   protocolId?: string; // Add protocol ID for tracking
+  protocolType?: 'MEDICATION' | 'MONITORING';
 }
 
 interface PatientData {
@@ -56,6 +64,11 @@ interface PatientData {
   city: string;
   email: string;
   phone: string;
+  spousePatientName: string;
+  spousePatientAddress: string;
+  spousePatientPhone: string;
+  spouseDateOfBirth: string;
+  spouseGender: string;
 }
 
 type TreatmentMethod = 'iui' | 'ivf' | 'other' | 'none';
@@ -89,15 +102,20 @@ interface WifeProfileResponse {
   patientAddress: string;
   email: string;
   patientPhone: string;
+  spousePatientName: string;
+  spousePatientAddress: string;
+  spousePatientPhone: string;
+  spouseDateOfBirth: string;
+  spouseGender: string;
 }
 
 interface ProtocolResponse {
   protocolId: string;
   name: string;
   targetSubject: 'WIFE' | 'HUSBAND';
-  protocolType: 'MEDICATION' | 'TEST';
+  protocolType: 'MEDICATION' | 'MONITORING';
   visibleToUI: boolean;
-  status?: 'ordered' | 'pending' | 'completed' | 'failed';
+  protocolStatus: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
   resultUrl?: string;
 }
 
@@ -133,13 +151,14 @@ interface APIPayload {
 interface ProtocolPayload {
   wifeProtocols: LabTestItem[];
   husbandProtocols: LabTestItem[];
-  stageId: string;
 }
 
+
 const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) => {
-  const { toast } = useToast();
+  const { toasts, toast } = useToast();
   const [activeSubTab, setActiveSubTab] = useState('wife');
   const [activeInterventionTab, setActiveInterventionTab] = useState('wife');
+
 
   const [generalDiagnosis, setGeneralDiagnosis] = useState('');
   const [selectedTreatmentMethod, setSelectedTreatmentMethod] = useState<TreatmentMethod>('none');
@@ -170,28 +189,29 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   const [originalHusbandLabTests, setOriginalHusbandLabTests] = useState<TestItem[]>([]);
 
   const [wifeLabTests, setWifeLabTests] = useState<TestItem[]>([
-    { id: 'cbc', name: 'Xét nghiệm máu toàn bộ (CBC)', checked: false, status: 'not-ordered' },
-    { id: 'amh', name: 'Đánh giá dự trữ buồng trứng (AMH)', checked: false, status: 'not-ordered' },
-    { id: 'thyroid', name: 'Xét nghiệm tuyến giáp (TSH, T3, FT4)', checked: false, status: 'not-ordered' },
-    { id: 'esr', name: 'Xét nghiệm tỉ lệ hồng cầu lắng (ESR)', checked: false, status: 'not-ordered' },
-    { id: 'chlamydia', name: 'Xét nghiệm Chlamydia', checked: false, status: 'not-ordered' },
-    { id: 'vdrl', name: 'Xét nghiệm VDRL', checked: false, status: 'not-ordered' },
-    { id: 'prolactin', name: 'Xét nghiệm nội tiết Prolactin', checked: false, status: 'not-ordered' },
-    { id: 'estrogen', name: 'Xét nghiệm nội tiết Estrogen', checked: false, status: 'not-ordered' },
-    { id: 'lh', name: 'Xét nghiệm nội tiết LH', checked: false, status: 'not-ordered' },
-    { id: 'fsh', name: 'Xét nghiệm nội tiết FSH', checked: false, status: 'not-ordered' },
+    { id: 'cbc', name: 'Xét nghiệm máu toàn bộ (CBC)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'amh', name: 'Đánh giá dự trữ buồng trứng (AMH)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'thyroid', name: 'Xét nghiệm tuyến giáp (TSH, T3, FT4)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'esr', name: 'Xét nghiệm tỉ lệ hồng cầu lắng (ESR)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'chlamydia', name: 'Xét nghiệm Chlamydia', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'vdrl', name: 'Xét nghiệm VDRL', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'prolactin', name: 'Xét nghiệm nội tiết Prolactin', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'estrogen', name: 'Xét nghiệm nội tiết Estrogen', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'lh', name: 'Xét nghiệm nội tiết LH', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'fsh', name: 'Xét nghiệm nội tiết FSH', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
   ]);
 
   const [husbandLabTests, setHusbandLabTests] = useState<TestItem[]>([
-    { id: 'semen', name: 'Xét nghiệm tinh dịch đồ', checked: false, status: 'not-ordered' },
-    { id: 'hormone', name: 'Xét nghiệm nội tiết tố', checked: false, status: 'not-ordered' },
-    { id: 'genetic', name: 'Xét nghiệm di truyền', checked: false, status: 'not-ordered' },
-    { id: 'immune', name: 'Xét nghiệm miễn dịch', checked: false, status: 'not-ordered' },
-    { id: 'dna', name: 'Độ phân mảnh DNA tinh trùng (Halosperm Test)', checked: false, status: 'not-ordered' },
+    { id: 'semen', name: 'Xét nghiệm tinh dịch đồ', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'hormone', name: 'Xét nghiệm nội tiết tố', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'genetic', name: 'Xét nghiệm di truyền', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'immune', name: 'Xét nghiệm miễn dịch', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
+    { id: 'dna', name: 'Độ phân mảnh DNA tinh trùng (Halosperm Test)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
   ]);
 
-  const [selectedAppointmentDate, setSelectedAppointmentDate] = useState<Date | null>(null);
-  const [appointmentNotes, setAppointmentNotes] = useState('');
+  const [selectedTimeframe, setSelectedTimeframe] = useState<string>('');
+  const [followUpNotes, setFollowUpNotes] = useState('');
+  const [followUpReason, setFollowUpReason] = useState('');
 
   const [patientData, setPatientData] = useState<PatientData>({
     name: 'Nguyễn Thị Lan Anh',
@@ -201,6 +221,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     city: 'Hà Nội',
     email: 'lananh.nguyen@email.com',
     phone: '0987654321',
+    spousePatientName: '',
+    spousePatientAddress: 'string',
+    spousePatientPhone: '',
+    spouseDateOfBirth: '',
+    spouseGender: '',
   });
 
   // Fetch wife vital data
@@ -227,6 +252,29 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
       fetchWifeVitalData();
     }
   }, [patientId]);
+
+  
+
+  const {
+    ProgressBar: ProgressBarComponent, // Đổi tên để tránh nhầm lẫn với component `ProgressBar` của bạn.
+    CompleteButton: CompleteButtonComponent, // Đổi tên tương tự
+    isStageCompleted,
+    completedStages,
+    currentStage,
+    treatmentStages // Giờ bạn có thể truy cập trạng thái của các stage nếu cần
+  } = useTreatmentProgress({
+    patientId: 123, // Sử dụng patientId từ mock data hoặc từ prop
+    onStageComplete: (stageName: string) => { // newStages không còn cần thiết ở đây vì useToast đã có đủ info
+      console.log(`Đã hoàn thành giai đoạn: ${stageName}`);
+      toast({ // <-- Sử dụng hàm `toast` từ `useToast` của Shadcn UI
+        title: "Thành công",
+        description: `Đã hoàn thành giai đoạn ${stageName}`,
+        // variant: "success" // Shadcn UI thường dùng "default" hoặc "destructive"
+      });
+    },
+    showButtons: true,
+    // initialStages: { specialty: true, intervention: false, postIntervention: false }
+  });
 
   // Fetch husband vital data
   useEffect(() => {
@@ -265,6 +313,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
           city: formatValue(data.patientAddress),
           email: data.email,
           phone: data.patientPhone,
+          spousePatientName: data.spousePatientName,
+          spousePatientAddress: data.spousePatientAddress,
+          spousePatientPhone: data.spousePatientPhone,
+          spouseDateOfBirth: data.spouseDateOfBirth,
+          spouseGender: data.spouseGender
         });
       } catch (error) {
         console.error('Error fetching wife profile data:', error);
@@ -275,6 +328,21 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
       fetchWifeProfileData();
     }
   }, [patientId]);
+
+  const mapBackendStatusToFrontendStatus = (backendStatus: ProtocolResponse['protocolStatus']): TestItem['status'] => {
+    switch (backendStatus) {
+      case 'PLANNED':
+        return 'ordered'; // Hoặc 'pending', tùy thuộc vào ý nghĩa "PLANNED" của bạn
+      case 'IN_PROGRESS':
+        return 'pending';
+      case 'COMPLETED':
+        return 'completed';
+      case 'CANCELLED':
+        return 'failed'; // Hoặc tạo trạng thái 'cancelled' riêng trên frontend
+      default:
+        return 'not-ordered'; // Trạng thái mặc định nếu không khớp
+    }
+  };
 
   // Fixed: Fetch protocol list and update lab tests with proper status logic
   useEffect(() => {
@@ -290,14 +358,16 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
             .filter(protocol => protocol.targetSubject === targetSubject && protocol.visibleToUI)
             .forEach(protocol => {
               const existingTest = newTestsMap.get(protocol.name);
+              const frontendStatus = mapBackendStatusToFrontendStatus(protocol.protocolStatus);
               if (existingTest) {
                 // Update existing test with backend data
                 newTestsMap.set(protocol.name, {
                   ...existingTest,
                   checked: true, // If protocol exists in backend, it should be checked
-                  status: protocol.status || 'pending', // Use backend status or default to pending
+                  status: frontendStatus, // Use backend status or default to pending
                   resultData: protocol.resultUrl || existingTest.resultData,
-                  protocolId: protocol.protocolId, // Store protocol ID for reference
+                  protocolId: protocol.protocolId,
+                  protocolType: protocol.protocolType // Store protocol ID for reference
                 });
               } else {
                 // Add new protocol if it doesn't exist in the default list
@@ -305,9 +375,10 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
                   id: protocol.protocolId,
                   name: protocol.name,
                   checked: true,
-                  status: protocol.status || 'pending',
+                  status: frontendStatus,
                   resultData: protocol.resultUrl,
                   protocolId: protocol.protocolId,
+                  protocolType: protocol.protocolType
                 });
               }
             });
@@ -424,64 +495,80 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
 
   // Fixed: Save only changed protocols
   const saveProtocols = async (): Promise<void> => {
-    const changedWifeTests = getChangedTests(wifeLabTests, originalWifeLabTests);
-    const changedHusbandTests = getChangedTests(husbandLabTests, originalHusbandLabTests);
+    const newlyCheckedWifeTests = wifeLabTests.filter(currentTest => {
+      const originalTest = originalWifeLabTests.find(orig => orig.name === currentTest.name);
+      return currentTest.checked && (!originalTest || originalTest.status === 'not-ordered');
+    });
 
-    // Only include newly checked tests (newly ordered)
-    const wifeProtocols: LabTestItem[] = changedWifeTests
-      .filter(test => test.checked && !originalWifeLabTests.find(orig => orig.name === test.name && orig.checked))
-      .map(test => ({
-        name: test.name,
-        protocolType: 'MEDICATION' as const,
-      }));
+    const newlyCheckedHusbandTests = husbandLabTests.filter(currentTest => {
+      const originalTest = originalHusbandLabTests.find(orig => orig.name === currentTest.name);
+      return currentTest.checked && (!originalTest || originalTest.status === 'not-ordered');
+    });
 
-    const husbandProtocols: LabTestItem[] = changedHusbandTests
-      .filter(test => test.checked && !originalHusbandLabTests.find(orig => orig.name === test.name && orig.checked))
-      .map(test => ({
-        name: test.name,
-        protocolType: 'MEDICATION' as const,
-      }));
+    // Chuyển đổi sang định dạng LabTestItem cho payload API
+    const wifeProtocolsToOrder: LabTestItem[] = newlyCheckedWifeTests.map(test => ({
+      name: test.name,
+      protocolType: test.protocolType || 'MEDICATION', // Sử dụng protocolType từ TestItem
+    }));
+
+    const husbandProtocolsToOrder: LabTestItem[] = newlyCheckedHusbandTests.map(test => ({
+      name: test.name,
+      protocolType: test.protocolType || 'MEDICATION', // Sử dụng protocolType từ TestItem
+    }));
 
     // Only send API call if there are actual changes
-    if (wifeProtocols.length === 0 && husbandProtocols.length === 0) {
+    if (wifeProtocolsToOrder.length === 0 && husbandProtocolsToOrder.length === 0) {
       console.log('No protocol changes detected');
       return;
     }
 
     const payload: ProtocolPayload = {
-      wifeProtocols,
-      husbandProtocols,
-      stageId: '3555beb0-6221-4237-be0b-0dca4e59ca5c',
+      wifeProtocols: wifeProtocolsToOrder,
+      husbandProtocols: husbandProtocolsToOrder,
     };
 
     try {
-      // Update the tests status to 'ordered' when sending to backend
-      const updatedWifeTests = wifeLabTests.map(test => {
-        const isNewlyOrdered = wifeProtocols.some(protocol => protocol.name === test.name);
-        return isNewlyOrdered ? { ...test, status: 'ordered' as const } : test;
-      });
+      await apiClient.post(`/doctors/treatment-profile/create-protocols?patientId=${patientId}`, payload);
 
-      const updatedHusbandTests = husbandLabTests.map(test => {
-        const isNewlyOrdered = husbandProtocols.some(protocol => protocol.name === test.name);
-        return isNewlyOrdered ? { ...test, status: 'ordered' as const } : test;
-      });
 
-      setWifeLabTests(updatedWifeTests);
-      setHusbandLabTests(updatedHusbandTests);
+      setWifeLabTests(prevTests =>
+        prevTests.map(test => {
+          if (newlyCheckedWifeTests.some(orderedTest => orderedTest.name === test.name)) {
+            return { ...test, status: 'ordered' as const };
+          }
+          return test;
+        })
+      );
 
-      console.log('Protocols Payload:', payload);
-
-      // Uncomment when you have the actual API endpoint
-      await apiClient.post(`/doctors/treatment-profile/create-protocols`, payload);
+      // Cập nhật husbandLabTests
+      setHusbandLabTests(prevTests =>
+        prevTests.map(test => {
+          if (newlyCheckedHusbandTests.some(orderedTest => orderedTest.name === test.name)) {
+            return { ...test, status: 'ordered' as const };
+          }
+          return test;
+        })
+      );
 
       toast({
         title: 'Đã lưu xét nghiệm',
         description: 'Danh sách xét nghiệm đã được cập nhật.',
       });
 
-      // Update original state after successful save
-      setOriginalWifeLabTests(JSON.parse(JSON.stringify(updatedWifeTests)));
-      setOriginalHusbandLabTests(JSON.parse(JSON.stringify(updatedHusbandTests)));
+      // Quan trọng: Cập nhật original state sau khi lưu thành công
+      // để các lần lưu sau chỉ phát hiện những thay đổi mới.
+      setOriginalWifeLabTests(JSON.parse(JSON.stringify(wifeLabTests.map(test => {
+        if (newlyCheckedWifeTests.some(orderedTest => orderedTest.name === test.name)) {
+          return { ...test, status: 'ordered' as const };
+        }
+        return test;
+      }))));
+      setOriginalHusbandLabTests(JSON.parse(JSON.stringify(husbandLabTests.map(test => {
+        if (newlyCheckedHusbandTests.some(orderedTest => orderedTest.name === test.name)) {
+          return { ...test, status: 'ordered' as const };
+        }
+        return test;
+      }))));
 
     } catch (error) {
       console.error('Error saving protocols:', error);
@@ -497,11 +584,17 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     await saveGeneralInfo();
     await saveProtocols();
 
-    if (selectedAppointmentDate) {
-      console.log('Appointment:', {
-        date: selectedAppointmentDate,
-        notes: appointmentNotes,
-      });
+    if (selectedTimeframe) {
+      const followUpData = {
+        timeframe: selectedTimeframe,
+        reason: followUpReason,
+        notes: followUpNotes,
+        patientId: patientId,
+        doctorId: localStorage.getItem('doctor'),
+        createdAt: new Date().toISOString()
+      };
+      console.log('Follow-up recommendation:', followUpData);
+      //await saveFollowUpRecommendation(followUpData);
     }
   };
 
@@ -639,7 +732,14 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsContent>
 
         <TabsContent value="appointment">
-          <AppointmentCalendar />
+          <AppointmentCalendar
+            selectedTimeframe={selectedTimeframe}
+            onTimeframeSelect={setSelectedTimeframe}
+            followUpNotes={followUpNotes}
+            onNotesChange={setFollowUpNotes}
+            followUpReason={followUpReason}
+            onReasonChange={setFollowUpReason}
+          />
         </TabsContent>
       </Tabs>
 
@@ -687,7 +787,14 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsContent>
 
         <TabsContent value="appointment">
-          <AppointmentCalendar />
+          <AppointmentCalendar
+            selectedTimeframe={selectedTimeframe}
+            onTimeframeSelect={setSelectedTimeframe}
+            followUpNotes={followUpNotes}
+            onNotesChange={setFollowUpNotes}
+            followUpReason={followUpReason}
+            onReasonChange={setFollowUpReason}
+          />
         </TabsContent>
       </Tabs>
 
@@ -719,8 +826,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
 
         </div>
 
+
         {/* Patient Info */}
         <PatientInfo patient={patientData} />
+
+        <ProgressBarComponent />
 
         {/* Tabs */}
         <Tabs defaultValue="specialty" className="w-full">
@@ -745,15 +855,30 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="specialty">{renderSpecialtySubTabs()}</TabsContent>
+          <TabsContent value="specialty">{renderSpecialtySubTabs()}
+           <CompleteButtonComponent stageKey="specialty" stageName="Chuyên Khoa" />
+          </TabsContent>
 
-          <TabsContent value="intervention">{renderInterventionSubTabs()}</TabsContent>
+          <TabsContent value="intervention">{renderInterventionSubTabs()}
+            <CompleteButtonComponent stageKey="intervention" stageName="Can thiệp" />
+          </TabsContent>
 
           <TabsContent value="post-intervention">
             <PostIntervention />
+            <CompleteButtonComponent stageKey="postIntervention" stageName="Hậu can thiệp" />
           </TabsContent>
         </Tabs>
       </div>
+      {toasts.map((t) => (
+        <Toast key={t.id} {...t}>
+          {t.title && <ToastTitle>{t.title}</ToastTitle>}
+          {t.description && (
+            <ToastDescription>{t.description}</ToastDescription>
+          )}
+          {t.action}
+          <ToastClose />
+        </Toast>
+      ))}
     </div>
   );
 };
