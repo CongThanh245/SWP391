@@ -65,8 +65,6 @@
 }
 
 .valueCard:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px var(--shadow-dark);
     border-color: var(--accent-color);
 }
 
