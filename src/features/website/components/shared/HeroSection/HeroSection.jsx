@@ -89,7 +89,7 @@ function HeroSection() {
             paddingBottom: "var(--spacing-sm)", // 8px
           }}
         >
-          Thông báo
+          Từ từ đã nhé!
         </DialogTitle>
         <DialogContent
           sx={{
@@ -98,7 +98,7 @@ function HeroSection() {
             padding: "var(--spacing-md)", // 16px
           }}
         >
-          <p>Vui lòng đăng nhập để đăng ký lịch hẹn.</p>
+          <p>Bạn cần đăng nhập để đăng ký lịch hẹn.</p>
         </DialogContent>
         <DialogActions
           sx={{

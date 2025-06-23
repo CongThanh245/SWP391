@@ -19,7 +19,7 @@
 .userSection {
   padding: var(--spacing-xl) var(--spacing-lg);
   border-bottom: 1px solid var(--card-border);
-  background: var(--gradient-accent);
+  background: var(--accent-color);
   color: var(--button-primary-text);
   display: flex;
   align-items: center;
@@ -112,7 +112,8 @@
 .menuItem:hover {
   background-color: var(--hover-accent);
   color: var(--deep-taupe);
-  border-left: 3px solid var(--deep-taupe);
+  /* border-left: 3px solid var(--deep-taupe); */
+  transform: translateX(5px);
 }
 
 .menuItem.active {
@@ -155,7 +156,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px; /* Reduced gap for better alignment */
+  gap: 10px;
+  /* Reduced gap for better alignment */
   width: 100%;
   padding: 12px 16px;
   background-color: var(--light-background);

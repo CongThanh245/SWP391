@@ -38,7 +38,7 @@ const ProfilePage = () => {
 
   const patientMenuItems = [
     { key: 'profile', label: 'Hồ sơ cá nhân', icon: User, path: '/health-records/profile' },
-    { key: 'medical-records', label: 'Hồ sơ bệnh án', icon: FileText, path: '/health-records/medical-records' },
+    { key: 'medical-records', label: 'Kết quả điều trị', icon: FileText, path: '/health-records/medical-records' },
     { key: 'appointments', label: 'Lịch khám', icon: Calendar, path: '/health-records/appointments' },
     { key: 'health-monitoring', label: 'Đơn thuốc', icon: Activity, path: '/health-records/health-monitoring' },
   ];
