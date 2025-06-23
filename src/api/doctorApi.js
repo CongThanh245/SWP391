@@ -147,3 +147,30 @@ export const getDetailedTestResult = async (protocolId) => {
     throw error;
   }
 };
+
+export const handlePreParationStage  = async (patientId) =>{
+   try {
+    const response = await apiClient.patch(`/doctors/treatment-profile/preparation/finish-stage?patientId=${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching detailed test result for protocolId ${patientId}:`, error);
+    throw error;
+  }
+}
+
+export const getPreparationStatus = async (patientId) => {
+  try {
+        const response = await apiClient.get(
+            '/doctors/treatment-profile/preparation/status',
+            {
+                params: {
+                    patientId: patientId
+                }
+            }
+        );
+        return response.data; // This will return { status: "PLANNED" } or similar
+    } catch (error) {
+        console.error('Failed to get preparation status:', error.response?.data || error.message);
+        throw error;
+    }
+}

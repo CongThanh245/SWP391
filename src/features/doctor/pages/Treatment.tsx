@@ -14,7 +14,8 @@ import PatientInfo from '@components/PatientInfo';
 import InterventionWife from '@components/InterventionWife';
 import InterventionHusband from '@components/InterventionHusband';
 import PostIntervention from '@components/PostIntervention';
-import { getWifeProfile, getWifeVital, getHusbandVital, getProtocolList, getPreparation_notes } from '@api/doctorApi';
+import {
+  getWifeProfile, getWifeVital, getHusbandVital, getProtocolList, getPreparation_notes} from '@api/doctorApi';
 import { formatValue } from '@utils/format';
 import apiClient from '@api/axiosConfig';
 import {
@@ -23,7 +24,7 @@ import {
   ToastDescription,
   ToastClose,
 } from "@components/ui/toast";
-import {useTreatmentProgress} from '@components/TreatmentProgress';
+import { useTreatmentProgress } from '@components/TreatmentProgress';
 
 interface TreatmentProps {
   onBackToDashboard?: () => void;
@@ -251,7 +252,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     }
   }, [patientId]);
 
-  
+
 
   const {
     ProgressBar: ProgressBarComponent, // Đổi tên để tránh nhầm lẫn với component `ProgressBar` của bạn.
@@ -343,7 +344,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   };
 
   // Fixed: Fetch protocol list and update lab tests with proper status logic
- useEffect(() => {
+  useEffect(() => {
     const fetchProtocolData = async () => {
       try {
         const data: ProtocolResponse[] = await getProtocolList(patientId);
@@ -581,6 +582,8 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     }
   };
 
+
+
   const renderSpecialtySubTabs = () => (
     <div className="space-y-6">
       <Tabs value={activeSubTab} onValueChange={setActiveSubTab}>
@@ -703,12 +706,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
                   </div>
                 </RadioGroup>
 
-                <Button
-                  onClick={handleSaveRecord}
-                  className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
-                >
-                  Hoàn thành giai đoạn chuyên khoa
-                </Button>
+                
               </div>
             </div>
           </Card>
@@ -839,7 +837,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
           </TabsList>
 
           <TabsContent value="specialty">{renderSpecialtySubTabs()}
-           <CompleteButtonComponent stageKey="specialty" stageName="Chuyên Khoa" />
+            <CompleteButtonComponent stageKey="preparation" stageName="Chuyên Khoa" />
           </TabsContent>
 
           <TabsContent value="intervention">{renderInterventionSubTabs()}
