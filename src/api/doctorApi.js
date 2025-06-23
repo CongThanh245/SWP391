@@ -137,3 +137,13 @@ export const getPreparation_notes = async (patientId) => {
     throw error;
   }
 }
+
+export const getDetailedTestResult = async (protocolId) => {
+  try {
+    const response = await apiClient.get(`/doctors/treatment-profile/evaluation?protocolId=${protocolId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching detailed test result for protocolId ${protocolId}:`, error);
+    throw error;
+  }
+};

@@ -51,7 +51,6 @@ interface TestItem {
   name: string;
   checked: boolean;
   status: 'ordered' | 'pending' | 'completed' | 'failed' | 'not-ordered';
-  resultData?: any;
   protocolId?: string; // Add protocol ID for tracking
   protocolType?: 'MEDICATION' | 'MONITORING';
 }
@@ -116,7 +115,6 @@ interface ProtocolResponse {
   protocolType: 'MEDICATION' | 'MONITORING';
   visibleToUI: boolean;
   protocolStatus: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  resultUrl?: string;
 }
 
 interface PreparationNotesResponse {
@@ -263,7 +261,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     currentStage,
     treatmentStages // Giờ bạn có thể truy cập trạng thái của các stage nếu cần
   } = useTreatmentProgress({
-    patientId: 123, // Sử dụng patientId từ mock data hoặc từ prop
+    patientId: patientId, // Sử dụng patientId từ mock data hoặc từ prop
     onStageComplete: (stageName: string) => { // newStages không còn cần thiết ở đây vì useToast đã có đủ info
       console.log(`Đã hoàn thành giai đoạn: ${stageName}`);
       toast({ // <-- Sử dụng hàm `toast` từ `useToast` của Shadcn UI
@@ -345,54 +343,57 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   };
 
   // Fixed: Fetch protocol list and update lab tests with proper status logic
-  useEffect(() => {
+ useEffect(() => {
     const fetchProtocolData = async () => {
       try {
         const data: ProtocolResponse[] = await getProtocolList(patientId);
         console.log('Fetched protocol data:', data);
 
-        const updateLabTests = (prevTests: TestItem[], protocols: ProtocolResponse[], targetSubject: 'WIFE' | 'HUSBAND') => {
-          const newTestsMap = new Map(prevTests.map(test => [test.name, { ...test }]));
+        const updateLabTestsState = (
+          currentDefaultTests: TestItem[],
+          protocolsFromBackend: ProtocolResponse[],
+          targetSubject: 'WIFE' | 'HUSBAND'
+        ) => {
+          const updatedTestsMap = new Map<string, TestItem>(
+            currentDefaultTests.map(test => [test.name, { ...test }])
+          );
 
-          protocols
+          protocolsFromBackend
             .filter(protocol => protocol.targetSubject === targetSubject && protocol.visibleToUI)
             .forEach(protocol => {
-              const existingTest = newTestsMap.get(protocol.name);
+              const existingTest = updatedTestsMap.get(protocol.name);
               const frontendStatus = mapBackendStatusToFrontendStatus(protocol.protocolStatus);
+
               if (existingTest) {
-                // Update existing test with backend data
-                newTestsMap.set(protocol.name, {
+                updatedTestsMap.set(protocol.name, {
                   ...existingTest,
-                  checked: true, // If protocol exists in backend, it should be checked
-                  status: frontendStatus, // Use backend status or default to pending
-                  resultData: protocol.resultUrl || existingTest.resultData,
-                  protocolId: protocol.protocolId,
-                  protocolType: protocol.protocolType // Store protocol ID for reference
+                  checked: true,
+                  status: frontendStatus,
+                  protocolId: protocol.protocolId, // RẤT QUAN TRỌNG: LƯU protocolId
+                  protocolType: protocol.protocolType, // Đảm bảo protocolType được gán
                 });
               } else {
-                // Add new protocol if it doesn't exist in the default list
-                newTestsMap.set(protocol.name, {
-                  id: protocol.protocolId,
+                // Thêm protocol mới nếu nó không có trong danh sách mặc định
+                updatedTestsMap.set(protocol.name, {
+                  id: protocol.protocolId || Date.now().toString(), // Tạo ID tạm nếu backend không cung cấp
                   name: protocol.name,
                   checked: true,
                   status: frontendStatus,
-                  resultData: protocol.resultUrl,
                   protocolId: protocol.protocolId,
-                  protocolType: protocol.protocolType
+                  protocolType: protocol.protocolType, // Đảm bảo protocolType được gán
                 });
               }
             });
-
-          return Array.from(newTestsMap.values());
+          return Array.from(updatedTestsMap.values());
         };
 
-        const updatedWifeTests = updateLabTests(wifeLabTests, data, 'WIFE');
-        const updatedHusbandTests = updateLabTests(husbandLabTests, data, 'HUSBAND');
+        const updatedWifeTests = updateLabTestsState(wifeLabTests, data, 'WIFE');
+        const updatedHusbandTests = updateLabTestsState(husbandLabTests, data, 'HUSBAND');
 
         setWifeLabTests(updatedWifeTests);
         setHusbandLabTests(updatedHusbandTests);
 
-        // Store original state for comparison
+        // Store original state for comparison after initial load
         setOriginalWifeLabTests(JSON.parse(JSON.stringify(updatedWifeTests)));
         setOriginalHusbandLabTests(JSON.parse(JSON.stringify(updatedHusbandTests)));
 
@@ -433,22 +434,13 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   }, [patientId]);
 
   // Fixed: Helper function to identify which tests have changed
-  const getChangedTests = (currentTests: TestItem[], originalTests: TestItem[]) => {
+  const getNewlyCheckedAndNotOrderedTests = (currentTests: TestItem[], originalTests: TestItem[]) => {
     const originalMap = new Map(originalTests.map(test => [test.name, test]));
 
     return currentTests.filter(currentTest => {
       const originalTest = originalMap.get(currentTest.name);
-
-      if (!originalTest) {
-        // New test that was added
-        return currentTest.checked && currentTest.status === 'not-ordered';
-      }
-
-      // Check if checked status or status changed
-      return (
-        currentTest.checked !== originalTest.checked ||
-        (currentTest.checked && currentTest.status !== originalTest.status)
-      );
+      // Test mới được chọn VÀ chưa từng được order (hoặc không tồn tại trong bản gốc)
+      return currentTest.checked && (!originalTest || originalTest.status === 'not-ordered');
     });
   };
 
@@ -495,30 +487,21 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
 
   // Fixed: Save only changed protocols
   const saveProtocols = async (): Promise<void> => {
-    const newlyCheckedWifeTests = wifeLabTests.filter(currentTest => {
-      const originalTest = originalWifeLabTests.find(orig => orig.name === currentTest.name);
-      return currentTest.checked && (!originalTest || originalTest.status === 'not-ordered');
-    });
+    const newlyOrderedWifeTests = getNewlyCheckedAndNotOrderedTests(wifeLabTests, originalWifeLabTests);
+    const newlyOrderedHusbandTests = getNewlyCheckedAndNotOrderedTests(husbandLabTests, originalHusbandLabTests);
 
-    const newlyCheckedHusbandTests = husbandLabTests.filter(currentTest => {
-      const originalTest = originalHusbandLabTests.find(orig => orig.name === currentTest.name);
-      return currentTest.checked && (!originalTest || originalTest.status === 'not-ordered');
-    });
-
-    // Chuyển đổi sang định dạng LabTestItem cho payload API
-    const wifeProtocolsToOrder: LabTestItem[] = newlyCheckedWifeTests.map(test => ({
+    const wifeProtocolsToOrder: LabTestItem[] = newlyOrderedWifeTests.map(test => ({
       name: test.name,
-      protocolType: test.protocolType || 'MEDICATION', // Sử dụng protocolType từ TestItem
+      protocolType: test.protocolType,
     }));
 
-    const husbandProtocolsToOrder: LabTestItem[] = newlyCheckedHusbandTests.map(test => ({
+    const husbandProtocolsToOrder: LabTestItem[] = newlyOrderedHusbandTests.map(test => ({
       name: test.name,
-      protocolType: test.protocolType || 'MEDICATION', // Sử dụng protocolType từ TestItem
+      protocolType: test.protocolType,
     }));
 
-    // Only send API call if there are actual changes
     if (wifeProtocolsToOrder.length === 0 && husbandProtocolsToOrder.length === 0) {
-      console.log('No protocol changes detected');
+      console.log('No new protocols to order.');
       return;
     }
 
@@ -528,47 +511,47 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     };
 
     try {
-      await apiClient.post(`/doctors/treatment-profile/create-protocols?patientId=${patientId}`, payload);
+      // Gửi yêu cầu POST để tạo protocols mới
+      const response = await apiClient.post<ProtocolResponse[]>(`/doctors/treatment-profile/create-protocols?patientId=${patientId}`, payload);
+      const createdProtocols = response.data; // Danh sách các protocol vừa được tạo từ backend
 
+      // Hàm cập nhật state sau khi các protocols được tạo
+      const updateStateWithCreatedProtocols = (prevTests: TestItem[], newlyOrdered: TestItem[], created: ProtocolResponse[], targetSubject: 'WIFE' | 'HUSBAND') => {
+        return prevTests.map(test => {
+          // Tìm protocol vừa được tạo khớp với test hiện tại (theo tên và đối tượng)
+          const matchedCreatedProtocol = created.find(
+            p => p.name === test.name && p.targetSubject === targetSubject
+          );
 
-      setWifeLabTests(prevTests =>
-        prevTests.map(test => {
-          if (newlyCheckedWifeTests.some(orderedTest => orderedTest.name === test.name)) {
-            return { ...test, status: 'ordered' as const };
+          if (matchedCreatedProtocol && newlyOrdered.some(n => n.name === test.name)) {
+            // Nếu đây là một test vừa được đặt hàng VÀ có protocol tương ứng từ backend,
+            // cập nhật status và protocolId
+            return {
+              ...test,
+              status: mapBackendStatusToFrontendStatus(matchedCreatedProtocol.protocolStatus),
+              protocolId: matchedCreatedProtocol.protocolId,
+              checked: true, // Đảm bảo checked là true nếu đã order
+            };
           }
           return test;
-        })
-      );
+        });
+      };
 
-      // Cập nhật husbandLabTests
-      setHusbandLabTests(prevTests =>
-        prevTests.map(test => {
-          if (newlyCheckedHusbandTests.some(orderedTest => orderedTest.name === test.name)) {
-            return { ...test, status: 'ordered' as const };
-          }
-          return test;
-        })
-      );
+      const updatedWifeTests = updateStateWithCreatedProtocols(wifeLabTests, newlyOrderedWifeTests, createdProtocols, 'WIFE');
+      const updatedHusbandTests = updateStateWithCreatedProtocols(husbandLabTests, newlyOrderedHusbandTests, createdProtocols, 'HUSBAND');
+
+      setWifeLabTests(updatedWifeTests);
+      setHusbandLabTests(updatedHusbandTests);
 
       toast({
         title: 'Đã lưu xét nghiệm',
         description: 'Danh sách xét nghiệm đã được cập nhật.',
       });
 
-      // Quan trọng: Cập nhật original state sau khi lưu thành công
-      // để các lần lưu sau chỉ phát hiện những thay đổi mới.
-      setOriginalWifeLabTests(JSON.parse(JSON.stringify(wifeLabTests.map(test => {
-        if (newlyCheckedWifeTests.some(orderedTest => orderedTest.name === test.name)) {
-          return { ...test, status: 'ordered' as const };
-        }
-        return test;
-      }))));
-      setOriginalHusbandLabTests(JSON.parse(JSON.stringify(husbandLabTests.map(test => {
-        if (newlyCheckedHusbandTests.some(orderedTest => orderedTest.name === test.name)) {
-          return { ...test, status: 'ordered' as const };
-        }
-        return test;
-      }))));
+      // CẬP NHẬT TRẠNG THÁI GỐC (original) sau khi LƯU thành công
+      // Điều này rất quan trọng để logic phát hiện thay đổi hoạt động đúng trong các lần lưu tiếp theo
+      setOriginalWifeLabTests(JSON.parse(JSON.stringify(updatedWifeTests)));
+      setOriginalHusbandLabTests(JSON.parse(JSON.stringify(updatedHusbandTests)));
 
     } catch (error) {
       console.error('Error saving protocols:', error);
