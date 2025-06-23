@@ -1,102 +1,153 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from '@components/ui/card';
-import { Calendar } from '@components/ui/calendar';
 import { Badge } from '@components/ui/badge';
+import { Button } from '@components/ui/button';
+import { Calendar, Clock, FileText } from 'lucide-react';
 
-const AppointmentCalendar: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  
-  // Mock data cho các ngày đã có lịch hẹn
-  const bookedDates = [
-    new Date(2024, 5, 15),
-    new Date(2024, 5, 16),
-    new Date(2024, 5, 20),
-    new Date(2024, 5, 25),
+interface AppointmentCalendarProps {
+  selectedTimeframe: string;
+  onTimeframeSelect: (timeframe: string) => void;
+  followUpNotes: string;
+  onNotesChange: (notes: string) => void;
+  followUpReason: string;
+  onReasonChange: (reason: string) => void;
+}
+
+const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
+  selectedTimeframe,
+  onTimeframeSelect,
+  followUpNotes,
+  onNotesChange,
+  followUpReason,
+  onReasonChange
+}) => {
+
+  const timeframeOptions = [
+    { value: '1_month', label: '1 tháng', description: 'Theo dõi sát' },
+    { value: '3_months', label: '3 tháng', description: 'Thường xuyên' },
+    { value: '6_months', label: '6 tháng', description: 'Định kỳ' },
+    { value: '1_year', label: '1 năm', description: 'Kiểm tra dài hạn' },
+    { value: 'custom', label: 'Tùy chỉnh', description: 'Theo chỉ định riêng' }
   ];
 
-  const isDateBooked = (date: Date) => {
-    return bookedDates.some(bookedDate => 
-      bookedDate.toDateString() === date.toDateString()
-    );
-  };
-
-  const isDateAvailable = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date >= today && !isDateBooked(date);
-  };
+  const commonReasons = [
+    'Theo dõi hiệu quả thuốc',
+    'Kiểm tra tác dụng phụ',
+    'Đánh giá tiến triển bệnh',
+    'Điều chỉnh liều thuốc',
+    'Xét nghiệm định kỳ',
+    'Tư vấn dinh dưỡng'
+  ];
 
   return (
     <Card className="p-6 bg-white border border-[color:var(--card-border)]">
-      <h3 className="text-lg font-semibold mb-4 text-[color:var(--text-accent)]">
-        Hẹn tái khám
-      </h3>
-      
-      <div className="space-y-4">
-        <div className="flex flex-wrap gap-2 mb-4">
-          <Badge variant="outline" className="border-green-500 text-green-700">
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-            Còn trống
-          </Badge>
-          <Badge variant="outline" className="border-red-500 text-red-700">
-            <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-            Đã full
-          </Badge>
-          <Badge variant="outline" className="border-[color:var(--deep-taupe)] text-[color:var(--deep-taupe)]">
-            <div className="w-2 h-2 bg-[color:var(--deep-taupe)] rounded-full mr-2"></div>
-            Đã chọn
-          </Badge>
+      <div className="flex items-center gap-2 mb-4">
+        <Calendar className="w-5 h-5 text-[color:var(--text-accent)]" />
+        <h3 className="text-lg font-semibold text-[color:var(--text-accent)]">
+          Khuyến nghị tái khám
+        </h3>
+      </div>
+
+      <div className="space-y-6">
+        {/* Chọn thời gian tái khám */}
+        <div>
+          <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-3">
+            <Clock className="w-4 h-4 inline mr-1" />
+            Thời gian khuyến nghị tái khám:
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            {timeframeOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => onTimeframeSelect(option.value)}
+                className={`p-3 text-left border rounded-lg transition-colors ${selectedTimeframe === option.value
+                    ? 'border-[color:var(--deep-taupe)] bg-[color:var(--secondary-background)]'
+                    : 'border-[color:var(--card-border)] hover:border-[color:var(--deep-taupe)]'
+                  }`}
+              >
+                <div className="font-medium text-[color:var(--text-accent)]">
+                  {option.label}
+                </div>
+                <div className="text-xs text-[color:var(--text-secondary)]">
+                  {option.description}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          disabled={(date) => date < new Date()}
-          className="rounded-md border border-[color:var(--card-border)] pointer-events-auto"
-          modifiers={{
-            booked: bookedDates,
-            available: (date) => isDateAvailable(date)
-          }}
-          modifiersStyles={{
-            booked: {
-              backgroundColor: '#fee2e2',
-              color: '#dc2626',
-              fontWeight: 'bold'
-            },
-            available: {
-              backgroundColor: '#f0fdf4',
-              color: '#16a34a'
-            }
-          }}
-        />
+        {/* Lý do tái khám */}
+        <div>
+          <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-3">
+            <FileText className="w-4 h-4 inline mr-1" />
+            Lý do tái khám:
+          </label>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {commonReasons.map((reason) => (
+              <Badge
+                key={reason}
+                variant={followUpReason.includes(reason) ? "default" : "outline"}
+                className={`cursor-pointer transition-colors ${followUpReason.includes(reason)
+                    ? 'bg-[color:var(--deep-taupe)] text-white'
+                    : 'hover:border-[color:var(--deep-taupe)]'
+                  }`}
+                onClick={() => {
+                  if (followUpReason.includes(reason)) {
+                    onReasonChange(followUpReason.replace(reason, '').replace(', ,', ', ').trim());
+                  } else {
+                    const newReason = followUpReason ? `${followUpReason}, ${reason}` : reason;
+                    onReasonChange(newReason);
+                  }
+                }}
+              >
+                {reason}
+              </Badge>
+            ))}
+          </div>
+          <textarea
+            value={followUpReason}
+            onChange={(e) => onReasonChange(e.target.value)}
+            className="w-full p-3 border border-[color:var(--card-border)] rounded-md resize-none focus:border-[color:var(--deep-taupe)] focus:outline-none"
+            rows={2}
+            placeholder="Nhập lý do tái khám hoặc chọn từ gợi ý ở trên..."
+          />
+        </div>
 
-        {selectedDate && (
-          <div className="mt-4 p-4 bg-[color:var(--secondary-background)] rounded-lg">
+        {/* Ghi chú thêm */}
+        <div>
+          <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-2">
+            Ghi chú thêm cho bệnh nhân:
+          </label>
+          <textarea
+            value={followUpNotes}
+            onChange={(e) => onNotesChange(e.target.value)}
+            className="w-full p-3 border border-[color:var(--card-border)] rounded-md resize-none focus:border-[color:var(--deep-taupe)] focus:outline-none"
+            rows={3}
+            placeholder="Ví dụ: Cần nhịn ăn 8 tiếng trước khi tái khám, mang theo kết quả xét nghiệm..."
+          />
+        </div>
+
+        {/* Xem trước thông báo */}
+        {selectedTimeframe && (
+          <div className="p-4 bg-[color:var(--secondary-background)] rounded-lg">
             <h4 className="font-medium text-[color:var(--text-accent)] mb-2">
-              Ngày đã chọn: {selectedDate.toLocaleDateString('vi-VN')}
+              Xem trước thông báo gửi bệnh nhân:
             </h4>
-            <p className="text-sm text-[color:var(--text-secondary)]">
-              Trạng thái: {isDateBooked(selectedDate) ? 
-                <span className="text-red-600 font-medium">Đã full</span> : 
-                <span className="text-green-600 font-medium">Còn trống</span>
-              }
-            </p>
-            {isDateAvailable(selectedDate) && (
-              <div className="mt-3">
-                <label className="block text-sm font-medium text-[color:var(--text-secondary)] mb-1">
-                  Ghi chú hẹn tái khám:
-                </label>
-                <textarea 
-                  className="w-full p-2 border border-[color:var(--card-border)] rounded-md resize-none focus:border-[color:var(--deep-taupe)] focus:outline-none"
-                  rows={3}
-                  placeholder="Nhập ghi chú cho cuộc hẹn..."
-                />
-              </div>
-            )}
+            <div className="text-sm text-[color:var(--text-secondary)] bg-white p-3 rounded border">
+              <p><strong>Thời gian:</strong> Sau {timeframeOptions.find(opt => opt.value === selectedTimeframe)?.label}</p>
+              {followUpReason && <p><strong>Lý do:</strong> {followUpReason}</p>}
+              {followUpNotes && <p><strong>Lưu ý:</strong> {followUpNotes}</p>}
+            </div>
           </div>
         )}
+      </div>
+      <div className="flex justify-end pt-6">
+        <Button
+        
+          className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
+        >
+          Lưu hồ sơ
+        </Button>
       </div>
     </Card>
   );
