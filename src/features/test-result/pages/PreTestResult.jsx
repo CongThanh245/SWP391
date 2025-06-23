@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Search, User, Phone, Calendar, X, Heart, Users } from "lucide-react";
-import { getPatients, getEvaluationCriteria } from "@api/patientApi";
+import {
+  Search,
+  User,
+  Phone,
+  Calendar,
+  X,
+  Activity,
+  FileText,
+  Edit3,
+} from "lucide-react";
+import {
+  getPatients,
+  getEvaluationCriteria,
+  updateEvaluationCriteria,
+} from "@api/patientApi";
 import styles from "./PreTestResult.module.css";
 
 const PreTestResult = () => {
@@ -35,29 +48,48 @@ const PreTestResult = () => {
       setEvaluationCriteria(data);
       setFormData(
         data.reduce((acc, criterion) => {
-          acc[criterion.id] = "";
+          acc[criterion.id] = {
+            currentValue: criterion.currentValue || "",
+            note: criterion.note || "",
+          };
           return acc;
         }, {})
       );
       setIsModalOpen(true);
     } catch (err) {
-      setError("Không thể tải tiêu chí đánh giá");
+      setError("Bệnh nhân chưa được bác sĩ chỉ định");
     }
   };
 
   const handlePatientClick = (patient) => {
     setSelectedPatient(patient);
-    const appointmentId = patient.latestAppointmentId; // Giả sử appointmentId có trong dữ liệu patient
+    const appointmentId = patient.latestAppointmentId;
     fetchEvaluationCriteria(appointmentId, patient.id);
   };
 
-  const handleInputChange = (criterionId, value) => {
-    setFormData((prev) => ({ ...prev, [criterionId]: value }));
+  const handleInputChange = (criterionId, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [criterionId]: { ...prev[criterionId], [field]: value },
+    }));
   };
 
   const handleSubmit = async () => {
-    console.log("Kết quả đã nhập:", formData);
-    setIsModalOpen(false);
+    try {
+      const updateData = Object.entries(formData).map(
+        ([criteriaId, { currentValue, note }]) => ({
+          criteriaId,
+          currentValue: currentValue || "",
+          note,
+        })
+      );
+
+      await updateEvaluationCriteria(updateData);
+      setIsModalOpen(false);
+      await fetchPatients();
+    } catch (err) {
+      setError("Không thể cập nhật tiêu chí đánh giá");
+    }
   };
 
   const filteredPatients = patients.filter((patient) => {
@@ -92,6 +124,32 @@ const PreTestResult = () => {
       age--;
     }
     return age;
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "COMPLETED":
+        return "var(--success-green)";
+      case "PENDING":
+        return "var(--warning-orange)";
+      case "IN_PROGRESS":
+        return "var(--accent-color)";
+      default:
+        return "var(--text-secondary)";
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "COMPLETED":
+        return "Hoàn thành";
+      case "PENDING":
+        return "Chờ xử lý";
+      case "IN_PROGRESS":
+        return "Đang thực hiện";
+      default:
+        return "Chưa xác định";
+    }
   };
 
   if (isLoading) return <div className={styles.loading}>Đang tải...</div>;
@@ -170,23 +228,120 @@ const PreTestResult = () => {
       </div>
 
       {isModalOpen && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h3>Nhập kết quả cho {selectedPatient.patientName}</h3>
-            {evaluationCriteria.map((criterion) => (
-              <div key={criterion.id} className={styles.criterion}>
-                <label>{criterion.name}</label>
-                <input
-                  type="text"
-                  value={formData[criterion.id]}
-                  onChange={(e) =>
-                    handleInputChange(criterion.id, e.target.value)
-                  }
-                />
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalTitle}>
+                <div className={styles.titleContent}>
+                  <div>
+                    <h3>Kết quả xét nghiệm - {selectedPatient?.patientName}</h3>
+                    <p>ID: {selectedPatient?.patientId}</p>
+                  </div>
+                </div>
               </div>
-            ))}
-            <button onClick={handleSubmit}>Lưu kết quả</button>
-            <button onClick={() => setIsModalOpen(false)}>Đóng</button>
+              <button
+                className={styles.closeButton}
+                onClick={() => setIsModalOpen(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className={styles.modalContent}>
+              <div className={styles.testResultsContainer}>
+                <div className={styles.tableHeader}>
+                  <div className={styles.headerCell}>
+                    <span>Tên xét nghiệm</span>
+                  </div>
+                  <div className={styles.headerCell}>
+                    <span>Kết quả</span>
+                  </div>
+                  <div className={styles.headerCell}>
+                    <span>Đơn vị</span>
+                  </div>
+                  <div className={styles.headerCell}>
+                    <span>Mô tả</span>
+                  </div>
+
+                  <div className={styles.headerCell}>
+                    <Edit3 size={16} />
+                    <span>Ghi chú</span>
+                  </div>
+                </div>
+
+                <div className={styles.testResultsList}>
+                  {evaluationCriteria.map((criterion, index) => (
+                    <div key={criterion.id} className={styles.testResultRow}>
+                      <div className={styles.testCell}>
+                        <div className={styles.testName}>
+                          <span>{criterion.name}</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.testCell}>
+                        <input
+                          type="text"
+                          className={styles.resultInput}
+                          value={formData[criterion.id]?.currentValue || ""}
+                          onChange={(e) =>
+                            handleInputChange(
+                              criterion.id,
+                              "currentValue",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Nhập kết quả"
+                        />
+                      </div>
+
+                      <div className={styles.testCell}>
+                        <span className={styles.unit}>
+                          {criterion.measurementUnit || "N/A"}
+                        </span>
+                      </div>
+
+                      <div className={styles.testCell}>
+                        <span className={styles.description}>
+                          {criterion.description || "Chưa có mô tả"}
+                        </span>
+                      </div>
+
+                      <div className={styles.testCell}>
+                        <input
+                          type="text"
+                          className={styles.noteInput}
+                          value={formData[criterion.id]?.note || ""}
+                          onChange={(e) =>
+                            handleInputChange(
+                              criterion.id,
+                              "note",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Ghi chú thêm"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.modalFooter}>
+              <div className={styles.footerActions}>
+                <button className={styles.saveButton} onClick={handleSubmit}>
+                  <Activity size={18} />
+                  Lưu kết quả
+                </button>
+                <button
+                  className={styles.cancelButton}
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  <X size={18} />
+                  Hủy bỏ
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
