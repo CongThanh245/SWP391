@@ -1,81 +1,93 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/card';
 import { Button } from '@components/ui/button';
 import { Badge } from '@components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui/select';
 import { Search, Filter, Calendar, FileText } from 'lucide-react';
 import { Input } from '@components/ui/input';
+import { getPatientList } from '@api/doctorApi'
+import {formatDate} from '@utils/format'
 
 interface PatientsContentProps {
     onPatientSelect?: (patientId: string) => void;
+}
+
+interface Patient {
+    id: number;
+    patientId: string;
+    patientName: string;
+    age: number;
+    treatmentStatus: string;
+    interventionType: string;
+    treatmentStage: string;
+    lastAppointmentDate: string;
+    nextAppointmentDate: string;
 }
 
 export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelect }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'waiting' | 'treating' | 'completed'>('all');
     const [stageFilter, setStageFilter] = useState<'all' | 'specialist' | 'intervention' | 'post-intervention'>('all');
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const [patients, setPatients] = useState<Patient[]>([]);
+
+    useEffect(() => {
+        const fetchPatientList = async () => {
+            try {
+                const data = await getPatientList({
+                    name: searchTerm,
+                    page: currentPage,
+                    size: 4,
+                });
+                console.log(data);
+                setTotalPages(data.totalPages);
+
+                const converted = data.content.map((item, index) => {
+                    const last = new Date(item.lastAppointmentDate);
+                    const next = new Date(item.nextAppointmentDate);
+                    const dateStrLast = formatDate(last.toISOString().split('T')[0]);
+                    const dateStrNext = formatDate(next.toISOString().split('T')[0]);
+
+                    return {
+                        id: currentPage * 4 + index + 1,
+                        patientId: item.patientId,
+                        patientName: item.patientName,
+                        age: item.age,
+                        treatmentStatus: item.treatmentStatus || 'unknown',
+                        interventionType: item.interventionType || 'N/A',
+                        treatmentStage: item.treatmentStage || 'unknown',
+                        lastAppointmentDate: dateStrLast,
+                        nextAppointmentDate: dateStrNext
+                    };
+                });
+
+                setPatients(converted);
+            } catch (error) {
+                console.error('Error loading patients:', error);
+            }
+        };
+
+        fetchPatientList();
+    }, [searchTerm, statusFilter, currentPage]);
 
 
-    const patients = [
-        {
-            id: 'BN001',
-            name: 'Nguyễn Thị A',
-            age: 28,
-            phone: '0901234567',
-            status: 'treating',
-            stage: 'intervention',
-            lastVisit: '2024-01-15',
-            nextAppointment: '2024-01-22',
-            treatment: 'IVF'
-        },
-        {
-            id: 'BN002',
-            name: 'Trần Văn B',
-            age: 32,
-            phone: '0902345678',
-            status: 'waiting',
-            stage: 'specialist',
-            lastVisit: '2024-01-10',
-            nextAppointment: '2024-01-18',
-            treatment: 'Tư vấn'
-        },
-        {
-            id: 'BN003',
-            name: 'Lê Thị C',
-            age: 30,
-            phone: '0903456789',
-            status: 'treating',
-            stage: 'post-intervention',
-            lastVisit: '2024-01-14',
-            nextAppointment: '2024-01-20',
-            treatment: 'IUI'
-        },
-        {
-            id: 'BN004',
-            name: 'Phạm Thị D',
-            age: 26,
-            phone: '0904567890',
-            status: 'completed',
-            stage: 'post-intervention',
-            lastVisit: '2024-01-12',
-            nextAppointment: null,
-            treatment: 'IVF'
-        },
-    ];
+
+   
 
     const filteredPatients = patients.filter(patient => {
-        const matchesSearch = patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            patient.id.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === 'all' || patient.status === statusFilter;
-        const matchesStage = stageFilter === 'all' || patient.stage === stageFilter;
+        const matchesSearch = patient.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            patient.patientId.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'all' || patient.treatmentStatus === statusFilter;
+        const matchesStage = stageFilter === 'all' || patient.treatmentStage === stageFilter;
 
         return matchesSearch && matchesStatus && matchesStage;
     });
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'waiting':
+            case 'IN_PROGRESS':
                 return <Badge variant="secondary">Chờ khám</Badge>;
             case 'treating':
                 return <Badge className="bg-blue-100 text-blue-800">Đang điều trị</Badge>;
@@ -88,7 +100,7 @@ export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelec
 
     const getStageBadge = (stage: string) => {
         switch (stage) {
-            case 'specialist':
+            case 'PREPARATION':
                 return <Badge variant="outline" className="bg-yellow-50 text-yellow-700">Chuyên khoa</Badge>;
             case 'intervention':
                 return <Badge variant="outline" className="bg-purple-50 text-purple-700">Can thiệp</Badge>;
@@ -171,40 +183,40 @@ export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelec
                     <Card
                         key={patient.id}
                         className="theme-card hover:shadow-lg transition-all cursor-pointer hover:border-[#4D3C2D]"
-                        onClick={() => handlePatientClick(patient.id)}
+                        onClick={() => handlePatientClick(patient.patientId)}
                     >
                         <CardHeader className="pb-3">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <CardTitle className="text-lg" style={{ color: '#4D3C2D' }}>{patient.name}</CardTitle>
+                                    <CardTitle className="text-lg" style={{ color: '#4D3C2D' }}>{patient.patientName}</CardTitle>
                                     <div className="flex items-center space-x-2 mt-1">
-                                        <Badge variant="outline" className="text-xs border-[#D9CAC2] text-[#4D3C2D]">{patient.id}</Badge>
+                                        <Badge variant="outline" className="text-xs border-[#D9CAC2] text-[#4D3C2D]">{patient.patientId}</Badge>
                                         <span className="text-sm text-gray-600">{patient.age} tuổi</span>
                                     </div>
                                 </div>
-                                {getStatusBadge(patient.status)}
+                                {getStatusBadge(patient.treatmentStatus)}
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm text-gray-600">Giai đoạn:</span>
-                                {getStageBadge(patient.stage)}
+                                {getStageBadge(patient.treatmentStage)}
                             </div>
 
                             <div className="flex items-center justify-between">
                                 <span className="text-sm text-gray-600">Điều trị:</span>
-                                <span className="text-sm font-medium" style={{ color: '#4D3C2D' }}>{patient.treatment}</span>
+                                <span className="text-sm font-medium" style={{ color: '#4D3C2D' }}>{patient.interventionType}</span>
                             </div>
 
                             <div className="flex items-center space-x-2">
                                 <Calendar className="h-4 w-4 text-gray-400" />
-                                <span className="text-sm text-gray-600">Khám cuối: {patient.lastVisit}</span>
+                                <span className="text-sm text-gray-600">Khám cuối: {patient.lastAppointmentDate}</span>
                             </div>
 
-                            {patient.nextAppointment && (
+                            {patient.nextAppointmentDate && (
                                 <div className="flex items-center space-x-2">
                                     <Calendar className="h-4 w-4" style={{ color: '#D9CAC2' }} />
-                                    <span className="text-sm" style={{ color: '#4D3C2D' }}>Hẹn tiếp: {patient.nextAppointment}</span>
+                                    <span className="text-sm" style={{ color: '#4D3C2D' }}>Hẹn tiếp: {patient.nextAppointmentDate}</span>
                                 </div>
                             )}
 
@@ -215,7 +227,7 @@ export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelec
                                     className="w-full border-[#D9CAC2] text-[#4D3C2D] hover:bg-[#D9CAC2]"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handlePatientClick(patient.id);
+                                        handlePatientClick(patient.patientId);
                                     }}
                                 >
                                     <FileText className="mr-2 h-4 w-4" />

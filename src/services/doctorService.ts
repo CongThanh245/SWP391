@@ -1,4 +1,6 @@
+import apiClient from '@/api/axiosConfig';
 import { importDoctors } from '@api/doctorApi';
+import {getDoctors} from '@api/adminApi'
 
 export interface DoctorCSVRow {
   [key: string]: string;
@@ -16,6 +18,46 @@ export interface MappedDoctor {
   gender: string | null;
   is_available: boolean;
   year_of_experience: string | null;
+}
+
+export interface MappedDoctorTwo {
+  id: string;
+  doctorId: string;
+  doctorName: string;
+  gender: string;
+  degree: string;
+  doctorAddress: string;
+  phone: string;
+  joinDate: string; 
+  dateOfBirth: string;
+  yearOfExperience: number;
+  about: string;
+  licenseNumber: string;
+  available: boolean;
+  active: boolean;
+  specialization: string;
+  totalPatients: number;
+  todayAppointments: number;
+  doctorEmail?: string; 
+}
+
+// UI Doctor interface (what your JSX expects)
+export interface UIDoctorData {
+   id: string;
+  name: string;
+  department: string;
+  specialist: string;
+  totalPatients: number;
+  todayAppointments: number;
+  status: string;
+  avatar: string;
+  phone: string;
+  email: string;
+  degree?: string;
+  experience?: number;
+  about?: string;
+  address?: string;
+  joinDate?: string;
 }
 
 export interface ImportOptions {
@@ -45,6 +87,16 @@ interface ApiImportResponse {
   duplicates?: MappedDoctor[];
 }
 
+export interface PaginatedDoctors {
+  doctors: MappedDoctorTwo[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+}
+
 export interface ImportResult {
   success: boolean;
   message: string;
@@ -66,7 +118,7 @@ export class DoctorService {
       date_of_birth: row['Date of Birth']?.trim() || null,
       gender: row['Gender']?.trim() || null,
       is_available: String(row['Is Available'] ?? '').toLowerCase().trim() === 'true',
-      year_of_experience:  row['Year Of Experience']?.trim() || null,
+      year_of_experience: row['Year Of Experience']?.trim() || null,
     };
   }
 
@@ -95,4 +147,32 @@ export class DoctorService {
       };
     }
   }
+
+  static async getAllDoctors(
+  page = 0,
+  size = 10,
+  search = '',
+  specialization = '',
+  status = ''
+): Promise<PaginatedDoctors> {
+  const params = {
+    page,
+    size,
+    search: search ?? "",
+    ...(specialization && { specialization }),
+    ...(status && { status }),
+  };
+
+  const data = await getDoctors(params);
+
+  return {
+    doctors: data.content as MappedDoctorTwo[],
+    page: data.number,
+    size: data.size,
+    totalElements: data.totalElements,
+    totalPages: data.totalPages,
+    first: data.first,
+    last: data.last,
+  };
 }
+  }

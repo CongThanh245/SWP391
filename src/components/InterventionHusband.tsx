@@ -59,13 +59,6 @@ const InterventionHusband: React.FC = () => {
         </div>
       </Card>
 
-      <Button
-        variant="outline"
-        className="border-[color:var(--card-border)] text-[color:var(--text-secondary)]"
-      >
-        <Plus className="w-4 h-4 mr-2" />
-        Thêm
-      </Button>
     </div>
   );
 };

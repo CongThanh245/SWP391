@@ -183,13 +183,6 @@ const InterventionWife: React.FC = () => {
           placeholder="Nhập ghi chú..."
           className="min-h-[100px] border-[color:var(--card-border)]"
         />
-        <Button
-          variant="outline"
-          className="mt-3 border-[color:var(--card-border)] text-[color:var(--text-secondary)]"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Thêm
-        </Button>
       </Card>
     </>
   );
@@ -276,6 +269,16 @@ const InterventionWife: React.FC = () => {
           </div>
         </div>
       </Card>
+
+      <Card className="p-6 bg-white border border-[color:var(--card-border)]">
+        <h3 className="text-lg font-semibold mb-4 text-[color:var(--text-accent)]">
+          Ghi chú bổ sung
+        </h3>
+        <Textarea
+          placeholder="Nhập ghi chú..."
+          className="min-h-[100px] border-[color:var(--card-border)]"
+        />
+      </Card>
     </>
   );
 
@@ -290,17 +293,9 @@ const InterventionWife: React.FC = () => {
             {stimulationProtocols.map((protocol) => 
               renderStimulationProtocol(
                 protocol.id, 
-                treatmentType === 'IUI' ? 'Phác đồ kích thích buồng trứng' : 'Tiêm kích trứng'
+                treatmentType === 'IUI' ? 'Kích thích buồng trứng' : 'Tiêm kích trứng'
               )
             )}
-            <Button
-              onClick={addStimulationProtocol}
-              variant="outline"
-              className="border-[color:var(--card-border)] text-[color:var(--text-secondary)]"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Bổ sung phác đồ
-            </Button>
           </div>
 
           {/* Theo dõi nang noãn */}

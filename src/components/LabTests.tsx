@@ -23,29 +23,34 @@ interface TestResult {
 interface LabTestsProps {
   title: string;
   tests: LabTest[];
+  onTestsChange: React.Dispatch<React.SetStateAction<LabTest[]>>;
 }
 
-const LabTests: React.FC<LabTestsProps> = ({ title, tests: initialTests }) => {
-  const [tests, setTests] = useState<LabTest[]>(initialTests);
+const LabTests: React.FC<LabTestsProps> = ({ title, tests, onTestsChange }) => {
+
   const [newTest, setNewTest] = useState('');
   const [showAddInput, setShowAddInput] = useState(false);
   const [selectedTest, setSelectedTest] = useState<{ id: string; name: string } | null>(null);
   const [testResults, setTestResults] = useState<Record<string, TestResult>>({});
 
   const handleTestChange = (testId: string, checked: boolean) => {
-    setTests(prev => prev.map(test => 
-      test.id === testId ? { ...test, checked } : test
-    ));
+    // Gọi onTestsChange để cập nhật state ở component cha
+    onTestsChange(prev =>
+      prev.map(test =>
+        test.id === testId ? { ...test, checked } : test
+      )
+    );
   };
 
   const handleAddTest = () => {
     if (newTest.trim()) {
       const newTestItem: LabTest = {
-        id: `custom-${Date.now()}`,
+        id: `custom-${Date.now()}`, // Đảm bảo ID này là duy nhất
         name: newTest.trim(),
         checked: false
       };
-      setTests(prev => [...prev, newTestItem]);
+      // Gọi onTestsChange để thêm xét nghiệm mới vào state ở component cha
+      onTestsChange(prev => [...prev, newTestItem]);
       setNewTest('');
       setShowAddInput(false);
     }
