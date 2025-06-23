@@ -31,7 +31,7 @@
   .appointmentPage {
     padding: var(--spacing-lg);
   }
-  
+
   .pageHeader h2 {
     font-size: var(--font-size-lg);
   }
@@ -47,7 +47,8 @@
 
 .tableHeader {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr; /* Adjusted for notes and actions */
+  grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr;
+  /* Adjusted for notes and actions */
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   background: var(--secondary-background);
@@ -66,13 +67,15 @@
 
 .appointmentRow {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr; /* Match tableHeader */
+  grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr;
+  /* Match tableHeader */
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   border-bottom: 1px solid var(--card-border);
   transition: all 0.3s ease;
   position: relative;
-  align-items: center; /* Ensure vertical alignment */
+  align-items: center;
+  /* Ensure vertical alignment */
 }
 
 .appointmentRow:last-child {
@@ -200,8 +203,10 @@
   display: flex;
   gap: var(--spacing-xs);
   align-items: center;
-  justify-content: flex-start; /* Prevent stretching */
-  min-width: 80px; /* Ensure enough space for buttons */
+  justify-content: flex-start;
+  /* Prevent stretching */
+  min-width: 80px;
+  /* Ensure enough space for buttons */
 }
 
 .actionBtn {
@@ -334,29 +339,39 @@
 }
 
 .modalCloseButton {
-  background: var(--primary-600);
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  background: var(--deep-taupe);
+  color: var(--light-background);
+  border: 2px solid var(--deep-taupe);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-2);
   cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px var(--shadow-accent);
 }
 
 .modalCloseButton:hover {
-  background: var(--primary-700);
+  background: var(--dark-accent);
+  border-color: var(--dark-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px var(--shadow-accent);
 }
 
 /* Responsive */
 @media (max-width: var(--breakpoint-lg)) {
+
   .tableHeader,
   .appointmentRow {
-    grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr; /* Keep all columns */
+    grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr;
+    /* Keep all columns */
   }
 }
 
 @media (max-width: var(--breakpoint-md)) {
   .tableHeader {
-    grid-template-columns: 1.5fr 1fr 1.5fr 0.8fr 1.2fr 0.8fr; /* Adjust proportions */
+    grid-template-columns: 1.5fr 1fr 1.5fr 0.8fr 1.2fr 0.8fr;
+    /* Adjust proportions */
     font-size: var(--font-size-xs);
     padding: var(--spacing-md);
   }
@@ -387,7 +402,8 @@
 
 @media (max-width: var(--breakpoint-sm)) {
   .tableHeader {
-    display: grid; /* Keep header visible */
+    display: grid;
+    /* Keep header visible */
     grid-template-columns: 1fr 1fr 1fr 0.8fr 1fr 0.8fr;
   }
 
@@ -411,6 +427,7 @@
     height: 24px;
   }
 }
+
 /* Thêm các CSS class này vào file AppointmentListReceptionist.module.css của bạn */
 
 /* Prevent body scroll when modal is open */
@@ -566,21 +583,21 @@ body.modalOpen {
     width: 95%;
     margin: var(--spacing-md);
   }
-  
+
   .detailsModalHeader,
   .detailsModalBody,
   .detailsModalActions {
     padding: var(--spacing-md);
   }
-  
+
   .detailsModalTitle {
     font-size: var(--font-size-base);
   }
-  
+
   .detailsInfo p {
     font-size: var(--font-size-sm);
   }
-  
+
   .detailsCancelButton,
   .detailsConfirmButton {
     padding: var(--spacing-xs) var(--spacing-sm);

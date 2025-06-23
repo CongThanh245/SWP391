@@ -1,37 +1,56 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { fetchAppointments, fetchAppointmentPatient, searchAppointments } from "@api/appointmentApi";
+import {
+  fetchAppointments,
+  searchAppointments,
+} from "@api/appointmentApi";
 
 const DEFAULT_FILTERS = { dateFilter: "all", specificDate: "" };
 
-export const useAppointments = ({ filterByPatientId, filters = DEFAULT_FILTERS, role = "receptionist", activeTab = "all" } = {}) => {
+export const useAppointments = ({
+  filterByPatientId,
+  filters = DEFAULT_FILTERS,
+  role = "receptionist",
+  activeTab = "all",
+} = {}) => {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Memoize filters
-  const normalizedFilters = useMemo(() => ({
-    dateFilter: filters.dateFilter || "all",
-    specificDate: filters.specificDate || "",
-    status: activeTab !== "all" ? activeTab : undefined,
-  }), [filters, activeTab]);
+  const normalizedFilters = useMemo(
+    () => ({
+      dateFilter: filters.dateFilter || "all",
+      specificDate: filters.specificDate || "",
+      status: activeTab !== "all" ? activeTab : undefined,
+    }),
+    [filters, activeTab]
+  );
 
   // Hàm lấy lịch hẹn
-  const loadAppointments = useCallback(async () => {  
+  const loadAppointments = useCallback(async () => {
     setIsLoading(true);
     try {
       let data;
       if (role === "patient") {
-        console.log('Gọi API /my_appointments/search cho bệnh nhân với bộ lọc:', normalizedFilters);
+        console.log(
+          "Gọi API /my_appointments/search cho bệnh nhân với bộ lọc:",
+          normalizedFilters
+        );
         const searchParams = {};
         if (normalizedFilters.status) {
           searchParams.status = normalizedFilters.status;
         }
-        if (normalizedFilters.dateFilter === "specific" && normalizedFilters.specificDate) {
+        if (
+          normalizedFilters.dateFilter === "specific" &&
+          normalizedFilters.specificDate
+        ) {
           searchParams.date = normalizedFilters.specificDate;
         }
         data = await searchAppointments(searchParams);
       } else {
-        console.log('Gọi API /receptionists/appointments cho lễ tân', { filterByPatientId });
+        console.log("Gọi API /receptionists/appointments cho lễ tân", {
+          filterByPatientId,
+        });
         data = await fetchAppointments(filterByPatientId);
       }
 
@@ -41,9 +60,9 @@ export const useAppointments = ({ filterByPatientId, filters = DEFAULT_FILTERS, 
       const mapped = appointmentData.map((appt) => {
         const appointmentDate = new Date(appt.appointmentDateTime);
         const date = appointmentDate.toISOString().split("T")[0];
-        const time = appointmentDate.toLocaleTimeString([], { 
-          hour: "2-digit", 
-          minute: "2-digit" 
+        const time = appointmentDate.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
         });
         const status = (appt.appointmentStatus || "").toLowerCase();
         return {
@@ -64,8 +83,10 @@ export const useAppointments = ({ filterByPatientId, filters = DEFAULT_FILTERS, 
       const sorted = mapped.sort((a, b) => {
         const dateA = new Date(a.rawDateTime);
         const dateB = new Date(b.rawDateTime);
-        if ((a.status === "pending" || a.status === "confirmed") && 
-            (b.status === "pending" || b.status === "confirmed")) {
+        if (
+          (a.status === "pending" || a.status === "confirmed") &&
+          (b.status === "pending" || b.status === "confirmed")
+        ) {
           return dateA - dateB;
         }
         return dateB - dateA;
@@ -85,13 +106,17 @@ export const useAppointments = ({ filterByPatientId, filters = DEFAULT_FILTERS, 
   }, [filterByPatientId, normalizedFilters, role]);
 
   useEffect(() => {
-    console.log('useEffect chạy với:', { filterByPatientId, normalizedFilters, role });
+    console.log("useEffect chạy với:", {
+      filterByPatientId,
+      normalizedFilters,
+      role,
+    });
     loadAppointments();
   }, [loadAppointments]);
 
   // Hàm làm mới dữ liệu
   const refetchAppointments = useCallback(() => {
-    console.log('Làm mới lịch hẹn');
+    console.log("Làm mới lịch hẹn");
     loadAppointments();
   }, [loadAppointments]);
 

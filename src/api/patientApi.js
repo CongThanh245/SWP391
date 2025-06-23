@@ -14,3 +14,10 @@ export const getPatientDetails = async (id) => {
   const response = await apiClient.get(`receptionists/patients/${id}`);
   return response.data;
 };
+
+export const getEvaluationCriteria = async (appointmentId, patientId) => {
+  const response = await apiClient.get(`/receptionists/evaluation-criteria`, {
+    params: { appointmentId, patientId }
+  });
+  return response.data;
+};

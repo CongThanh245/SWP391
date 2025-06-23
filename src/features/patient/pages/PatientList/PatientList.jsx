@@ -42,7 +42,7 @@ const PatientList = () => {
     const patientName = patient.patientName || "";
     const patientId = patient.patientId || "";
     const patientPhone = patient.patientPhone || "";
-    
+
     return (
       patientName.toLowerCase().includes(searchLower) ||
       patientId.toLowerCase().includes(searchLower) ||
@@ -149,7 +149,7 @@ const PatientList = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className={styles.patientDetails}>
                 <div className={styles.detailRow}>
                   <Phone size={16} />
@@ -160,7 +160,7 @@ const PatientList = () => {
                   <span>Ngày tham gia: {formatDate(patient.joinDate)}</span>
                 </div>
               </div>
-              
+
               <button
                 className={styles.detailButton}
                 onClick={() => fetchPatientDetails(patient.id)}
