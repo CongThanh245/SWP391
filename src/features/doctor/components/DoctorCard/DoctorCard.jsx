@@ -1,4 +1,4 @@
-// DoctorCard.jsx
+// src/features/doctor/components/DoctorCard/DoctorCard.jsx
 import React from 'react';
 import Card from '@components/common/Card/Card';
 import styles from './DoctorCard.module.css';
@@ -17,7 +17,11 @@ const DoctorCard = ({ doctor, onClick }) => {
 
   const getSpecializationTags = (specialization) => {
     if (!specialization) return [];
-    return specialization.split(',').map(spec => spec.trim()).slice(0, 3);
+    // API trả về specialization là chuỗi đơn (ví dụ: "IVF_SPECIALIST")
+    // Nếu server trả về chuỗi phân tách bằng dấu phẩy, giữ logic split
+    return specialization.includes(',') 
+      ? specialization.split(',').map(spec => spec.trim()).slice(0, 3)
+      : [specialization];
   };
 
   // Left content - Thông tin cơ bản bên dưới avatar
@@ -28,7 +32,7 @@ const DoctorCard = ({ doctor, onClick }) => {
         {getGenderBadgeText(doctor.gender)}
       </div>
       <div className={styles.experience}>
-        {doctor.yearsOfExperience} năm kinh nghiệm
+        {doctor.yearOfExperience} năm kinh nghiệm {/* Sửa từ yearsOfExperience */}
       </div>
     </div>
   );
@@ -39,7 +43,7 @@ const DoctorCard = ({ doctor, onClick }) => {
       {/* Học vấn */}
       <div className={styles.section}>
         <h4 className={styles.sectionTitle}>Học vấn</h4>
-        <p className={styles.sectionText}>{doctor.degree}</p>
+        <p className={styles.sectionText}>{doctor.degree || 'Không có thông tin'}</p>
       </div>
 
       {/* Chuyên môn */}
@@ -54,14 +58,14 @@ const DoctorCard = ({ doctor, onClick }) => {
         </div>
       </div>
 
-
       {/* Thành tựu */}
       <div className={styles.section}>
         <h4 className={styles.sectionTitle}>Thành tựu nổi bật</h4>
         <ul className={styles.achievementsList}>
-          <li>Chứng chỉ chuyên khoa cấp I {doctor.specialization}</li>
-          <li>Hơn {doctor.yearsOfExperience} năm kinh nghiệm điều trị</li>
-          <li>Thành viên Hội Y học Việt Nam</li>
+          <li>Chứng chỉ chuyên khoa {doctor.specialization}</li>
+          <li>Hơn {doctor.yearOfExperience} năm kinh nghiệm điều trị</li>
+          {/* Xóa mục giả định nếu không có trong API */}
+          {doctor.about && <li>{doctor.about.slice(0, 100)}...</li>}
         </ul>
       </div>
     </div>

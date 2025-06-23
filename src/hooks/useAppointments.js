@@ -3,6 +3,7 @@ import {
   fetchAppointments,
   searchAppointments,
 } from "@api/appointmentApi";
+import { formatDate } from "@utils/format"; // Assuming utils is in the same directory
 
 const DEFAULT_FILTERS = { dateFilter: "all", specificDate: "" };
 
@@ -59,7 +60,6 @@ export const useAppointments = ({
 
       const mapped = appointmentData.map((appt) => {
         const appointmentDate = new Date(appt.appointmentDateTime);
-        const date = appointmentDate.toISOString().split("T")[0];
         const time = appointmentDate.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -71,7 +71,7 @@ export const useAppointments = ({
           patientName: appt.patientName,
           doctorName: appt.doctorName,
           status,
-          date,
+          date: formatDate(appt.appointmentDateTime), // Use formatDate from utils
           time,
           notes: appt.notes || "",
           rawDateTime: appt.appointmentDateTime,
@@ -80,19 +80,7 @@ export const useAppointments = ({
         };
       });
 
-      const sorted = mapped.sort((a, b) => {
-        const dateA = new Date(a.rawDateTime);
-        const dateB = new Date(b.rawDateTime);
-        if (
-          (a.status === "pending" || a.status === "confirmed") &&
-          (b.status === "pending" || b.status === "confirmed")
-        ) {
-          return dateA - dateB;
-        }
-        return dateB - dateA;
-      });
-
-      setAppointments(sorted);
+      setAppointments(mapped); // Bỏ phần sort, sử dụng dữ liệu đã được backend sắp xếp
     } catch (err) {
       setError("Không thể tải lịch hẹn. Vui lòng thử lại sau.");
       console.error("Error loading appointments:", {

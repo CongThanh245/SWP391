@@ -191,7 +191,7 @@ const AppointmentListReceptionist = ({
             {appointment.notes ? (
               <>
                 <span className={styles.notes} title={appointment.notes}>
-                  {appointment.notes.length > 50
+                  {appointment.notes.length > 20
                     ? `${appointment.notes.substring(0, 20)}...`
                     : appointment.notes}
                 </span>

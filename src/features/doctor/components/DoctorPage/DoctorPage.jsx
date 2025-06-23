@@ -1,49 +1,66 @@
-// DoctorsPage.jsx
-// http://localhost:5173/our-doctors
-import React, { useState, useMemo } from "react";
+import {useState, useMemo, useEffect } from "react"; // Add useEffect
+import { Link, useParams, useNavigate } from "react-router-dom";
 import DoctorCard from "@features/doctor/components/DoctorCard/DoctorCard";
+import DoctorDetails from "@features/doctor/components/DoctorDetails/DoctorDetails";
 import styles from "./DoctorPage.module.css";
 import { useDoctors } from "@hooks/useDoctors";
 
+// Modal Component
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <button className={styles.modalCloseButton} onClick={onClose}>
+          ×
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 const DoctorsPage = () => {
-  const { doctors, loading, error } = useDoctors();
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [page, setPage] = useState(0);
+  const size = 10;
+  const [allSpecializations, setAllSpecializations] = useState([]); // New state for all specializations
 
-  const activeDoctors = useMemo(() => {
-    return doctors.filter((doctor) => doctor.active === true);
-  }, [doctors]);
+  const { doctors, pagination, loading, error } = useDoctors({
+    search: searchTerm || undefined,
+    specialization: selectedFilter !== "all" ? selectedFilter : undefined,
+    page,
+    size,
+  });
 
-  // Lọc theo chuyên khoa và tìm kiếm
-  const filteredDoctors = useMemo(() => {
-    let filtered = activeDoctors;
-
-    // Lọc theo chuyên khoa
-    if (selectedFilter !== "all") {
-      filtered = filtered.filter((doctor) =>
-        doctor.specialization
-          ?.toLowerCase()
-          .includes(selectedFilter.toLowerCase())
-      );
+  // Populate allSpecializations when doctors data is first loaded (no filters)
+  useEffect(() => {
+    if (doctors && selectedFilter === "all" && !searchTerm) {
+      const specs = doctors?.map((doctor) => doctor.specialization).filter(Boolean) || [];
+      const uniqueSpecs = [...new Set(specs)];
+      // Only update if allSpecializations is empty or different
+      if (
+        allSpecializations.length === 0 ||
+        JSON.stringify(allSpecializations) !== JSON.stringify(uniqueSpecs)
+      ) {
+        setAllSpecializations(uniqueSpecs);
+      }
     }
+  }, [doctors, selectedFilter, searchTerm, allSpecializations]);
 
-    // Tìm kiếm theo tên
-    if (searchTerm) {
-      filtered = filtered.filter((doctor) =>
-        doctor.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+  // Remove the dynamic specializations memo since we'll use allSpecializations
+  // const specializations = useMemo(() => {
+  //   const specs = doctors?.map((doctor) => doctor.specialization).filter(Boolean) || [];
+  //   return [...new Set(specs)];
+  // }, [doctors]);
 
-    return filtered;
-  }, [activeDoctors, selectedFilter, searchTerm]);
-
-  // Lấy danh sách chuyên khoa unique
-  const specializations = useMemo(() => {
-    const specs = activeDoctors
-      .map((doctor) => doctor.specialization)
-      .filter(Boolean);
-    return [...new Set(specs)];
-  }, [activeDoctors]);
+  const handleCloseModal = () => {
+    navigate("/doctors");
+  };
 
   if (loading) {
     return (
@@ -78,28 +95,6 @@ const DoctorsPage = () => {
             của bạn
           </p>
         </div>
-
-        {/* Statistics */}
-        <div className={styles.statsContainer}>
-          <div className={styles.statItem}>
-            <span className={styles.statNumber}>{activeDoctors.length}</span>
-            <span className={styles.statLabel}>Bác sĩ</span>
-          </div>
-          <div className={styles.statItem}>
-            <span className={styles.statNumber}>
-              {activeDoctors.reduce(
-                (sum, doctor) => sum + (doctor.yearsOfExperience || 0),
-                0
-              )}
-              +
-            </span>
-            <span className={styles.statLabel}>Năm kinh nghiệm</span>
-          </div>
-          <div className={styles.statItem}>
-            <span className={styles.statNumber}>{specializations.length}</span>
-            <span className={styles.statLabel}>Chuyên khoa</span>
-          </div>
-        </div>
       </div>
 
       {/* Filter and Search Section */}
@@ -119,10 +114,9 @@ const DoctorsPage = () => {
             viewBox="0 0 24 24"
             fill="none"
             stroke="#4d3c2d"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="lucide lucide-search-icon lucide-search"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             className={styles.searchIcon}
           >
             <path d="m21 21-4.34-4.34" />
@@ -139,7 +133,7 @@ const DoctorsPage = () => {
           >
             Tất cả
           </button>
-          {specializations.map((spec, index) => (
+          {allSpecializations.map((spec, index) => (
             <button
               key={index}
               className={`${styles.filterButton} ${
@@ -156,16 +150,22 @@ const DoctorsPage = () => {
       {/* Results count */}
       <div className={styles.resultsInfo}>
         <p>
-          Hiển thị {filteredDoctors.length} bác sĩ
+          Hiển thị {doctors.length} bác sĩ
           {searchTerm && ` cho "${searchTerm}"`}
         </p>
       </div>
 
       {/* Doctors Grid */}
-      {filteredDoctors.length > 0 ? (
+      {doctors.length > 0 ? (
         <div className={styles.doctorsGrid}>
-          {filteredDoctors.map((doctor) => (
-            <DoctorCard key={doctor.id} doctor={doctor} />
+          {doctors.map((doctor) => (
+            <Link
+              key={doctor.id}
+              to={`/doctors/${doctor.id}`}
+              className={styles.doctorCardLink}
+            >
+              <DoctorCard doctor={doctor} />
+            </Link>
           ))}
         </div>
       ) : (
@@ -187,6 +187,35 @@ const DoctorsPage = () => {
             Xóa bộ lọc
           </button>
         </div>
+      )}
+
+      {/* Pagination */}
+      {pagination?.totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            disabled={page === 0}
+            onClick={() => setPage(page - 1)}
+            className={styles.pageButton}
+          >
+            Trước
+          </button>
+          <span>
+            Trang {page + 1} / {pagination?.totalPages || 1}
+          </span>
+          <button
+            disabled={page === (pagination?.totalPages || 1) - 1}
+            onClick={() => setPage(page + 1)}
+            className={styles.pageButton}
+          >
+            Sau
+          </button>
+        </div>
+      )}
+
+      {id && (
+        <Modal isOpen={!!id} onClose={handleCloseModal}>
+          <DoctorDetails onClose={handleCloseModal} />
+        </Modal>
       )}
     </div>
   );

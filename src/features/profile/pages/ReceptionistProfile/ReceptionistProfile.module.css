@@ -1,0 +1,80 @@
+/* ReceptionistProfile.module.css - Two-column info layout with edit button */
+.profileContainer {
+  width: 100%;
+  background: var(--light-background);
+  border-radius: 0.75rem;
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin:   20px 0;
+}
+
+/* Header: title + edit button */
+.profileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+.pageTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--deep-taupe);
+  margin: 0;
+}
+.editButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--card-border);
+  border-radius: 0.5rem;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Info grid: two columns, each item label above, value below */
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-lg) var(--spacing-xl); 
+}
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin: 10px 0;
+}
+.infoIcon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+.infoContent {
+  display: flex;
+  flex-direction: column;
+}
+.infoLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+.infoValue {
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Hide unused sections */
+.avatarSection,
+.actionButtons,
+.statusBadge {
+  display: none;
+}
+
+/* Responsive: single column on mobile */
+@media (max-width: 480px) {
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}

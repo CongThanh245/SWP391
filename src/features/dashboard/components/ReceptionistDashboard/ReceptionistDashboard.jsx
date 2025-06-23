@@ -169,11 +169,6 @@ const ReceptionistDashboard = () => {
     // },
   ];
 
-  // Thông tin user
-  const userInfo = {
-    name: "Nguyễn Thị Lan",
-    role: "receptionist",
-  };
 
   // Xử lý khi click vào menu
   const handleMenuClick = (key) => {
@@ -210,8 +205,6 @@ const ReceptionistDashboard = () => {
               menuItems.find((item) => item.key === key).path
             )
           }
-          userRole="receptionist"
-          userInfo={userInfo}
         />
       }
     >

@@ -9,12 +9,12 @@
 
 /* Dashboard Header */
 .dashboardHeader {
-  background: var(--card-gradient);
   border-radius: 12px;
   padding: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
   box-shadow: 0 4px 20px var(--shadow-dark-gray);
   border: 1px solid var(--card-border);
+  border-top: var(--accent-color) solid 2px;
 }
 
 .userInfo {
@@ -94,17 +94,20 @@
 }
 
 .statCard.blue .statIcon {
-  background: linear-gradient(135deg, #A8E6CF, #7FCDCD); /* Xanh mint nhạt */
+  background: linear-gradient(135deg, #A8E6CF, #7FCDCD);
+  /* Xanh mint nhạt */
 }
 
 /* Card 2: Gradient cam đào nhạt - màu ấm hòa hợp với nâu */
 .statCard.orange .statIcon {
-  background: linear-gradient(135deg, #FFD3A5, #FFAAA5); /* Cam đào nhạt */
+  background: linear-gradient(135deg, #FFD3A5, #FFAAA5);
+  /* Cam đào nhạt */
 }
 
 /* Card 3: Gradient tím lavender - màu mát mẻ tương phản với nâu */
 .statCard.purple .statIcon {
-  background: linear-gradient(135deg, #C7CEEA, #B19CD9); /* Tím lavender */
+  background: linear-gradient(135deg, #C7CEEA, #B19CD9);
+  /* Tím lavender */
 }
 
 
@@ -173,19 +176,23 @@
 }
 
 .actionCard.blue::before {
-  background: linear-gradient(135deg, #A8E6CF, #7FCDCD); /* Xanh mint nhạt */
+  background: linear-gradient(135deg, #A8E6CF, #7FCDCD);
+  /* Xanh mint nhạt */
 }
 
 .actionCard.green::before {
-  background: linear-gradient(135deg, #FFD3A5, #FFAAA5); /* Cam đào nhạt */
+  background: linear-gradient(135deg, #FFD3A5, #FFAAA5);
+  /* Cam đào nhạt */
 }
 
 .actionCard.purple::before {
-  background: linear-gradient(135deg, #FFD3A5, #FFAAA5); /* Cam đào nhạt */
+  background: linear-gradient(135deg, #FFD3A5, #FFAAA5);
+  /* Cam đào nhạt */
 }
 
 .actionCard.orange::before {
-  background: linear-gradient(135deg, #C7CEEA, #B19CD9); /* Tím lavender */
+  background: linear-gradient(135deg, #C7CEEA, #B19CD9);
+  /* Tím lavender */
 }
 
 .actionCard:hover {
@@ -297,12 +304,12 @@
   .dashboard {
     padding: var(--spacing-md);
   }
-  
+
   .statsGrid {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--spacing-md);
   }
-  
+
   .actionsGrid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--spacing-md);
@@ -313,42 +320,42 @@
   .dashboard {
     padding: var(--spacing-sm);
   }
-  
+
   .dashboardHeader {
     padding: var(--spacing-lg);
   }
-  
+
   .userInfo {
     gap: var(--spacing-md);
   }
-  
+
   .userAvatar {
     width: 50px;
     height: 50px;
   }
-  
+
   .welcomeText {
     font-size: var(--font-size-lg);
   }
-  
+
   .statsGrid {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
   }
-  
+
   .statCard {
     padding: var(--spacing-md);
   }
-  
+
   .actionsGrid {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
   }
-  
+
   .actionCard {
     padding: var(--spacing-md);
   }
-  
+
   .recentActivitySection {
     padding: var(--spacing-lg);
   }
@@ -360,15 +367,15 @@
     text-align: center;
     gap: var(--spacing-sm);
   }
-  
+
   .statValue {
     font-size: var(--font-size-xl);
   }
-  
+
   .actionCard {
     text-align: center;
   }
-  
+
   .actionButton {
     align-self: center;
   }
