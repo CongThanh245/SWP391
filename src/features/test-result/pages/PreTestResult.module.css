@@ -66,12 +66,6 @@
   justify-content: center;
   gap: var(--spacing-sm);
 }
-
-.pageHeader p::before {
-  content: '📋';
-  font-size: 18px;
-}
-
 .stats {
   display: flex;
   justify-content: center;
@@ -166,32 +160,117 @@
 }
 
 /* Enhanced patient grid with lab-style cards */
-.patientGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: var(--spacing-xl);
-  max-width: 1600px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-  padding: var(--spacing-md);
+/* Main container */
+.patientListPage {
+  padding: var(--spacing-xl);
+  background: var(--primary-background);
+  min-height: 100vh;
+  font-family: var(--font-family);
 }
 
-/* Medical-themed patient cards */
+/* Header section */
+.pageHeader {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.pageHeader h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-accent);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.pageHeader p {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: var(--spacing-md);
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.stats span {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--secondary-background);
+  border-radius: 20px;
+  border: 1px solid var(--card-border);
+}
+
+/* Search section */
+.searchSection {
+  margin-bottom: var(--spacing-xl);
+  display: flex;
+  justify-content: center;
+}
+
+.searchBox {
+  position: relative;
+  max-width: 500px;
+  width: 100%;
+}
+
+.searchBox svg {
+  position: absolute;
+  left: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-color);
+  z-index: 1;
+}
+
+.searchBox input {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 48px;
+  border: 2px solid var(--card-border);
+  border-radius: 25px;
+  font-size: var(--font-size-base);
+  font-family: var(--font-family);
+  background: var(--card-background);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-dark-gray);
+}
+
+.searchBox input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--hover-accent);
+}
+
+.searchBox input::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Patient grid */
+.patientGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: var(--spacing-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Patient card */
 .patientCard {
   background: var(--card-background);
-  border: 2px solid var(--card-border);
-  border-radius: 20px;
-  padding: var(--spacing-xl);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: var(--spacing-lg);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px var(--shadow-dark-gray);
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-  backdrop-filter: blur(10px);
-  transform-style: preserve-3d;
+  gap: var(--spacing-md);
 }
 
 .patientCard::before {
@@ -200,91 +279,86 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, var(--success-green), #4CAF50, #81C784);
+  height: 4px;
+  background: var(--success-green);
   opacity: 0;
-  transition: all 0.3s ease;
-  border-radius: 20px 20px 0 0;
-}
-
-.patientCard::after {
-  content: '🩺';
-  position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
-  font-size: 24px;
-  opacity: 0.1;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .patientCard.inactive::before {
-  background: linear-gradient(90deg, var(--warning-orange), #FF9800, #FFB74D);
+  background: var(--warning-orange);
 }
 
 .patientCard:hover {
-  border-color: var(--accent-color);  
+  border-color: var(--card-hover-border);
+  box-shadow: 0 8px 24px var(--shadow-accent);
+  transform: translateY(-4px);
 }
 
 .patientCard:hover::before {
   opacity: 1;
 }
 
-.patientCard:hover::after {
-  opacity: 0.3;
-  transform: scale(1.1) rotate(10deg);
+/* Status badge */
+.statusBadge {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 12px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Enhanced patient header */
+.statusBadge.active {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-green);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.statusBadge.inactive {
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--warning-orange);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+/* Patient header */
 .patientHeader {
   display: flex;
   align-items: flex-start;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
-  position: relative;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
 }
 
 .patientAvatar {
-  background: linear-gradient(145deg, var(--secondary-background), rgba(64, 158, 255, 0.1));
-  border: 3px solid var(--card-border);
-  border-radius: 50%;
-  padding: var(--spacing-lg);
-  color: var(--accent-color);
-  transition: all 0.4s ease;
-  flex-shrink: 0;
-  position: relative;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(145deg, var(--secondary-background), rgba(64, 158, 255, 0.1));
+    border: 3px solid var(--card-border);
+    border-radius: 50%;
+    padding: var(--spacing-lg);
+    color: var(--accent-color);
+    transition: all 0.4s ease;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-.patientAvatar::before {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: -1;
+.patientCard:hover .patientAvatar {
+  border-color: var(--accent-color);
+  background: var(--hover-accent);
 }
-
-.patientCard:hover .patientAvatar::before {
-  opacity: 1;
-}
-
 
 .patientBasicInfo {
   flex: 1;
 }
 
 .patientBasicInfo h4 {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   color: var(--text-primary);
-  font-weight: 700;
-  margin: 0 0 var(--spacing-sm) 0;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-xs) 0;
   line-height: 1.2;
-  position: relative;
-}
-
-.patientCard:hover .patientBasicInfo h4::after {
-  width: 100%;
 }
 
 .patientId {
@@ -299,21 +373,17 @@
 }
 
 .patientAge {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   color: var(--accent-color);
   margin: 0;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
+  font-weight: 500;
 }
-
 .patientAge::before {
   content: '👤';
   font-size: 16px;
 }
 
-/* Enhanced patient details with medical icons */
+/* Patient details */
 .patientDetails {
   display: flex;
   flex-direction: column;
@@ -326,73 +396,37 @@
 }
 
 .detailRow {
-    display: flex
-;
-    align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-sm) 0;
-    position: relative;
-}
-
-
-.detailRow:hover::before {
-  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) 0;
 }
 
 .detailRow svg {
   color: var(--accent-color);
   flex-shrink: 0;
-  padding: var(--spacing-xs);
-  background: rgba(64, 158, 255, 0.1);
-  border-radius: 8px;
-  transition: all 0.3s ease;
 }
 
 .detailRow span {
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.4;
 }
 
-/* Enhanced detail button with medical theme */
+/* Detail button */
 .detailButton {
-  padding: var(--spacing-md) var(--spacing-xl);
-  background: var(--button-primary-bg);
+  padding: 15px 10px;
+  background: var(--accent-color);
   color: var(--primary-background);
   border: none;
-  border-radius: 16px;
-  font-size: var(--font-size-base);
-  font-weight: 600;
+  border-radius: 8px;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   margin-top: auto;
-  position: relative;
-  overflow: hidden;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
 }
-
-.detailButton::before {
-  font-size: 16px;
-  transition: transform 0.3s ease;
-}
-
-.detailButton::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: all 0.4s ease;
-}
-
 
 .detailButton:hover {
   background: var(--button-hover-bg);
@@ -400,6 +434,7 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
+
 
 
 /* Enhanced no results */
@@ -734,5 +769,459 @@
   
   .modalContent {
     padding: var(--spacing-md);
+  }
+}
+
+/* Enhanced modal styles - Full screen layout */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--card-background);
+  border-radius: 16px;
+  width: 95vw;
+  height: 90vh;
+  max-width: none;
+  max-height: none;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid var(--card-border);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 2px solid var(--card-border);
+  background: linear-gradient(135deg, rgba(64, 158, 255, 0.08), rgba(76, 175, 80, 0.05));
+  flex-shrink: 0;
+}
+
+.modalTitle {
+  flex: 1;
+}
+
+.titleContent {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.titleContent svg {
+  color: var(--accent-color);
+  padding: 8px;
+  background: rgba(64, 158, 255, 0.15);
+  border-radius: 12px;
+}
+
+.titleContent h3 {
+  font-size: 24px;
+  color: var(--accent-color);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.titleContent p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 4px 0 0 0;
+  font-weight: 500;
+}
+
+.closeButton {
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid rgba(239, 68, 68, 0.2);
+  cursor: pointer;
+  color: #ef4444;
+  transition: all 0.3s ease;
+  padding: 12px;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background: rgba(239, 68, 68, 0.15);
+  transform: scale(1.03);
+}
+
+/* Enhanced test results container */
+.modalContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.testResultsContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Table header styling */
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr  2.5fr 2fr;
+  gap: 16px;
+  padding: 20px 32px;
+  background: linear-gradient(135deg, var(--secondary-background), rgba(64, 158, 255, 0.05));
+  border-bottom: 2px solid var(--card-border);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(64, 158, 255, 0.08);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.headerCell svg {
+  color: var(--accent-color);
+}
+
+.headerCell:hover {
+  background: rgba(64, 158, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Test results list */
+.testResultsList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 32px 32px;
+  background: linear-gradient(180deg, transparent, rgba(64, 158, 255, 0.02));
+}
+
+/* Enhanced test result row */
+.testResultRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr  2.5fr 2fr;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(64, 158, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.testResultRow::before {
+  content: '';
+  position: absolute;
+  left: -32px;
+  right: -32px;
+  top: 0;
+  bottom: 0;
+  background: transparent;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.testResultRow:hover::before {
+  background: rgba(64, 158, 255, 0.05);
+  box-shadow: 0 4px 16px rgba(64, 158, 255, 0.1);
+}
+
+.testResultRow:last-child {
+  border-bottom: none;
+}
+
+/* Enhanced test cell styling */
+.testCell {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 12px;
+}
+
+/* Test name with icon */
+.testName {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.testIcon {
+  font-size: 20px;
+  padding: 8px;
+  background: linear-gradient(135deg, rgba(64, 158, 255, 0.1), rgba(76, 175, 80, 0.1));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+}
+
+/* Unit styling */
+.unit {
+  font-weight: 600;
+  color: var(--accent-color);
+  background: rgba(64, 158, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  text-align: center;
+  min-width: 60px;
+}
+
+/* Description styling */
+.description {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 8px 12px;
+  background: rgba(108, 117, 125, 0.05);
+  border-radius: 8px;
+}
+
+/* Enhanced input styling */
+.resultInput, .noteInput {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--card-border);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--secondary-background);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  font-family: inherit;
+}
+
+.resultInput:focus, .noteInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.15);
+  transform: translateY(-1px);
+  background: var(--card-background);
+}
+
+.resultInput::placeholder, .noteInput::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.resultInput {
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.noteInput {
+  font-size: 13px;
+}
+
+/* Status badge */
+.statusBadge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(108, 117, 125, 0.1);
+  border: 2px solid currentColor;
+  text-align: center;
+  min-width: 80px;
+  display: inline-block;
+}
+
+/* Enhanced modal footer */
+.modalFooter {
+  padding: 24px 32px;
+  border-top: 2px solid var(--card-border);
+  background: linear-gradient(135deg, rgba(64, 158, 255, 0.03), rgba(76, 175, 80, 0.02));
+  flex-shrink: 0;
+}
+
+.footerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  align-items: center;
+}
+
+.saveButton, .cancelButton {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.saveButton {
+  background: linear-gradient(135deg, var(--button-primary-bg) 0%, var(--button-hover-bg) 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(189, 104, 24, 0.3);
+}
+
+.saveButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(177, 87, 8, 0.4);
+}
+
+.cancelButton {
+  background: rgba(108, 117, 125, 0.1);
+  color: var(--text-secondary);
+  border: 2px solid var(--card-border);
+}
+
+.cancelButton:hover {
+  background: rgba(108, 117, 125, 0.15);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+}
+
+/* Custom scrollbar for test results list */
+.testResultsList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.testResultsList::-webkit-scrollbar-track {
+  background: rgba(64, 158, 255, 0.05);
+  border-radius: 4px;
+}
+
+.testResultsList::-webkit-scrollbar-thumb {
+  background: rgba(184, 78, 8, 0.3);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.testResultsList::-webkit-scrollbar-thumb:hover {
+  background: rgba(154, 63, 14, 0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .tableHeader, .testResultRow {
+    grid-template-columns: 1.8fr 0.8fr 2fr 1.3fr 1.8fr 0.8fr;
+    gap: 12px;
+  }
+  
+  .modal {
+    width: 98vw;
+    height: 95vh;
+  }
+}
+
+@media (max-width: 1200px) {
+  .tableHeader, .testResultRow {
+    grid-template-columns: 1.5fr 0.7fr 1.8fr 1.2fr 1.5fr 0.7fr;
+    gap: 10px;
+    font-size: 13px;
+  }
+  
+  .testResultsList {
+    padding: 16px 24px 24px;
+  }
+  
+  .modalHeader, .modalFooter {
+    padding: 20px 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+  
+  .modalOverlay {
+    padding: 0;
+  }
+  
+  .tableHeader, .testResultRow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .testResultRow {
+    flex-direction: column;
+    display: flex;
+    padding: 16px;
+    background: var(--card-background);
+    margin-bottom: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+  }
+  
+  .testCell {
+    min-height: auto;
+    padding: 4px 0;
+  }
+  
+  .tableHeader {
+    display: none;
+  }
+  
+  .testResultsList {
+    padding: 16px;
   }
 }

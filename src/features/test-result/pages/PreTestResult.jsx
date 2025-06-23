@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Search, User, Phone, Calendar, X } from "lucide-react";
-import { getPatients, getEvaluationCriteria, updateEvaluationCriteria } from "@api/patientApi";
+import {
+  Search,
+  User,
+  Phone,
+  Calendar,
+  X,
+  Activity,
+  FileText,
+  Edit3,
+} from "lucide-react";
+import {
+  getPatients,
+  getEvaluationCriteria,
+  updateEvaluationCriteria,
+} from "@api/patientApi";
 import styles from "./PreTestResult.module.css";
 
 const PreTestResult = () => {
@@ -35,7 +48,10 @@ const PreTestResult = () => {
       setEvaluationCriteria(data);
       setFormData(
         data.reduce((acc, criterion) => {
-          acc[criterion.id] = { currentValue: criterion.currentValue || 0, note: criterion.note || "" };
+          acc[criterion.id] = {
+            currentValue: criterion.currentValue || "",
+            note: criterion.note || "",
+          };
           return acc;
         }, {})
       );
@@ -54,17 +70,19 @@ const PreTestResult = () => {
   const handleInputChange = (criterionId, field, value) => {
     setFormData((prev) => ({
       ...prev,
-      [criterionId]: { ...prev[criterionId], [field]: value }
+      [criterionId]: { ...prev[criterionId], [field]: value },
     }));
   };
 
   const handleSubmit = async () => {
     try {
-      const updateData = Object.entries(formData).map(([criteriaId, { currentValue, note }]) => ({
-        criteriaId,
-        currentValue: parseFloat(currentValue) || 0,
-        note
-      }));
+      const updateData = Object.entries(formData).map(
+        ([criteriaId, { currentValue, note }]) => ({
+          criteriaId,
+          currentValue: currentValue || "",
+          note,
+        })
+      );
 
       await updateEvaluationCriteria(updateData);
       setIsModalOpen(false);
@@ -99,10 +117,39 @@ const PreTestResult = () => {
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     return age;
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "COMPLETED":
+        return "var(--success-green)";
+      case "PENDING":
+        return "var(--warning-orange)";
+      case "IN_PROGRESS":
+        return "var(--accent-color)";
+      default:
+        return "var(--text-secondary)";
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "COMPLETED":
+        return "Hoàn thành";
+      case "PENDING":
+        return "Chờ xử lý";
+      case "IN_PROGRESS":
+        return "Đang thực hiện";
+      default:
+        return "Chưa xác định";
+    }
   };
 
   if (isLoading) return <div className={styles.loading}>Đang tải...</div>;
@@ -111,7 +158,8 @@ const PreTestResult = () => {
   return (
     <div className={styles.patientListPage}>
       <div className={styles.pageHeader}>
-        <h2>Nhập kết quả xét nghiệm</h2>
+        <h2>Danh sách Bệnh nhân</h2>
+        <p>Quản lý thông tin bệnh nhân</p>
         <div className={styles.stats}>
           <span>Tổng số: {patients.length}</span>
         </div>
@@ -159,11 +207,11 @@ const PreTestResult = () => {
 
               <div className={styles.patientDetails}>
                 <div className={styles.detailRow}>
-                  <Phone size={22} />
+                  <Phone size={16} />
                   <span>{patient.patientPhone}</span>
                 </div>
                 <div className={styles.detailRow}>
-                  <Calendar size={22} />
+                  <Calendar size={16} />
                   <span>Ngày tham gia: {formatDate(patient.joinDate)}</span>
                 </div>
               </div>
@@ -184,7 +232,12 @@ const PreTestResult = () => {
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitle}>
-                <h3>Nhập kết quả cho {selectedPatient.patientName}</h3>
+                <div className={styles.titleContent}>
+                  <div>
+                    <h3>Kết quả xét nghiệm - {selectedPatient?.patientName}</h3>
+                    <p>ID: {selectedPatient?.patientId}</p>
+                  </div>
+                </div>
               </div>
               <button
                 className={styles.closeButton}
@@ -193,42 +246,101 @@ const PreTestResult = () => {
                 <X size={24} />
               </button>
             </div>
+
             <div className={styles.modalContent}>
-              {evaluationCriteria.map((criterion) => (
-                <div key={criterion.id} className={styles.criterion}>
-                  <label>{criterion.name}</label>
-                  <input
-                    type="number"
-                    value={formData[criterion.id]?.currentValue || ""}
-                    onChange={(e) =>
-                      handleInputChange(criterion.id, "currentValue", e.target.value)
-                    }
-                    placeholder="Nhập giá trị"
-                  />
-                  <input
-                    type="text"
-                    value={formData[criterion.id]?.note || ""}
-                    onChange={(e) =>
-                      handleInputChange(criterion.id, "note", e.target.value)
-                    }
-                    placeholder="Ghi chú"
-                  />
+              <div className={styles.testResultsContainer}>
+                <div className={styles.tableHeader}>
+                  <div className={styles.headerCell}>
+                    <span>Tên xét nghiệm</span>
+                  </div>
+                  <div className={styles.headerCell}>
+                    <span>Kết quả</span>
+                  </div>
+                  <div className={styles.headerCell}>
+                    <span>Đơn vị</span>
+                  </div>
+                  <div className={styles.headerCell}>
+                    <span>Mô tả</span>
+                  </div>
+
+                  <div className={styles.headerCell}>
+                    <Edit3 size={16} />
+                    <span>Ghi chú</span>
+                  </div>
                 </div>
-              ))}
+
+                <div className={styles.testResultsList}>
+                  {evaluationCriteria.map((criterion, index) => (
+                    <div key={criterion.id} className={styles.testResultRow}>
+                      <div className={styles.testCell}>
+                        <div className={styles.testName}>
+                          <span>{criterion.name}</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.testCell}>
+                        <input
+                          type="text"
+                          className={styles.resultInput}
+                          value={formData[criterion.id]?.currentValue || ""}
+                          onChange={(e) =>
+                            handleInputChange(
+                              criterion.id,
+                              "currentValue",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Nhập kết quả"
+                        />
+                      </div>
+
+                      <div className={styles.testCell}>
+                        <span className={styles.unit}>
+                          {criterion.measurementUnit || "N/A"}
+                        </span>
+                      </div>
+
+                      <div className={styles.testCell}>
+                        <span className={styles.description}>
+                          {criterion.description || "Chưa có mô tả"}
+                        </span>
+                      </div>
+
+                      <div className={styles.testCell}>
+                        <input
+                          type="text"
+                          className={styles.noteInput}
+                          value={formData[criterion.id]?.note || ""}
+                          onChange={(e) =>
+                            handleInputChange(
+                              criterion.id,
+                              "note",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Ghi chú thêm"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
+
             <div className={styles.modalFooter}>
-              <button
-                className={styles.modalCloseButton}
-                onClick={handleSubmit}
-              >
-                Lưu kết quả
-              </button>
-              <button
-                className={styles.modalCloseButton}
-                onClick={() => setIsModalOpen(false)}
-              >
-                Đóng
-              </button>
+              <div className={styles.footerActions}>
+                <button className={styles.saveButton} onClick={handleSubmit}>
+                  <Activity size={18} />
+                  Lưu kết quả
+                </button>
+                <button
+                  className={styles.cancelButton}
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  <X size={18} />
+                  Hủy bỏ
+                </button>
+              </div>
             </div>
           </div>
         </div>
