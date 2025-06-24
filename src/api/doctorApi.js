@@ -174,3 +174,18 @@ export const getPreparationStatus = async (patientId) => {
         throw error;
     }
 }
+
+export const saveFollowUpRecommendation = async (followUpData) =>{
+  try {
+    // Using apiClient.post as per your example's structure
+    const response = await apiClient.patch(
+      '/doctors/treatment-profile/preparation/followUpAppointment', // Example endpoint, adjust as needed
+      followUpData
+      // You can add a third argument for config here if needed, e.g., { headers: { Authorization: 'Bearer ...' }}
+    );
+    return response.data; // Return the data part of the response, mirroring your getPreparationStatus
+  } catch (error) {
+    console.error('Failed to save follow-up recommendation:', error.response?.data || error.message);
+    throw error; // Re-throw the error for external handling
+  }
+};

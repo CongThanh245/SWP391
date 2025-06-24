@@ -15,7 +15,9 @@ import InterventionWife from '@components/InterventionWife';
 import InterventionHusband from '@components/InterventionHusband';
 import PostIntervention from '@components/PostIntervention';
 import {
-  getWifeProfile, getWifeVital, getHusbandVital, getProtocolList, getPreparation_notes} from '@api/doctorApi';
+  getWifeProfile, getWifeVital, getHusbandVital, getProtocolList, getPreparation_notes
+  , saveFollowUpRecommendation
+} from '@api/doctorApi';
 import { formatValue } from '@utils/format';
 import apiClient from '@api/axiosConfig';
 import {
@@ -568,18 +570,6 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     await saveGeneralInfo();
     await saveProtocols();
 
-    if (selectedTimeframe) {
-      const followUpData = {
-        timeframe: selectedTimeframe,
-        reason: followUpReason,
-        notes: followUpNotes,
-        patientId: patientId,
-        doctorId: localStorage.getItem('doctor'),
-        createdAt: new Date().toISOString()
-      };
-      console.log('Follow-up recommendation:', followUpData);
-      //await saveFollowUpRecommendation(followUpData);
-    }
   };
 
 
@@ -706,7 +696,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
                   </div>
                 </RadioGroup>
 
-                
+
               </div>
             </div>
           </Card>
@@ -720,6 +710,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
             onNotesChange={setFollowUpNotes}
             followUpReason={followUpReason}
             onReasonChange={setFollowUpReason}
+            patientId= {patientId}
           />
         </TabsContent>
       </Tabs>
@@ -775,6 +766,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
             onNotesChange={setFollowUpNotes}
             followUpReason={followUpReason}
             onReasonChange={setFollowUpReason}
+            patientId={patientId}
           />
         </TabsContent>
       </Tabs>
