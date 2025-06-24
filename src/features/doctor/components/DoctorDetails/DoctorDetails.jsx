@@ -1,3 +1,4 @@
+// src/features/doctor/components/DoctorDetails/DoctorDetails.jsx
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useDoctors } from '@hooks/useDoctors';
@@ -22,58 +23,48 @@ const DoctorDetails = ({ onClose }) => {
     return <div className={styles.error}>Không tìm thấy bác sĩ</div>;
   }
 
-  // Left content - có thể thêm rating, badges, etc.
   const leftContent = (
     <div className={styles.doctorStats}>
       <div className={styles.experience}>
-        <strong>{doctor.yearsOfExperience}</strong>
+        <strong>{doctor.yearOfExperience}</strong> {/* Sửa từ yearsOfExperience */}
         <span>Năm kinh nghiệm</span>
       </div>
     </div>
   );
 
-  // Right content - thông tin chi tiết
   const rightContent = (
     <div className={styles.doctorInfo}>
       <h3 className={styles.doctorName}>{doctor.name}</h3>
-      
       <div className={styles.infoGrid}>
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>ID:</span>
           <span className={styles.infoValue}>{doctor.id}</span>
         </div>
-        
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Chuyên môn:</span>
           <span className={styles.infoValue}>{doctor.specialization}</span>
         </div>
-        
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Số điện thoại:</span>
           <span className={styles.infoValue}>{doctor.phone}</span>
         </div>
-        
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Bằng cấp:</span>
           <span className={styles.infoValue}>{doctor.degree}</span>
         </div>
-        
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Số giấy phép:</span>
           <span className={styles.infoValue}>{doctor.licenseNumber}</span>
         </div>
-        
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Giới tính:</span>
           <span className={styles.infoValue}>{doctor.gender}</span>
         </div>
-        
         <div className={styles.infoItem}>
           <span className={styles.infoLabel}>Địa chỉ:</span>
           <span className={styles.infoValue}>{doctor.address}</span>
         </div>
       </div>
-      
       {doctor.about && (
         <div className={styles.aboutSection}>
           <h4 className={styles.aboutTitle}>Giới thiệu:</h4>
@@ -89,7 +80,6 @@ const DoctorDetails = ({ onClose }) => {
         <h2>Thông tin bác sĩ</h2>
         <p>Chi tiết thông tin bác sĩ</p>
       </div>
-      
       <Card
         avatar={doctor.image ? { src: doctor.image, alt: doctor.name } : null}
         avatarPlaceholder={doctor.name?.charAt(0)?.toUpperCase() || 'BS'}

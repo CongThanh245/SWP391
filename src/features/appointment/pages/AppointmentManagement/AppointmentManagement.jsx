@@ -1,17 +1,22 @@
-import React, { useState, useMemo } from "react";
-import styles from "./AppointmentManagement.module.css";
-import AppointmentFilterTabs from "@features/appointment/components/AppointmentFilterTabs/AppointmentFilterTabs";
-import AppointmentListReceptionist from "@features/appointment/components/AppointmentListReceptionist/AppointmentListReceptionist";
-import { useAppointments } from "@hooks/useAppointments";
+import React, { useState, useMemo } from 'react';
+import styles from './AppointmentManagement.module.css';
+import AppointmentFilterTabs from '@features/appointment/components/AppointmentFilterTabs/AppointmentFilterTabs';
+import AppointmentListReceptionist from '@features/appointment/components/AppointmentListReceptionist/AppointmentListReceptionist';
+import { useAppointments } from '@hooks/useAppointments';
+import { useToast } from '@hooks/use-toast'; // Your useToast hook
 
 const AppointmentManagement = () => {
-  const [activeTab, setActiveTab] = useState("pending");
+  const [activeTab, setActiveTab] = useState('pending');
+  const { toast } = useToast(); // Get toast function
 
-  const filters = useMemo(() => ({
-    dateFilter: "all",
-    fromDate: "",
-    toDate: "",
-  }), []);
+  const filters = useMemo(
+    () => ({
+      dateFilter: 'all',
+      fromDate: '',
+      toDate: '',
+    }),
+    [],
+  );
 
   const { appointments, isLoading, error, refetchAppointments } = useAppointments({ filters });
 
@@ -21,10 +26,10 @@ const AppointmentManagement = () => {
 
   const appointmentCounts = useMemo(() => {
     return {
-      pending: appointments.filter((app) => app.status === "pending").length,
-      confirmed: appointments.filter((app) => app.status === "confirmed").length,
-      completed: appointments.filter((app) => app.status === "completed").length,
-      cancelled: appointments.filter((app) => app.status === "cancelled").length,
+      pending: appointments.filter((app) => app.status === 'pending').length,
+      confirmed: appointments.filter((app) => app.status === 'confirmed').length,
+      completed: appointments.filter((app) => app.status === 'completed').length,
+      cancelled: appointments.filter((app) => app.status === 'cancelled').length,
     };
   }, [appointments]);
 
@@ -52,7 +57,8 @@ const AppointmentManagement = () => {
         appointments={filteredAppointments}
         isLoading={isLoading}
         activeTab={activeTab}
-        refetchAppointments={refetchAppointments} // Truyền hàm làm mới
+        refetchAppointments={refetchAppointments}
+        toast={toast} // Pass toast function
       />
     </div>
   );

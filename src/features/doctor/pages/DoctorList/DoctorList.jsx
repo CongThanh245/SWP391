@@ -1,14 +1,30 @@
-import React from "react";
-import { User, Phone } from "lucide-react";
-import { useDoctors } from "@hooks/useDoctors";
-import { Link, useParams, useNavigate } from "react-router-dom";
-import styles from "./DoctorList.module.css";
-import DoctorDetails from "@features/doctor/components/DoctorDetails/DoctorDetails"; // Import DoctorDetails để dùng như modal
+// src/features/doctor/components/DoctorList/DoctorList.jsx
+import React from 'react';
+import { User, Phone } from 'lucide-react';
+import { useDoctors } from '@hooks/useDoctors';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import styles from './DoctorList.module.css';
+import DoctorDetails from '@features/doctor/components/DoctorDetails/DoctorDetails';
+
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <button className={styles.modalCloseButton} onClick={onClose}>
+          ×
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+};
 
 const DoctorList = () => {
   const { id } = useParams(); // Lấy id từ URL
   const navigate = useNavigate();
-  const { doctors, loading, error } = useDoctors();
+  const { doctors, loading, error } = useDoctors(); // Sử dụng hook
 
   if (loading) {
     return <div className={styles.loading}>Đang tải...</div>;
@@ -18,9 +34,8 @@ const DoctorList = () => {
     return <div className={styles.error}>Lỗi: {error}</div>;
   }
 
-  // Hàm đóng modal
   const handleCloseModal = () => {
-    navigate("/receptionist-dashboard/doctors"); // Quay lại danh sách
+    navigate('/receptionist-dashboard/doctors'); // Quay lại danh sách
   };
 
   return (
@@ -57,7 +72,7 @@ const DoctorList = () => {
         ))}
       </div>
 
-      {/* Hiển thị modal nếu có id trong URL */}
+      {/* Modal hiển thị DoctorDetails nếu có id */}
       {id && (
         <Modal isOpen={!!id} onClose={handleCloseModal}>
           <DoctorDetails onClose={handleCloseModal} />
@@ -68,19 +83,3 @@ const DoctorList = () => {
 };
 
 export default DoctorList;
-
-// Component Modal đơn giản (có thể thay bằng thư viện như Material-UI)
-const Modal = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modalContent}>
-        <button className={styles.modalCloseButton} onClick={onClose}>
-          ×
-        </button>
-        {children}
-      </div>
-    </div>
-  );
-};

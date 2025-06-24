@@ -126,32 +126,6 @@ const PreTestResult = () => {
     return age;
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "COMPLETED":
-        return "var(--success-green)";
-      case "PENDING":
-        return "var(--warning-orange)";
-      case "IN_PROGRESS":
-        return "var(--accent-color)";
-      default:
-        return "var(--text-secondary)";
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case "COMPLETED":
-        return "Hoàn thành";
-      case "PENDING":
-        return "Chờ xử lý";
-      case "IN_PROGRESS":
-        return "Đang thực hiện";
-      default:
-        return "Chưa xác định";
-    }
-  };
-
   if (isLoading) return <div className={styles.loading}>Đang tải...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
 
