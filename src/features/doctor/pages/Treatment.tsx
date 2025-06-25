@@ -751,7 +751,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsList>
 
         <TabsContent value="wife">
-          <InterventionWife />
+          <InterventionWife patientId = {patientId} />
         </TabsContent>
 
         <TabsContent value="husband">
