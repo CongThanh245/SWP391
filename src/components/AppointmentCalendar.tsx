@@ -3,6 +3,8 @@ import { Card } from '@components/ui/card';
 import { Badge } from '@components/ui/badge';
 import { Button } from '@components/ui/button';
 import { Calendar, Clock, FileText } from 'lucide-react';
+import { saveFollowUpRecommendation } from '@api/doctorApi'
+import { useToast } from '@hooks/use-toast';
 
 interface AppointmentCalendarProps {
   selectedTimeframe: string;
@@ -11,6 +13,7 @@ interface AppointmentCalendarProps {
   onNotesChange: (notes: string) => void;
   followUpReason: string;
   onReasonChange: (reason: string) => void;
+  patientId: string;
 }
 
 const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
@@ -19,9 +22,10 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
   followUpNotes,
   onNotesChange,
   followUpReason,
-  onReasonChange
+  onReasonChange,
+  patientId
 }) => {
-
+  const { toasts, toast } = useToast();
   const timeframeOptions = [
     { value: '1_month', label: '1 tháng', description: 'Theo dõi sát' },
     { value: '3_months', label: '3 tháng', description: 'Thường xuyên' },
@@ -38,6 +42,33 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     'Xét nghiệm định kỳ',
     'Tư vấn dinh dưỡng'
   ];
+
+  const handleNextAppoinment = async () => {
+    if (selectedTimeframe) {
+      const followUpData = {
+        recommendedDate: selectedTimeframe,
+        reason: followUpReason,
+        note: followUpNotes,
+        patientId: patientId,
+      };
+      console.log('Follow-up recommendation:', followUpData);
+      try {
+        const followUpResult = await saveFollowUpRecommendation(followUpData);
+        toast({
+          title: 'Đã lưu khuyến nghị tái khám thành công',
+          description: 'Danh sách xét nghiệm đã được cập nhật.',
+        });
+        console.log('Follow-up recommendation saved successfully:', followUpResult);
+      } catch (error) {
+        toast({
+          title: 'Lỗi',
+          description: 'Không thể gửi khuyến nghị tái khám',
+          variant: 'destructive',
+        });
+        console.error('Failed to save follow-up recommendation:', error.message);
+      }
+    }
+  }
 
   return (
     <Card className="p-6 bg-white border border-[color:var(--card-border)]">
@@ -61,8 +92,8 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                 key={option.value}
                 onClick={() => onTimeframeSelect(option.value)}
                 className={`p-3 text-left border rounded-lg transition-colors ${selectedTimeframe === option.value
-                    ? 'border-[color:var(--deep-taupe)] bg-[color:var(--secondary-background)]'
-                    : 'border-[color:var(--card-border)] hover:border-[color:var(--deep-taupe)]'
+                  ? 'border-[color:var(--deep-taupe)] bg-[color:var(--secondary-background)]'
+                  : 'border-[color:var(--card-border)] hover:border-[color:var(--deep-taupe)]'
                   }`}
               >
                 <div className="font-medium text-[color:var(--text-accent)]">
@@ -88,8 +119,8 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                 key={reason}
                 variant={followUpReason.includes(reason) ? "default" : "outline"}
                 className={`cursor-pointer transition-colors ${followUpReason.includes(reason)
-                    ? 'bg-[color:var(--deep-taupe)] text-white'
-                    : 'hover:border-[color:var(--deep-taupe)]'
+                  ? 'bg-[color:var(--deep-taupe)] text-white'
+                  : 'hover:border-[color:var(--deep-taupe)]'
                   }`}
                 onClick={() => {
                   if (followUpReason.includes(reason)) {
@@ -143,10 +174,10 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
       </div>
       <div className="flex justify-end pt-6">
         <Button
-        
+          onClick={handleNextAppoinment}
           className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
         >
-          Lưu hồ sơ
+          Hẹn tái khám
         </Button>
       </div>
     </Card>

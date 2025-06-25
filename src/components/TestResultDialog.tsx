@@ -1,130 +1,112 @@
-// TestResultDialog.tsx (Example - your actual implementation might differ)
-import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@components/ui/dialog';
-import { Label } from '@components/ui/label';
-import { Input } from '@components/ui/input';
-// Assuming you have a component to display PDF/image if resultData is a URL
-import { Separator } from '@components/ui/separator';
-import {Button} from '@components/ui/button'
+// @components/ResultDisplayModal.tsx
 
-interface TestResult {
-  testValue: string;
-  unit: string;
-  referenceRange: string;
-  diagnosis: string;
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@components/ui/dialog';
+import { ScrollArea } from '@components/ui/scroll-area';
+import {Button} from '@components/ui/button';
+import { CircleDotDashed, XCircle } from 'lucide-react';
+
+// ================================================================
+// CẬP NHẬT INTERFACE CHO PROPS
+// ================================================================
+interface TestParameter {
+  name: string;
+  targetValue: number | null;
+  currentValue: number;
+  measurementUnit: string;
+  description: string;
 }
 
-interface TestResultDialogProps {
+interface DetailedTestResult {
+  parameters: TestParameter[];
+}
+
+interface ResultDisplayModalProps {
   isOpen: boolean;
   onClose: () => void;
-  testName: string;
-  initialResultData?: string; // Could be a URL or a JSON string/object
-  // onSave?: (results: TestResult) => void; // Removed if no longer saving
+  // testName: string; // Có thể lấy từ resultData.testName
+  resultData: DetailedTestResult | null; // Dữ liệu kết quả chi tiết
+  isLoading: boolean; // THÊM TRẠNG THÁI LOADING
 }
 
-const TestResultDialog: React.FC<TestResultDialogProps> = ({ isOpen, onClose, testName, initialResultData }) => {
-  const [displayedResult, setDisplayedResult] = useState<TestResult | null>(null);
-  const [loadingResult, setLoadingResult] = useState(false);
-  const [errorResult, setErrorResult] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isOpen && initialResultData) {
-      setLoadingResult(true);
-      setErrorResult(null);
-      // Example: If initialResultData is a URL to a JSON, fetch it
-      // If it's directly a JSON string/object, parse it.
-      try {
-        // Assume initialResultData is a URL to a JSON file for this example
-        // In a real app, you might fetch a PDF/image or structured JSON
-        fetch(initialResultData)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Failed to fetch result data');
-            }
-            return response.json(); // Or response.blob() for files
-          })
-          .then(data => {
-            setDisplayedResult(data); // Assuming data matches TestResult structure
-            setLoadingResult(false);
-          })
-          .catch(err => {
-            console.error("Error fetching test result:", err);
-            setErrorResult("Không thể tải kết quả xét nghiệm.");
-            setLoadingResult(false);
-          });
-      } catch (e) {
-        setErrorResult("Dữ liệu kết quả không hợp lệ.");
-        setLoadingResult(false);
-      }
-    } else if (!isOpen) {
-      setDisplayedResult(null); // Clear data when dialog closes
-      setLoadingResult(false);
-      setErrorResult(null);
-    }
-  }, [isOpen, initialResultData]);
-
+const ResultDisplayModal: React.FC<ResultDisplayModalProps> = ({ isOpen, onClose, resultData, isLoading }) => {
+  if (!isOpen) return null;
+   const testNameForTitle = isLoading
+    ? "Đang tải..."
+    : resultData && resultData.parameters.length > 0
+      ? resultData.parameters[0].name // Lấy tên từ parameter đầu tiên
+      : "N/A"; // Nếu không có dữ liệu hoặc parameters rỗng
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col bg-white p-6 rounded-lg shadow-xl border border-[color:var(--card-border)]"> {/* Thêm style giống card */}
         <DialogHeader>
-          <DialogTitle>Kết quả xét nghiệm: {testName}</DialogTitle>
-          <DialogDescription>
-            Thông tin chi tiết về kết quả xét nghiệm này.
+          <DialogTitle className="text-xl font-bold mb-2 text-[color:var(--text-accent)]">
+            Kết quả xét nghiệm: {testNameForTitle}
+          </DialogTitle>
+          <DialogDescription className="text-[color:var(--text-secondary)]">
+            Chi tiết kết quả của xét nghiệm đã hoàn thành.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          {loadingResult && <p>Đang tải kết quả...</p>}
-          {errorResult && <p className="text-red-500">{errorResult}</p>}
-          {displayedResult && (
-            <>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="testValue" className="text-right">
-                  Giá trị
-                </Label>
-                <Input id="testValue" value={displayedResult.testValue} readOnly className="col-span-3" />
+
+        {/* ================================================================ */}
+        {/* NỘI DUNG CHÍNH CỦA MODAL VỚI TRANG TRÍ */}
+        {/* ================================================================ */}
+        <ScrollArea className="flex-grow p-4 mt-4 -mx-4"> {/* Đã điều chỉnh padding và margin âm */}
+          <div className="space-y-4 px-4"> {/* Thêm padding ngang vào đây */}
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center h-40 text-[color:var(--text-secondary)]">
+                <CircleDotDashed className="w-8 h-8 animate-spin text-[color:var(--deep-taupe)] mb-3" />
+                <p>Đang tải kết quả...</p>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="unit" className="text-right">
-                  Đơn vị
-                </Label>
-                <Input id="unit" value={displayedResult.unit} readOnly className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="referenceRange" className="text-right">
-                  Khoảng tham chiếu
-                </Label>
-                <Input id="referenceRange" value={displayedResult.referenceRange} readOnly className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="diagnosis" className="text-right">
-                  Chẩn đoán
-                </Label>
-                <Input id="diagnosis" value={displayedResult.diagnosis} readOnly className="col-span-3" />
-              </div>
-              {/* If resultData can be a URL to a PDF/image, you'd render an iframe or img here */}
-              {initialResultData && initialResultData.startsWith('http') && (
-                  <div className="mt-4">
-                      <Separator className="my-4" />
-                      <h4 className="text-md font-semibold mb-2">Tài liệu đính kèm:</h4>
-                      {/* Render based on file type. Example for PDF: */}
-                      <iframe src={initialResultData} className="w-full h-96 border rounded" title="Test Result Document"></iframe>
-                      {/* Or for image: <img src={initialResultData} alt="Result" className="max-w-full h-auto" /> */}
-                      <p className="text-sm text-gray-500 mt-2">Xem tài liệu gốc tại đây.</p>
+            ) : resultData && Array.isArray(resultData.parameters) && resultData.parameters.length > 0 ? (
+              // Hiển thị từng thông số xét nghiệm
+              resultData.parameters.map((param, index) => (
+                <div key={index} className="bg-gray-50 p-4 rounded-md border border-gray-200"> {/* Mỗi thông số trong một "card" nhỏ */}
+                  <h4 className="font-semibold text-base mb-2 text-[color:var(--text-accent)]">{param.name}</h4>
+                  <div className="space-y-1 text-sm">
+                    <p className="text-[color:var(--text-secondary)]">
+                      <span className="font-medium">Giá trị hiện tại:</span>{' '}
+                      {param.currentValue !== null ? `${param.currentValue} ${param.measurementUnit}` : 'N/A'}
+                    </p>
+                    <p className="text-[color:var(--text-secondary)]">
+                      <span className="font-medium">Giá trị mục tiêu:</span>{' '}
+                      {param.targetValue !== null ? `${param.targetValue} ${param.measurementUnit}` : 'N/A'}
+                    </p>
+                    {param.description && (
+                      <p className="text-xs text-gray-500 mt-2 italic">
+                        {param.description}
+                      </p>
+                    )}
                   </div>
-              )}
-            </>
-          )}
-          {!initialResultData && !loadingResult && !errorResult && (
-              <p className="text-center text-gray-500">Không có dữ liệu kết quả nào được cung cấp cho xét nghiệm này.</p>
-          )}
+                </div>
+              ))
+            ) : (
+              // Trường hợp không có dữ liệu
+              <div className="flex flex-col items-center justify-center h-40 text-red-500">
+                <XCircle className="w-8 h-8 mb-3" />
+                <p className="text-center">
+                  {resultData && Array.isArray(resultData.parameters) && resultData.parameters.length === 0
+                    ? "Không có thông số chi tiết nào cho xét nghiệm này."
+                    : "Không có dữ liệu kết quả chi tiết."
+                  }
+                </p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        {/* Nút Đóng */}
+        <div className="flex justify-end pt-4">
+          <Button
+            onClick={onClose}
+            className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-6 py-2 rounded-md"
+          >
+            Đóng
+          </Button>
         </div>
-        <DialogFooter>
-          {/* Removed save button */}
-          <Button onClick={onClose}>Đóng</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default TestResultDialog;
+export default ResultDisplayModal;

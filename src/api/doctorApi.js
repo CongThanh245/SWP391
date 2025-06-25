@@ -135,3 +135,55 @@ export const getPreparation_notes = async (patientId) => {
     throw error;
   }
 }
+
+export const getDetailedTestResult = async (protocolId) => {
+  try {
+    const response = await apiClient.get(`/doctors/treatment-profile/evaluation?protocolId=${protocolId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching detailed test result for protocolId ${protocolId}:`, error);
+    throw error;
+  }
+};
+
+export const handlePreParationStage  = async (patientId) =>{
+   try {
+    const response = await apiClient.patch(`/doctors/treatment-profile/preparation/finish-stage?patientId=${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching detailed test result for protocolId ${patientId}:`, error);
+    throw error;
+  }
+}
+
+export const getPreparationStatus = async (patientId) => {
+  try {
+        const response = await apiClient.get(
+            '/doctors/treatment-profile/preparation/status',
+            {
+                params: {
+                    patientId: patientId
+                }
+            }
+        );
+        return response.data; // This will return { status: "PLANNED" } or similar
+    } catch (error) {
+        console.error('Failed to get preparation status:', error.response?.data || error.message);
+        throw error;
+    }
+}
+
+export const saveFollowUpRecommendation = async (followUpData) =>{
+  try {
+    // Using apiClient.post as per your example's structure
+    const response = await apiClient.patch(
+      '/doctors/treatment-profile/preparation/followUpAppointment', // Example endpoint, adjust as needed
+      followUpData
+      // You can add a third argument for config here if needed, e.g., { headers: { Authorization: 'Bearer ...' }}
+    );
+    return response.data; // Return the data part of the response, mirroring your getPreparationStatus
+  } catch (error) {
+    console.error('Failed to save follow-up recommendation:', error.response?.data || error.message);
+    throw error; // Re-throw the error for external handling
+  }
+};
