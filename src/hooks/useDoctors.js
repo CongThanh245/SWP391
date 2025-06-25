@@ -1,41 +1,40 @@
-import { getDoctors } from "@api/doctorApi";
-import { useState, useEffect } from "react";
+// src/hooks/useDoctors.js
+import { useState, useEffect } from 'react';
+import { getDoctors } from '@api/doctorApi';
 
-export const useDoctors = () => {
+export const useDoctors = (params = {}) => {
   const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const loadDoctors = async () => {
+    const fetchDoctors = async () => {
+      setLoading(true);
       try {
-        const data = await getDoctors();
-        const mappedData = data.map((doctor) => ({
-          id: doctor.doctor_id,
-          name: doctor.doctor_name,
-          phone: doctor.phone,
-          licenseNumber: doctor.license_number,
-          degree: doctor.degree,
+        const data = await getDoctors(params);
+        // Ánh xạ dữ liệu từ API response sang định dạng components sử dụng
+        const mappedDoctors = data.content.map(doctor => ({
+          id: doctor.doctorId,
+          name: doctor.doctorName,           // Ánh xạ doctorName → name
           specialization: doctor.specialization,
-          about: doctor.about,
-          address: doctor.doctor_address,
+          phone: doctor.phone,
+          yearOfExperience: doctor.yearOfExperience, // Không phải yearsOfExperience
+          degree: doctor.degree,
+          licenseNumber: doctor.licenseNumber,
           gender: doctor.gender,
-          image: doctor.image || "/assets/images/bacsi.png",
-          yearsOfExperience: doctor.year_of_experience,
-          joinDate: doctor.joinDate,
-          dateOfBirth: doctor.dateOfBirth,
-          active: doctor.active,
-          available: doctor.available,
+          address: doctor.doctorAddress,     // Ánh xạ doctorAddress → address
+          about: doctor.about,
         }));
-        setDoctors(mappedData);
-        setLoading(false);
+        setDoctors(mappedDoctors);
       } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
       }
     };
-    loadDoctors();
-  }, []);
+
+    fetchDoctors();
+  }, [JSON.stringify(params)]); // Tái chạy khi params thay đổi
 
   return { doctors, loading, error };
 };
