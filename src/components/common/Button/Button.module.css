@@ -24,6 +24,8 @@
   background-color: var(--button-secondary-bg);
   color: var(--button-secondary-text);
   border: 2px solid var(--button-secondary-border);
+  display: flex;
+  align-items: center;
 }
 
 .secondary:hover {

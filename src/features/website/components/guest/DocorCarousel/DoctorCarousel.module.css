@@ -12,6 +12,7 @@
 .carouselWrapper {
   width: 1064px; /* Width of 4 cards (266px * 4) */
   overflow: hidden;
+  justify-items: center;
 }
 
 .carousel {

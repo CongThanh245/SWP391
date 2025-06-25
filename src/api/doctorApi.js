@@ -2,12 +2,9 @@
 import axios from 'axios';
 import apiClient from './axiosConfig';
 
-
-const API_URL = 'https://683a7bc143bb370a8672d354.mockapi.io/doctors';
-
 export const getDoctors = async (params = {}) => {
   try {
-    const response = await apiClient.get('/admin/doctors', { params });
+    const response = await apiClient.get('/guest/doctors', { params });
     return response.data;
   } catch (error) {
     console.error('Failed to fetch doctors:', error.response?.data || error.message);

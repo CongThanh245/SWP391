@@ -18,10 +18,6 @@ const PatientInfo = ({ user, onEdit }) => {
     <div className={styles.card}>
       <div className={styles.header}>
         <h3 className={styles.title}>Thông tin cá nhân</h3>
-        <Button variant="secondary" onClick={onEdit}>
-          <Edit2 size={16} className={styles.editIcon} />
-          Chỉnh sửa
-        </Button>
       </div>
 
       <div className={styles.grid}>

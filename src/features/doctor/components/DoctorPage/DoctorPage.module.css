@@ -11,8 +11,8 @@
 /* Header Section */
 .headerSection {
   text-align: center;
-  margin-bottom: var(--spacing-xxl);
   background: var(--card-background);
+  margin-bottom: -70px;
   padding: var(--spacing-xxl) var(--spacing-xl);
   border-radius: var(--border-radius-2);
   box-shadow: var(--shadow-dark-gray);
