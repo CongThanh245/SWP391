@@ -160,13 +160,13 @@ body {
 }
 
 .formGroup input.inputError:focus {
-  border-color: var(--error-color);
+  border-color: var(--warning-red);
   box-shadow: 0 0 0 3px rgba(229, 115, 115, 0.1);
 }
 
 .errorMessage {
-  color: var(--error-color);
-  font-size: 0.8rem;
+  color: var(--warning-red);
+  font-size: 15px;
   margin-top: 0.25rem;
 }
 
@@ -331,7 +331,7 @@ body {
 }
 
 .requiredMark {
-  color: var(--error-color);
+  color: var(--warning-red);
   margin-left: 2px;
 }
 
@@ -351,4 +351,62 @@ body {
     gap: 1rem;
     align-items: flex-start;
   }
+}
+
+
+/* Form */
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.formGroup label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Áp dụng cho cả input và select */
+.formGroup input,
+.formGroup select {
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(189, 189, 189, 0.3);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.formGroup input.inputError,
+.formGroup select.inputError {
+  border-color: var(--error-color);
+  background-color: rgba(229, 115, 115, 0.05);
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 3px var(--hover-accent);
+}
+
+.formGroup input.inputError:focus,
+.formGroup select.inputError:focus {
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 3px rgba(229, 115, 115, 0.1);
+}
+
+.errorMessage {
+  color: var(--warning-red);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }

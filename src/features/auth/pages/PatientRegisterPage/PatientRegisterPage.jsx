@@ -1,355 +1,184 @@
-import React, { useState } from "react";
-import styles from "./PatientRegisterPage.module.css";
+// src/features/auth/PatientRegisterPage/RegisterPage.jsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import { registerUser } from "../../../../api/authApi";
-import { useNavigate } from 'react-router-dom';
+import styles from "./PatientRegisterPage.module.css";
 
-// Định nghĩa cấu trúc form fields
-const FORM_FIELDS = [
-  {
-    id: "fullName",
-    name: "fullName",
-    type: "text",
-    label: "Họ và tên",
-    placeholder: "Nhập họ và tên của bạn",
-    required: true,
-    validation: {
-      required: "Vui lòng nhập họ và tên",
-    },
-  },
-  {
-    id: "dateOfBirth",
-    name: "dateOfBirth",
-    type: "date",
-    label: "Ngày sinh",
-    placeholder: "DD/MM/YYYY",
-    required: true,
-    validation: {
-      required: "Vui lòng nhập ngày sinh",
-    },
-  },
-  {
-    id: "phoneNumber",
-    name: "phoneNumber",
-    type: "tel",
-    label: "Số điện thoại",
-    placeholder: "Nhập số điện thoại của bạn",
-    required: true,
-    validation: {
-      required: "Vui lòng nhập số điện thoại",
-      pattern: {
-        value: /^(0|\+84)(\d{9,10})$/,
-        message: "Số điện thoại không hợp lệ (định dạng Việt Nam)",
-      },
-    },
-  },
-  {
-    id: "email",
-    name: "email",
-    type: "email",
-    label: "Email",
-    placeholder: "Nhập địa chỉ email của bạn",
-    required: true,
-    validation: {
-      required: "Vui lòng nhập email",
-      pattern: {
-        value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        message: "Email không hợp lệ",
-      },
-    },
-  },
-  {
-    id: "username",
-    name: "username",
-    type: "text",
-    label: "Tên đăng nhập",
-    placeholder: "Tạo tên đăng nhập (tối thiểu 6 ký tự)",
-    required: true,
-    validation: {
-      required: "Vui lòng nhập tên đăng nhập",
-      minLength: {
-        value: 6,
-        message: "Tên đăng nhập phải có ít nhất 6 ký tự",
-      },
-    },
-  },
-  {
-    id: "password",
-    name: "password",
-    type: "password",
-    label: "Mật khẩu",
-    placeholder: "Tạo mật khẩu mới (tối thiểu 8 ký tự)",
-    required: true,
-    validation: {
-      required: "Vui lòng nhập mật khẩu",
-      pattern: {
-        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-        message:
-          "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số",
-      },
-    },
-  },
-  {
-    id: "confirmPassword",
-    name: "confirmPassword",
-    type: "password",
-    label: "Xác nhận mật khẩu",
-    placeholder: "Nhập lại mật khẩu",
-    required: true,
-    validation: {
-      required: "Vui lòng xác nhận mật khẩu",
-      match: {
-        field: "password",
-        message: "Mật khẩu không trùng khớp",
-      },
-    },
-  },
-];
-
+const validationSchema = Yup.object({
+  fullName: Yup.string()
+    .min(2, "Ít nhất 2 ký tự")
+    .required("Vui lòng nhập họ và tên"),
+  dateOfBirth: Yup.date()
+    .max(new Date(), "Ngày sinh không hợp lệ")
+    .required("Vui lòng chọn ngày sinh"),
+  phoneNumber: Yup.string()
+    .matches(/^(0|\+84)(\d{9,10})$/, "SĐT không hợp lệ")
+    .required("Vui lòng nhập số điện thoại"),
+  email: Yup.string()
+    .email("Email không hợp lệ")
+    .required("Vui lòng nhập email"),
+  password: Yup.string()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
+      "Ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số"
+    )
+    .required("Vui lòng nhập mật khẩu"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Mật khẩu không khớp")
+    .required("Vui lòng xác nhận mật khẩu"),
+  gender: Yup.string()
+    .oneOf(["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"])
+    .required("Vui lòng chọn giới tính"),
+});
 
 const RegisterPage = () => {
-  // Khởi tạo state form data động từ FORM_FIELDS
   const navigate = useNavigate();
-  const initialFormData = FORM_FIELDS.reduce(
-    (acc, field) => {
-      acc[field.name] = "";
-      return acc;
-    },
-    { agreeTerms: false }
-  );
-
-  const [formData, setFormData] = useState(initialFormData);
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-
-  // Xử lý thay đổi giá trị input
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
-
-    setFormData({
-      ...formData,
-      [name]: newValue,
-    });
-
-    // Xóa lỗi khi người dùng bắt đầu sửa
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: null,
-      }));
-    }
-
-    // Xóa API error khi user bắt đầu sửa
-    if (errors.apiError) {
-      setErrors(prev => ({
-        ...prev,
-        apiError: null,
-      }));
-    }
-
-    // Kiểm tra xác nhận mật khẩu ngay khi gõ
-    if (
-      name === "confirmPassword" ||
-      (name === "password" && formData.confirmPassword)
-    ) {
-      const passwordToCheck = name === "password" ? value : formData.password;
-      const confirmValue =
-        name === "confirmPassword" ? value : formData.confirmPassword;
-
-      if (confirmValue && passwordToCheck !== confirmValue) {
-        setErrors(prev => ({
-          ...prev,
-          confirmPassword: "Mật khẩu không trùng khớp",
-        }));
-      } else if (confirmValue) {
-        setErrors(prev => ({
-          ...prev,
-          confirmPassword: null,
-        }));
-      }
-    }
-  };
-
-  // Validate một trường dữ liệu
-  const validateField = (fieldName, value) => {
-    const field = FORM_FIELDS.find((f) => f.name === fieldName);
-    if (!field || !field.validation) return null;
-
-    const { validation } = field;
-
-    if (validation.required && !value) {
-      return validation.required;
-    }
-
-    if (validation.pattern && value && !validation.pattern.value.test(value)) {
-      return validation.pattern.message;
-    }
-
-    if (validation.minLength && value && value.length < validation.minLength.value) {
-      return validation.minLength.message;
-    }
-
-    if (validation.match) {
-      const matchFieldValue = formData[validation.match.field];
-      if (value !== matchFieldValue) {
-        return validation.match.message;
-      }
-    }
-
-    return null;
-  };
-
-  // Validate tất cả các trường
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    FORM_FIELDS.forEach((field) => {
-      const error = validateField(field.name, formData[field.name]);
-      if (error) {
-        newErrors[field.name] = error;
-        isValid = false;
-      }
-    });
-
-    if (!formData.agreeTerms) {
-      newErrors.agreeTerms =
-        "Bạn phải đồng ý với Điều khoản sử dụng và Chính sách bảo mật";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  // Xử lý submit form - FIXED: Removed duplicate function
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    if (validateForm()) {
-      try {
-        const result = await registerUser(formData);
-        console.log("Đăng ký thành công:", result);
-        setSubmitSuccess(true);
-
-
-      } catch (error) {
-        console.error("Lỗi khi đăng ký:", error);
-        setErrors(prev => ({
-          ...prev,
-          apiError:
-            error.response?.data?.message ||
-            "Đăng ký thất bại. Vui lòng thử lại sau.",
-        }));
-      } finally {
-        setIsSubmitting(false);
-      }
-    } else {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className={styles.registerContainer}>
       <div className={styles.backToHome}>
-        <p>
-          <a href="/">Quay lại trang chủ</a>
-        </p>
+        <a href="/">Quay lại trang chủ</a>
       </div>
+
       <div className={styles.registerCard}>
         <div className={styles.registerHeader}>
           <h1>Đăng ký tài khoản</h1>
           <p>Tạo tài khoản mới để trở thành bệnh nhân</p>
         </div>
 
-        {submitSuccess ? (
-          <div className={styles.successMessage}>
-            <div className={styles.successIcon}>✓</div>
-            <h2>Đăng ký thành công!</h2>
-            <p>
-              Một email xác nhận đã được gửi đến{" "}
-              <strong>{formData.email}</strong>.
-            </p>
-            <p>
-              Vui lòng kiểm tra hộp thư và nhập mã OTP kích hoạt để hoàn
-              tất quá trình đăng ký.
-            </p>
-            <button
-              onClick={() =>
-                navigate('/verify-otp', { state: { email: formData.email } })
-              }
-            >
-              Tiếp tục
-            </button>
-          </div>
-        ) : (
-          <form className={styles.registerForm} onSubmit={handleSubmit}>
-            {/* Display API error at the top if exists */}
-            {errors.apiError && (
-              <div className={styles.apiErrorMessage}>
-                <p className={styles.errorMessage}>{errors.apiError}</p>
-              </div>
-            )}
+        <Formik
+          initialValues={{
+            fullName: "",
+            dateOfBirth: "",
+            phoneNumber: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            gender: "",
+          }}
+          validationSchema={validationSchema}
+          onSubmit={async (values, { setSubmitting, setStatus }) => {
+            try {
+              await registerUser({
+                fullName: values.fullName,
+                dateOfBirth: values.dateOfBirth,
+                phoneNumber: values.phoneNumber,
+                email: values.email,
+                password: values.password,
+                gender: values.gender,
+              });
+              navigate("/verify-otp", { state: { email: values.email } });
+            } catch (err) {
+              setStatus(err.message);
+            } finally {
+              setSubmitting(false);
+            }
+          }}
+        >
+          {({ isSubmitting, status }) => (
+            <Form className={styles.registerForm} noValidate>
+              {status && <div className={styles.apiErrorMessage}>{status}</div>}
 
-            {FORM_FIELDS.map((field) => (
-              <div key={field.id} className={styles.formGroup}>
-                <label htmlFor={field.id}>
-                  {field.label}{" "}
-                  {field.required && (
-                    <span className={styles.requiredMark}>*</span>
-                  )}
-                </label>
-                <input
-                  type={field.type}
-                  id={field.id}
-                  name={field.name}
-                  placeholder={field.placeholder}
-                  value={formData[field.name]}
-                  onChange={handleChange}
-                  className={errors[field.name] ? styles.inputError : ""}
-                  required={field.required}
+              <div className={styles.formGroup}>
+                <label>Họ và tên*</label>
+                <Field name="fullName" placeholder="Nhập họ và tên" />
+                <ErrorMessage
+                  name="fullName"
+                  component="div"
+                  className={styles.errorMessage}
                 />
-                {errors[field.name] && (
-                  <p className={styles.errorMessage}>{errors[field.name]}</p>
-                )}
               </div>
-            ))}
 
-            <div className={styles.formOptions}>
-              <div className={styles.agreeTerms}>
-                <input
-                  type="checkbox"
-                  id="agreeTerms"
-                  name="agreeTerms"
-                  checked={formData.agreeTerms}
-                  onChange={handleChange}
+              <div className={styles.formGroup}>
+                <label>Ngày sinh*</label>
+                <Field name="dateOfBirth" type="date" />
+                <ErrorMessage
+                  name="dateOfBirth"
+                  component="div"
+                  className={styles.errorMessage}
                 />
-                <label htmlFor="agreeTerms">
-                  Tôi đồng ý với <a href="#">Điều khoản sử dụng</a> và <a href="#">Chính sách bảo mật</a>
-                </label>
               </div>
-              {errors.agreeTerms && (
-                <p className={styles.errorMessage}>{errors.agreeTerms}</p>
-              )}
-            </div>
 
-            <button
-              type="submit"
-              className={styles.registerButton}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Đang xử lý..." : "Đăng ký"}
-            </button>
-          </form>
-        )}
+              <div className={styles.formGroup}>
+                <label>Số điện thoại*</label>
+                <Field name="phoneNumber" placeholder="0xxxxxxxxx" />
+                <ErrorMessage
+                  name="phoneNumber"
+                  component="div"
+                  className={styles.errorMessage}
+                />
+              </div>
 
-        <div className={styles.loginPrompt}>
-          <p>
-            Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
-          </p>
-        </div>
+              <div className={styles.formGroup}>
+                <label>Email*</label>
+                <Field name="email" type="email" placeholder="abc@xyz.com" />
+                <ErrorMessage
+                  name="email"
+                  component="div"
+                  className={styles.errorMessage}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Mật khẩu*</label>
+                <Field
+                  name="password"
+                  type="password"
+                  placeholder="Mật khẩu"
+                />
+                <ErrorMessage
+                  name="password"
+                  component="div"
+                  className={styles.errorMessage}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Xác nhận mật khẩu*</label>
+                <Field
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Nhập lại mật khẩu"
+                />
+                <ErrorMessage
+                  name="confirmPassword"
+                  component="div"
+                  className={styles.errorMessage}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Giới tính*</label>
+                <Field name="gender" as="select">
+                  <option value="">Chọn giới tính</option>
+                  <option value="MALE">Nam</option>
+                  <option value="FEMALE">Nữ</option>
+                  <option value="OTHER">Khác</option>
+                  <option value="PREFER_NOT_TO_SAY">Không tiết lộ</option>
+                </Field>
+                <ErrorMessage
+                  name="gender"
+                  component="div"
+                  className={styles.errorMessage}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className={styles.registerButton}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Đang xử lý..." : "Đăng ký"}
+              </button>
+            </Form>
+          )}
+        </Formik>
+
+        <p className={styles.loginPrompt}>
+          Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
+        </p>
       </div>
     </div>
   );

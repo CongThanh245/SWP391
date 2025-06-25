@@ -11,13 +11,13 @@ const cardWidth = 266;
 const DoctorsCarousel = () => {
   const carouselRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { doctors, loading, error } = useDoctors();
+  const { doctors, loading, error } = useDoctors(); // Lấy trực tiếp doctors đã được backend lọc
 
-  // Lọc chỉ các bác sĩ active
-  const activeDoctors = doctors.filter(doctor => doctor.active);
+  // Bỏ dòng này đi: const activeDoctors = doctors.filter(doctor => doctor.active);
 
   const isAtStart = currentIndex === 0;
-  const isAtEnd = currentIndex + visibleCount >= activeDoctors.length;
+  // Sử dụng doctors.length thay vì activeDoctors.length
+  const isAtEnd = currentIndex + visibleCount >= doctors.length;
 
   const scrollToIndex = (index) => {
     if (carouselRef.current) {
@@ -50,8 +50,9 @@ const DoctorsCarousel = () => {
     return <div className={styles.carouselContainer}>Lỗi: {error}</div>;
   }
 
-  if (activeDoctors.length === 0) {
-    return <div className={styles.carouselContainer}>Không có bác sĩ nào đang hoạt động.</div>;
+  // Sử dụng doctors.length thay vì activeDoctors.length
+  if (doctors.length === 0) {
+    return <div className={styles.carouselContainer}>Không có bác sĩ nào.</div>;
   }
 
   return (
@@ -67,7 +68,8 @@ const DoctorsCarousel = () => {
       <div className={styles.carouselWrapper}>
         <p className={styles.carouseTitle}>Đội ngũ chuyên gia</p>
         <div className={styles.carousel} ref={carouselRef}>
-          {activeDoctors.map((doctor, index) => (
+          {/* Sử dụng doctors trực tiếp */}
+          {doctors.map((doctor, index) => (
             <div key={`doctor-${index}`} className={styles.carouselItem}>
               <DoctorCard doctor={doctor} />
             </div>

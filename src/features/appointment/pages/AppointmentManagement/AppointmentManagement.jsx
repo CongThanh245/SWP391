@@ -3,11 +3,10 @@ import styles from './AppointmentManagement.module.css';
 import AppointmentFilterTabs from '@features/appointment/components/AppointmentFilterTabs/AppointmentFilterTabs';
 import AppointmentListReceptionist from '@features/appointment/components/AppointmentListReceptionist/AppointmentListReceptionist';
 import { useAppointments } from '@hooks/useAppointments';
-import { useToast } from '@hooks/use-toast'; // Your useToast hook
 
 const AppointmentManagement = () => {
   const [activeTab, setActiveTab] = useState('pending');
-  const { toast } = useToast(); // Get toast function
+
 
   const filters = useMemo(
     () => ({
@@ -58,7 +57,6 @@ const AppointmentManagement = () => {
         isLoading={isLoading}
         activeTab={activeTab}
         refetchAppointments={refetchAppointments}
-        toast={toast} // Pass toast function
       />
     </div>
   );

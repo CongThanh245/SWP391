@@ -1,0 +1,198 @@
+/* ProfileContent.module.css */
+
+.pageTitle {
+  font-size: var(--font-size-xxl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  font-family: var(--font-family);
+}
+
+/* Modal Styles */
+.editForm {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr ;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.detailItemFull {
+  /* grid-column: 1 / -1; */
+}
+
+.detailLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-accent);
+  margin-bottom: var(--spacing-xs);
+  font-family: var(--font-family);
+}
+
+.formInput {
+  padding: var(--spacing-md);
+  border: 2px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  transition: all 0.3s ease;
+  background-color: var(--card-background);
+  color: var(--text-primary);
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--deep-taupe);
+  box-shadow: 0 0 0 3px var(--hover-accent);
+}
+
+.formInput:hover {
+  border-color: var(--card-hover-border);
+}
+
+.formSelect {
+  padding: var(--spacing-md);
+  border: 2px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  background-color: var(--card-background);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.formSelect:focus {
+  outline: none;
+  border-color: var(--deep-taupe);
+  box-shadow: 0 0 0 3px var(--hover-accent);
+}
+
+.formSelect:hover {
+  border-color: var(--card-hover-border);
+}
+
+.modalActions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--card-border);
+}
+
+.btnBase {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnUpdate {
+  background: var(--button-primary-bg);
+  color: var(--card-background);
+  box-shadow: var(--box-shadow);
+}
+
+.btnUpdate:hover {
+  background: var(--button-hover-bg);
+  box-shadow: 0 4px 12px var(--shadow-accent);
+  transform: translateY(-2px);
+}
+
+.btnUpdate:active {
+  transform: translateY(0);
+  box-shadow: var(--box-shadow);
+}
+
+.btnCancel {
+  background-color: var(--secondary-background);
+  color: var(--text-secondary);
+  border: 1px solid var(--card-border);
+}
+
+.btnCancel:hover {
+  background-color: var(--hover-accent);
+  color: var(--text-primary);
+  border-color: var(--card-hover-border);
+}
+
+.btnCancel:active {
+  background-color: var(--card-border);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .editForm {
+    padding: var(--spacing-md);
+  }
+  
+  .detailGrid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .modalActions {
+    flex-direction: column-reverse;
+    gap: var(--spacing-sm);
+  }
+  
+  .btnBase {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .pageTitle {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-lg);
+  }
+}
+
+/* Form validation styles */
+.formInput:invalid {
+  border-color: var(--warning-red);
+}
+
+.formInput:invalid:focus {
+  border-color: var(--warning-red);
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+.formSelect:invalid {
+  border-color: var(--warning-red);
+}
+
+/* Loading state */
+.btnUpdate:disabled {
+  background: var(--color-dark-variant);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btnUpdate:disabled:hover {
+  background: var(--color-dark-variant);
+  transform: none;
+  box-shadow: none;
+}
+

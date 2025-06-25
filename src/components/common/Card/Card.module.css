@@ -15,7 +15,6 @@
   flex-direction: row;
   align-items: flex-start;
   gap: var(--spacing-xl);
-  cursor: pointer;
 }
 
 

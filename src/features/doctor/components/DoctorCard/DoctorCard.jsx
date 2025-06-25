@@ -1,27 +1,17 @@
-// src/features/doctor/components/DoctorCard/DoctorCard.jsx
 import React from 'react';
 import Card from '@components/common/Card/Card';
 import styles from './DoctorCard.module.css';
 
 const DoctorCard = ({ doctor, onClick }) => {
+  // Lấy chữ cái đầu của tên nếu không có ảnh
   const getInitials = (name) => {
     if (!name) return 'N';
-    const nameParts = name.split(' ');
-    if (nameParts.length === 1) return nameParts[0].charAt(0).toUpperCase();
-    return nameParts[0].charAt(0).toUpperCase();
+    return name.split(' ').pop().charAt(0).toUpperCase(); // Lấy chữ cái đầu của từ cuối (họ)
   };
 
+  // Chuyển giới tính thành nhãn hiển thị
   const getGenderBadgeText = (gender) => {
     return gender === 'MALE' ? 'Nam khoa' : 'Sản phụ khoa';
-  };
-
-  const getSpecializationTags = (specialization) => {
-    if (!specialization) return [];
-    // API trả về specialization là chuỗi đơn (ví dụ: "IVF_SPECIALIST")
-    // Nếu server trả về chuỗi phân tách bằng dấu phẩy, giữ logic split
-    return specialization.includes(',') 
-      ? specialization.split(',').map(spec => spec.trim()).slice(0, 3)
-      : [specialization];
   };
 
   // Left content - Thông tin cơ bản bên dưới avatar
@@ -32,7 +22,7 @@ const DoctorCard = ({ doctor, onClick }) => {
         {getGenderBadgeText(doctor.gender)}
       </div>
       <div className={styles.experience}>
-        {doctor.yearOfExperience} năm kinh nghiệm {/* Sửa từ yearsOfExperience */}
+        {doctor.yearOfExperience} năm kinh nghiệm
       </div>
     </div>
   );
@@ -50,11 +40,7 @@ const DoctorCard = ({ doctor, onClick }) => {
       <div className={styles.section}>
         <h4 className={styles.sectionTitle}>Chuyên môn</h4>
         <div className={styles.specializationTags}>
-          {getSpecializationTags(doctor.specialization).map((spec, index) => (
-            <span key={index} className={styles.specializationTag}>
-              {spec}
-            </span>
-          ))}
+          <p className={styles.specializationTag}>{doctor.specialization || 'Không có thông tin'}</p>
         </div>
       </div>
 
@@ -62,9 +48,8 @@ const DoctorCard = ({ doctor, onClick }) => {
       <div className={styles.section}>
         <h4 className={styles.sectionTitle}>Thành tựu nổi bật</h4>
         <ul className={styles.achievementsList}>
-          <li>Chứng chỉ chuyên khoa {doctor.specialization}</li>
+          {doctor.specialization && <li>Chứng chỉ chuyên khoa {doctor.specialization}</li>}
           <li>Hơn {doctor.yearOfExperience} năm kinh nghiệm điều trị</li>
-          {/* Xóa mục giả định nếu không có trong API */}
           {doctor.about && <li>{doctor.about.slice(0, 100)}...</li>}
         </ul>
       </div>
@@ -72,7 +57,7 @@ const DoctorCard = ({ doctor, onClick }) => {
   );
 
   // Avatar props
-  const avatarProps = doctor.image && doctor.image !== "/assets/images/bacsi.png" 
+  const avatarProps = doctor.image && doctor.image !== '/assets/images/bacsi.png'
     ? { src: doctor.image, alt: doctor.name }
     : null;
 
