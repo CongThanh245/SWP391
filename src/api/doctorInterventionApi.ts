@@ -44,6 +44,14 @@ interface FollicularMonitoringData {
 type CreateFollicularMonitoringPayload = Omit<FollicularMonitoringData, 'id' | 'status'>;
 type UpdateFollicularMonitoringPayload = Omit<FollicularMonitoringData, 'id' | 'status'>;
 
+interface IntraUterineInseminationProcessData {
+    status: string; // e.g., "IN_PROGRESS", "COMPLETED", "CANCELLED", etc.
+    actionDate: string; // Format: "YYYY-MM-DD"
+}
+
+type UpdateIUIProcessPayload = IntraUterineInseminationProcessData;
+
+
 
 // =========================================================
 // Các hàm API
@@ -160,3 +168,109 @@ export const hasInProgressUltrasound = async (patientId: string): Promise<boolea
         throw error;
     }
 }
+
+export const getIntraUterineInseminationProcess = async (patientId: string): Promise<IntraUterineInseminationProcessData | null> => {
+    try {
+        const response = await apiClient.get<IntraUterineInseminationProcessData>(`/doctors/treatment-profile/intervention/intrauterine-insemination-process?patientId=${patientId}`);
+        // Assuming backend returns null/empty if no data, or throws 404
+        return response.data || null;
+    } catch (error) {
+        if (error.response && error.response.status === 404) {
+            return null; // Gracefully handle no existing process
+        }
+        console.error("Error fetching Intra-Uterine Insemination Process data:", error);
+        throw error;
+    }
+};
+
+// PATCH - Update Intra-Uterine Insemination Process (status and/or actionDate)
+export const updateIntraUterineInseminationProcess = async (patientId: string, data: UpdateIUIProcessPayload): Promise<IntraUterineInseminationProcessData> => {
+    try {
+        const response = await apiClient.patch<IntraUterineInseminationProcessData>(
+            `/doctors/treatment-profile/intervention/update-intrauterine-insemination-process?patientId=${patientId}`,
+            data
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update Intra-Uterine Insemination Process:', error);
+        throw error;
+    }
+};
+
+// PATCH - Complete Intra-Uterine Insemination Process
+export const completeIntraUterineInseminationProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-intrauterine-insemination-process?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete Intra-Uterine Insemination Process:', error);
+        throw error;
+    }
+};
+
+// PATCH - Cancel Intra-Uterine Insemination Process
+export const cancelIntraUterineInseminationProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-intrauterine-insemination-process?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel Intra-Uterine Insemination Process:', error);
+        throw error;
+    }
+};
+
+export const updateInterventionStageNotes = async (patientId: string, notes: string) =>{
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/update-intervention-stage-notes?patientId=${patientId}`, notes);
+    } catch (error) {
+        console.error('Failed to update notes intervention Process:', error);
+        throw error;
+    }
+}
+
+
+export const getInterventionStageNotes = async (patientId: string): Promise<string> =>{
+    try {
+        const response = await apiClient.get(`/doctors/treatment-profile/intervention/intervention-stage-notes?patientId=${patientId}`);
+        return response.data.notes;
+    } catch (error) {
+        console.error('Failed to get notes intervention Process:', error);
+        throw error;
+    }
+}
+
+export const getSpermProcessingData = async (patientId: string) => {
+    try {
+        const response = await apiClient.get(`/doctors/treatment-profile/intervention/sperm-processing?patientId=${patientId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to get sperm processing data:', error);
+        throw error;
+    }
+};
+
+export const updateSpermProcessingData = async (patientId: string, data) => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/update-sperm-processing?patientId=${patientId}`, data);
+    } catch (error) {
+        console.error('Failed to update sperm processing data:', error);
+        throw error;
+    }
+};
+
+export const completeSpermProcessing = async (patientId: string) => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-sperm-processing?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete sperm processing:', error);
+        throw error;
+    }
+};
+
+export const cancelSpermProcessing = async (patientId: string) => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-sperm-processing?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel sperm processing:', error);
+        throw error;
+    }
+};
+
