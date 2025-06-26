@@ -132,7 +132,7 @@ const PreTestResult = () => {
   return (
     <div className={styles.patientListPage}>
       <div className={styles.pageHeader}>
-        <h2>Danh sách Bệnh nhân</h2>
+        <h2>Nhập kết quả xét nghiệm</h2>
         <p>Quản lý thông tin bệnh nhân</p>
         <div className={styles.stats}>
           <span>Tổng số: {patients.length}</span>
