@@ -43,7 +43,9 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     'Tư vấn dinh dưỡng'
   ];
 
-  const handleNextAppoinment = async () => {
+  const handleNextAppoinment = async (e) => {
+    e.preventDefault(); // Prevent any default behavior
+    e.stopPropagation(); // Stop event bubbling
     if (selectedTimeframe) {
       const followUpData = {
         recommendedDate: selectedTimeframe,
@@ -180,7 +182,9 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
           Hẹn tái khám
         </Button>
       </div>
+      
     </Card>
+    
   );
 };
 

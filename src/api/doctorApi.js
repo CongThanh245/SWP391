@@ -1,5 +1,4 @@
 // src/features/doctor/services/doctorApi.js
-import axios from 'axios';
 import apiClient from './axiosConfig';
 
 export const getDoctors = async (params = {}) => {

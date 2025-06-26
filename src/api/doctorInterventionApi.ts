@@ -30,6 +30,7 @@ export interface OvarianStimulationPayload {
     prescription: PrescriptionPayload;
     startDate: string;
     drugResponse: string;
+    status: string;
 }
 
 interface FollicularMonitoringData {
@@ -88,6 +89,26 @@ export const updateOvarianStimulationProcess = async (patientId: string, data: O
         return response.data;
     } catch (error) {
         console.error('Failed to update ovarian stimulation process:', error);
+        throw error;
+    }
+};
+
+
+export const completeOvarianStimulationProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-ovarian-stimulation-process?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete Ovarian Stimulation Process  Process:', error);
+        throw error;
+    }
+};
+
+
+export const cancelOvarianStimulationProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-ovarian-stimulation-process?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel Ovarian Stimulation Process Process:', error);
         throw error;
     }
 };
