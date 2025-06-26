@@ -295,3 +295,50 @@ export const cancelSpermProcessing = async (patientId: string) => {
     }
 };
 
+
+//IVF
+
+export const getOvulationTriggerInjectionProcess = async (patientId: string): Promise<OvarianStimulationPayload | null> => {
+    try {
+        const response = await apiClient.get<OvarianStimulationPayload>(`/doctors/treatment-profile/intervention/ovulation-trigger-injection?patientId=${patientId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch ovarian stimulation process:', error);
+        if (error.response && error.response.status === 404) {
+            return null;
+        }
+        throw error;
+    }
+};
+
+// Loại bỏ 'any'
+export const updateOvulationTriggerInjectionProcess = async (patientId: string, data: OvarianStimulationPayload): Promise<OvarianStimulationPayload> => {
+    try {
+        const response = await apiClient.patch<OvarianStimulationPayload>(`/doctors/treatment-profile/intervention/update-ovulation-trigger-injection?patientId=${patientId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update ovarian stimulation process:', error);
+        throw error;
+    }
+};
+
+
+export const completeOvulationTriggerInjectionProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-ovulation-trigger-injection?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete Ovarian Stimulation Process  Process:', error);
+        throw error;
+    }
+};
+
+
+export const cancelOvulationTriggerInjectionProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-ovulation-trigger-injection?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel Ovarian Stimulation Process Process:', error);
+        throw error;
+    }
+};
+
