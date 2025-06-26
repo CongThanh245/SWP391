@@ -1,16 +1,17 @@
-// @features/dashboard/components/DashboardHome.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Button from "@components/common/Button/Button";
 import styles from "../../components/ReceptionistDashboard/ReceptionistDashboard.module.css";
 import { useNavigate } from "react-router-dom";
-import { fetchReceptionistProfile } from "@api/receptionistApi"; // Adjust import path as needed
+import { fetchReceptionistProfile } from "@api/receptionistApi";
 import ReceptionistProfile from "@features/profile/pages/ReceptionistProfile/ReceptionistProfile";
+import { AppointmentContext } from "@utils/AppointmentContext"; // Adjust path as needed
 
 const ReceptionistHomePage = () => {
   const navigate = useNavigate();
   const [receptionistProfile, setReceptionistProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { appointmentCounts } = useContext(AppointmentContext);
 
   // Fetch receptionist profile on component mount
   useEffect(() => {
@@ -42,7 +43,6 @@ const ReceptionistHomePage = () => {
     const name = getDisplayName();
     return `Chào mừng, ${name}`;
   };
-
 
   return (
     <div className={styles.dashboard}>
@@ -87,7 +87,7 @@ const ReceptionistHomePage = () => {
           </div>
         </div>
       </div>
-      <ReceptionistProfile></ReceptionistProfile>
+      <ReceptionistProfile />
 
       {/* Loading/Error States */}
       {loading && (
@@ -126,7 +126,7 @@ const ReceptionistHomePage = () => {
           {[
             {
               label: "Lịch hẹn hôm nay",
-              value: "24",
+              value: appointmentCounts.pending + appointmentCounts.confirmed, // Tổng pending và confirmed
               color: "blue",
               icon: (
                 <svg
@@ -149,7 +149,7 @@ const ReceptionistHomePage = () => {
             },
             {
               label: "Chờ xác nhận",
-              value: "12",
+              value: appointmentCounts.pending,
               color: "orange",
               icon: (
                 <svg
@@ -170,8 +170,8 @@ const ReceptionistHomePage = () => {
               ),
             },
             {
-              label: "Kết quả chờ nhập",
-              value: "5",
+              label: "Hoàn tất",
+              value: appointmentCounts.completed,
               color: "purple",
               icon: (
                 <svg

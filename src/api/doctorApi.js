@@ -11,7 +11,15 @@ export const getDoctors = async (params = {}) => {
     throw new Error(error.response?.data?.message || 'Failed to fetch doctors');
   }
 };
-
+export const getAdminDoctors = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/admin/doctors', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch doctors:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to fetch doctors');
+  }
+};
 export const getDoctorsStats = async () => {
   const response = await apiClient.get('/doctors/me/stats');
   return response.data

@@ -3,10 +3,10 @@ import styles from './AppointmentManagement.module.css';
 import AppointmentFilterTabs from '@features/appointment/components/AppointmentFilterTabs/AppointmentFilterTabs';
 import AppointmentListReceptionist from '@features/appointment/components/AppointmentListReceptionist/AppointmentListReceptionist';
 import { useAppointments } from '@hooks/useAppointments';
+import { AppointmentContext } from '@utils/AppointmentContext';
 
 const AppointmentManagement = () => {
   const [activeTab, setActiveTab] = useState('pending');
-
 
   const filters = useMemo(
     () => ({
@@ -31,34 +31,36 @@ const AppointmentManagement = () => {
       cancelled: appointments.filter((app) => app.status === 'cancelled').length,
     };
   }, [appointments]);
-
+  const contextValue = useMemo(() => ({ appointmentCounts }), [appointmentCounts]);
   const handleTabChange = (tabKey) => {
     setActiveTab(tabKey);
   };
 
   return (
-    <div className={styles.appointmentPage}>
-      <div className={styles.pageHeader}>
-        <h2>Quản lý bệnh nhân đặt lịch</h2>
-        <p>Xem và quản lý tất cả lịch hẹn theo trạng thái</p>
+    <AppointmentContext.Provider value={{ appointmentCounts }}>
+      <div className={styles.appointmentPage}>
+        <div className={styles.pageHeader}>
+          <h2>Quản lý bệnh nhân đặt lịch</h2>
+          <p>Xem và quản lý tất cả lịch hẹn theo trạng thái</p>
+        </div>
+
+        {isLoading && <p>Đang tải...</p>}
+        {error && <p className={styles.error}>{error}</p>}
+
+        <AppointmentFilterTabs
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          appointmentCounts={appointmentCounts}
+        />
+
+        <AppointmentListReceptionist
+          appointments={filteredAppointments}
+          isLoading={isLoading}
+          activeTab={activeTab}
+          refetchAppointments={refetchAppointments}
+        />
       </div>
-
-      {isLoading && <p>Đang tải...</p>}
-      {error && <p className={styles.error}>{error}</p>}
-
-      <AppointmentFilterTabs
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        appointmentCounts={appointmentCounts}
-      />
-
-      <AppointmentListReceptionist
-        appointments={filteredAppointments}
-        isLoading={isLoading}
-        activeTab={activeTab}
-        refetchAppointments={refetchAppointments}
-      />
-    </div>
+    </AppointmentContext.Provider>
   );
 };
 
