@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchReceptionistProfile } from "@api/receptionistApi";
 import ReceptionistProfile from "@features/profile/pages/ReceptionistProfile/ReceptionistProfile";
 import { AppointmentContext } from "@utils/AppointmentContext"; // Adjust path as needed
+import { useToast } from "@hooks/use-toast"; // Import useToast
 
 const ReceptionistHomePage = () => {
   const navigate = useNavigate();
@@ -12,9 +13,22 @@ const ReceptionistHomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { appointmentCounts } = useContext(AppointmentContext);
+  const { toast } = useToast(); // Initialize useToast
 
-  // Fetch receptionist profile on component mount
+  // Fetch receptionist profile and handle toast on component mount
   useEffect(() => {
+    // Check for fresh login and show toast
+    const isFreshLogin = localStorage.getItem("isFreshLogin");
+    if (isFreshLogin === "true") {
+      toast({
+        title: "Đăng nhập thành công",
+        description: "Chào mừng bạn đã quay trở lại.",
+        variant: "success", // Optional: Use variant if supported
+      });
+      localStorage.removeItem("isFreshLogin"); // Clear flag to prevent re-trigger on refresh
+    }
+
+    // Fetch receptionist profile
     const loadReceptionistProfile = async () => {
       try {
         setLoading(true);
@@ -22,14 +36,14 @@ const ReceptionistHomePage = () => {
         setReceptionistProfile(profileData);
       } catch (err) {
         setError(err.message);
-        console.error('Error fetching receptionist profile:', err);
+        console.error("Error fetching receptionist profile:", err);
       } finally {
         setLoading(false);
       }
     };
 
     loadReceptionistProfile();
-  }, []);
+  }, [toast]); // Include toast in dependency array
 
   // Format name for display
   const getDisplayName = () => {
@@ -126,7 +140,7 @@ const ReceptionistHomePage = () => {
           {[
             {
               label: "Lịch hẹn hôm nay",
-              value: appointmentCounts.pending + appointmentCounts.confirmed, // Tổng pending và confirmed
+              value: appointmentCounts.pending + appointmentCounts.confirmed,
               color: "blue",
               icon: (
                 <svg

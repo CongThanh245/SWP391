@@ -11,7 +11,13 @@ const PatientInfo = ({ user, onEdit }) => {
     { icon: User, label: 'Giới tính', value: user.gender },
     { icon: Mail, label: 'Email', value: user.email },
     { icon: Heart, label: 'Tình trạng hôn nhân', value: user.maritalStatus },
-    { icon: ShieldAlert, label: 'Người liên hệ khẩn cấp', value: user.emergencyContact}
+    // Thêm thông tin spouse
+    { icon: User, label: 'Tên người đi kèm', value: user.spouseName },
+    { icon: MapPin, label: 'Địa chỉ người đi kèm', value: user.spouseAddress },
+    { icon: Phone, label: 'Số điện thoại người đi kèm', value: user.spousePhone },
+    { icon: ShieldAlert, label: 'Liên hệ khẩn cấp người đi kèm', value: user.spouseEmergencyContact },
+    { icon: Calendar, label: 'Ngày sinh người đi kèm', value: user.spouseBirthDate },
+    { icon: User, label: 'Giới tính người đi kèm', value: user.spouseGender },
   ];
 
   return (

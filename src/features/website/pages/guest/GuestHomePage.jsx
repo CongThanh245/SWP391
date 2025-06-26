@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useToast } from "@hooks/use-toast"; // Ensure this is correctly imported
 import HeroSection from "@features/website/components/shared/HeroSection/HeroSection.jsx";
 import JourneySection from "@features/website/components/guest/JourneySection/JourneySection";
 import DoctorsCarousel from "@features/website/components/guest/DocorCarousel/DoctorCarousel";
@@ -11,25 +12,32 @@ import PatientHero from "@features/website/components/patient/PatientHero/Patien
 const GuestHomePage = () => {
   const [isPatient, setIsPatient] = useState(false);
   const [user, setUser] = useState(null);
-
-  const isAuthenticated = () => {
-    const authToken = localStorage.getItem("authToken");
-    const userRole = localStorage.getItem("role");
-    return authToken && userRole === "PATIENT"; 
-  };
-
-  const getUserData = () => {
-    const userData = localStorage.getItem("user");
-    return userData ? JSON.parse(userData) : null;
-  };
+  const { toasts, toast } = useToast();
 
   useEffect(() => {
-    const patientStatus = isAuthenticated();
-    setIsPatient(patientStatus);
-    if (patientStatus) {
-      setUser(getUserData());
+    // Check authentication status
+    const authToken = localStorage.getItem("authToken");
+    const userRole = localStorage.getItem("role");
+    const isPatientAuthenticated = authToken && userRole === "PATIENT";
+    setIsPatient(isPatientAuthenticated);
+
+    // Fetch user data if authenticated as patient
+    if (isPatientAuthenticated) {
+      const userData = localStorage.getItem("user");
+      setUser(userData ? JSON.parse(userData) : null);
     }
-  }, []);
+
+    // Show welcome toast for fresh login
+    const isFreshLogin = localStorage.getItem("isFreshLogin");
+    if (isFreshLogin === "true") {
+      toast({
+        title: "Đăng nhập thành công",
+        description: "Chào mừng bạn đã quay trở lại.",
+        variant: "success", // Optional: Use variant if supported
+      });
+      localStorage.removeItem("isFreshLogin"); // Clear flag to prevent re-trigger
+    }
+  }, [toast]); // Include toast in dependency array
 
   return (
     <div>
