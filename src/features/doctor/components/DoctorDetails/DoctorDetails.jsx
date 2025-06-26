@@ -1,13 +1,13 @@
 // src/features/doctor/components/DoctorDetails/DoctorDetails.jsx
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useDoctors } from '@hooks/useDoctors';
+import { useAdminDoctors } from '@hooks/useDoctors';
 import Card from '@components/common/Card/Card';
 import styles from './DoctorDetails.module.css';
 
 const DoctorDetails = ({ onClose }) => {
   const { id } = useParams();
-  const { doctors, loading, error } = useDoctors();
+  const { doctors, loading, error } = useAdminDoctors();
 
   if (loading) {
     return <div className={styles.loading}>Đang tải...</div>;

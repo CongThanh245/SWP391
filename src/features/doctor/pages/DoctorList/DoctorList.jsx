@@ -1,7 +1,7 @@
 // src/features/doctor/components/DoctorList/DoctorList.jsx
 import React from 'react';
 import { User, Phone } from 'lucide-react';
-import { useDoctors } from '@hooks/useDoctors';
+import { useAdminDoctors } from '@hooks/useDoctors';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import styles from './DoctorList.module.css';
 import DoctorDetails from '@features/doctor/components/DoctorDetails/DoctorDetails';
@@ -24,7 +24,7 @@ const Modal = ({ isOpen, onClose, children }) => {
 const DoctorList = () => {
   const { id } = useParams(); // Lấy id từ URL
   const navigate = useNavigate();
-  const { doctors, loading, error } = useDoctors(); // Sử dụng hook
+  const { doctors, loading, error } = useAdminDoctors(); // Sử dụng hook
 
   if (loading) {
     return <div className={styles.loading}>Đang tải...</div>;
