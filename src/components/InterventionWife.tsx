@@ -5,6 +5,9 @@ import { Loader2 } from 'lucide-react'; // Assuming you use Loader2 icon
 import OvarianStimulationProtocolCard from './InterventionWife/OvarianStimulationProtocolCard';
 import FollicularMonitoringCard from './InterventionWife/FollicularMonitoringCard'
 import IntraUterineInseminationProcessCard from './InterventionWife/IntraUterineInseminationProcessCard'
+import OvulationTriggerInjectionCard from './InterventionWife/OvulationTriggerInjectionCard'
+import EndometrialPreparationCard from './InterventionWife/EndometrialPreparationCard'
+import EmbryoTransferCard from './InterventionWife/EmbryoTransferCard'
 import { getInterventionStageNotes, updateInterventionStageNotes } from '@api/doctorInterventionApi'
 import { Button } from '@components/ui/button';
 
@@ -85,7 +88,11 @@ const InterventionWife: React.FC<InterventionWifeProps> = ({ patientId }) => {
                 <>
                     {interventionType === 'IVF' && (
                         <>
-
+                             {<OvulationTriggerInjectionCard patientId={patientId} />}
+                             {<FollicularMonitoringCard patientId={patientId} />}
+                             {<EndometrialPreparationCard patientId={patientId} />}
+                             {<EmbryoTransferCard patientId={patientId} />}
+                    
                         </>
                     )}
                     {interventionType === 'IUI' && (
