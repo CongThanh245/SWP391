@@ -94,7 +94,7 @@ export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelec
             case 'completed':
                 return <Badge className="bg-green-100 text-green-800">Hoàn tất</Badge>;
             default:
-                return <Badge variant="outline">{status}</Badge>;
+                return <Badge variant="outline">Chưa biết</Badge>;
         }
     };
 
@@ -102,12 +102,12 @@ export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelec
         switch (stage) {
             case 'PREPARATION':
                 return <Badge variant="outline" className="bg-yellow-50 text-yellow-700">Chuyên khoa</Badge>;
-            case 'intervention':
+            case 'INTERVENTION':
                 return <Badge variant="outline" className="bg-purple-50 text-purple-700">Can thiệp</Badge>;
-            case 'post-intervention':
+            case 'POST_INTERVENTION':
                 return <Badge variant="outline" className="bg-indigo-50 text-indigo-700">Hậu can thiệp</Badge>;
             default:
-                return <Badge variant="outline">{stage}</Badge>;
+                return <Badge variant="outline">Chưa có thông tin</Badge>;
         }
     };
 

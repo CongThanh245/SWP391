@@ -27,6 +27,7 @@ import {
   ToastClose,
 } from "@components/ui/toast";
 import { useTreatmentProgress } from '@components/TreatmentProgress';
+import { getMedicationList } from '@api/doctorInterventionApi';
 
 interface TreatmentProps {
   onBackToDashboard?: () => void;
@@ -154,11 +155,16 @@ interface ProtocolPayload {
   husbandProtocols: LabTestItem[];
 }
 
+interface Medication { id: string; name: string; }
 
 const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) => {
   const { toasts, toast } = useToast();
   const [activeSubTab, setActiveSubTab] = useState('wife');
   const [activeInterventionTab, setActiveInterventionTab] = useState('wife');
+
+  const [medicationList, setMedicationList] = useState<Medication[]>([]);
+  const [isLoadingMedicationList, setIsLoadingMedicationList] = useState(false);
+  const [errorMedicationList, setErrorMedicationList] = useState<string | null>(null);
 
 
   const [generalDiagnosis, setGeneralDiagnosis] = useState('');
@@ -229,6 +235,23 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     spouseGender: '',
   });
 
+
+  useEffect(() => {
+          const fetchMedications = async () => {
+              setIsLoadingMedicationList(true);
+              setErrorMedicationList(null);
+              try {
+                  const data = await getMedicationList();
+                  setMedicationList(data);
+              } catch (error) {
+                  console.error("Failed to fetch medication list:", error);
+                  setErrorMedicationList("Không thể tải danh sách thuốc. Vui lòng thử lại.");
+              } finally {
+                  setIsLoadingMedicationList(false);
+              }
+          };
+          fetchMedications();
+      }, []);
   // Fetch wife vital data
   useEffect(() => {
     const fetchWifeVitalData = async () => {
@@ -710,7 +733,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
             onNotesChange={setFollowUpNotes}
             followUpReason={followUpReason}
             onReasonChange={setFollowUpReason}
-            patientId= {patientId}
+            patientId={patientId}
           />
         </TabsContent>
       </Tabs>
@@ -751,11 +774,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsList>
 
         <TabsContent value="wife">
-          <InterventionWife patientId = {patientId} />
+          <InterventionWife patientId={patientId} />
         </TabsContent>
 
         <TabsContent value="husband">
-          <InterventionHusband patientId= {patientId} />
+          <InterventionHusband patientId={patientId} />
         </TabsContent>
 
         <TabsContent value="appointment">
@@ -837,7 +860,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
           </TabsContent>
 
           <TabsContent value="post-intervention">
-            <PostIntervention />
+            <PostIntervention
+              patientId={patientId}
+              medicationList={medicationList}
+              AppointmentCalendar={AppointmentCalendar}
+            />
             <CompleteButtonComponent stageKey="postIntervention" stageName="Hậu can thiệp" />
           </TabsContent>
         </Tabs>
