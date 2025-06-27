@@ -8,6 +8,7 @@ import IntraUterineInseminationProcessCard from './InterventionWife/IntraUterine
 import OvulationTriggerInjectionCard from './InterventionWife/OvulationTriggerInjectionCard'
 import EndometrialPreparationCard from './InterventionWife/EndometrialPreparationCard'
 import EmbryoTransferCard from './InterventionWife/EmbryoTransferCard'
+import OocyteRetrievalProcedureCard from './InterventionWife/OocyteRetrievalProcedureCard'
 import { getInterventionStageNotes, updateInterventionStageNotes } from '@api/doctorInterventionApi'
 import { Button } from '@components/ui/button';
 
@@ -34,8 +35,8 @@ const InterventionWife: React.FC<InterventionWifeProps> = ({ patientId }) => {
             try {
                 const type = await getPatientInterventionType(patientId);
                 setInterventionType(type);
-                const notesString: string  = await getInterventionStageNotes(patientId);
-                setFollowUpNotes(notesString  || '');
+                const notesString: string = await getInterventionStageNotes(patientId);
+                setFollowUpNotes(notesString || '');
             } catch (error) {
                 console.error("Failed to fetch intervention type:", error);
                 setErrorInterventionType("Không thể tải loại can thiệp.");
@@ -88,11 +89,12 @@ const InterventionWife: React.FC<InterventionWifeProps> = ({ patientId }) => {
                 <>
                     {interventionType === 'IVF' && (
                         <>
-                             {<OvulationTriggerInjectionCard patientId={patientId} />}
-                             {<FollicularMonitoringCard patientId={patientId} />}
-                             {<EndometrialPreparationCard patientId={patientId} />}
-                             {<EmbryoTransferCard patientId={patientId} />}
-                    
+                            {<OvulationTriggerInjectionCard patientId={patientId} />}
+                            {<FollicularMonitoringCard patientId={patientId} />}
+                            {<EndometrialPreparationCard patientId={patientId} />}
+                            {<OocyteRetrievalProcedureCard patientId={patientId} />}
+                            {<EmbryoTransferCard patientId={patientId} />}
+
                         </>
                     )}
                     {interventionType === 'IUI' && (

@@ -59,6 +59,14 @@ interface EmbryoTransferData {
     status: string;
 }
 
+interface OocyteRetrievalProcedureData {
+    actionDate: string;
+    totalOocytesRetrieved: number;
+    maturedOocytes: number;
+    frozenOocytes: number;
+    status: string;
+}
+
 
 // =========================================================
 // Các hàm API
@@ -437,6 +445,52 @@ export const completeEndometrialPreparationProcess = async (patientId: string): 
 export const cancelEndometrialPreparationProcess = async (patientId: string): Promise<void> => {
     try {
         await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-endometrial-preparation?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel Ovarian Stimulation Process Process:', error);
+        throw error;
+    }
+};
+
+//OocyteRetrieval
+
+export const getOocyteRetrievalProcedure = async (patientId: string): Promise<OocyteRetrievalProcedureData  | null> => {
+    try {
+        const response = await apiClient.get<OocyteRetrievalProcedureData>(`/doctors/treatment-profile/intervention/oocyte-retrieval-procedure?patientId=${patientId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch ovarian stimulation process:', error);
+        if (error.response && error.response.status === 404) {
+            return null;
+        }
+        throw error;
+    }
+};
+
+// Loại bỏ 'any'
+export const updateOocyteRetrievalProcedure = async (patientId: string, data: OocyteRetrievalProcedureData): Promise<OocyteRetrievalProcedureData> => {
+    try {
+        const response = await apiClient.patch<OocyteRetrievalProcedureData>(`/doctors/treatment-profile/intervention/update-oocyte-retrieval-procedure?patientId=${patientId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update ovarian stimulation process:', error);
+        throw error;
+    }
+};
+
+
+export const completeOocyteRetrievalProcedure = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-oocyte-retrieval-procedure?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete Ovarian Stimulation Process  Process:', error);
+        throw error;
+    }
+};
+
+
+export const cancelOocyteRetrievalProcedure = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-oocyte-retrieval-procedure?patientId=${patientId}`);
     } catch (error) {
         console.error('Failed to cancel Ovarian Stimulation Process Process:', error);
         throw error;
