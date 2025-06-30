@@ -312,7 +312,7 @@
   width: 50px;
   height: 50px;
   background: linear-gradient(135deg, var(--deep-taupe), var(--warm-taupe));
-  color: white;
+  color: var(--deep-taupe);
   border-radius: 50%;
   font-size: var(--font-size-lg);
   font-weight: 700;

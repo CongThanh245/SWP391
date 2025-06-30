@@ -27,7 +27,7 @@ const LoginForm = ({
     password: Yup.string().required("Vui lòng nhập mật khẩu"),
   });
 
-  const handleSubmit = async (values, { setFieldValue }) => {
+  const handleSubmit = async (values, { setFieldValue, setFieldError }) => {
     setLoading(true);
 
     try {
@@ -46,7 +46,14 @@ const LoginForm = ({
       );
 
       if (!response.ok) {
-        throw new Error("Đăng nhập thất bại");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.validationErrors
+          ? errorData.validationErrors.join(", ")
+          : "Email hoặc mật khẩu không đúng";
+        // Gán lỗi vào trường username hoặc password
+        setFieldError("username", errorMessage);
+        setFieldError("password", errorMessage);
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -75,13 +82,6 @@ const LoginForm = ({
       }, 1000);
     } catch (error) {
       console.error("Lỗi đăng nhập:", error.message);
-      
-      // Hiển thị toast lỗi
-      toast({
-        title: "Lỗi",
-        description: error.message,
-        variant: "destructive",
-      });
 
       // Clear mật khẩu khi đăng nhập thất bại
       setFieldValue("password", "");
@@ -105,6 +105,8 @@ const LoginForm = ({
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
+          validateOnBlur={false} // Prevent validation on blur
+          validateOnChange={false} // Prevent validation on change
         >
           {({ values, errors, touched, handleChange, handleBlur }) => (
             <Form className={styles.loginForm}>

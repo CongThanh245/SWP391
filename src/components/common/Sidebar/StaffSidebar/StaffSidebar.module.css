@@ -19,7 +19,7 @@
 .userSection {
   padding: var(--spacing-xl) var(--spacing-lg);
   border-bottom: 1px solid var(--card-border);
-  background: var(--accent-color);
+  background: var(--text-secondary);
   color: var(--button-primary-text);
   display: flex;
   align-items: center;
