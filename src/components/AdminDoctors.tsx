@@ -109,6 +109,7 @@ const Doctors = () => {
           about: doctor.about || '',
           address: doctor.doctorAddress || '',
           joinDate: doctor.joinDate || '',
+          imageProfile: doctor.imageProfile || '',
         }));
         setDoctorsData(doctorsDataFormatted);
       }
@@ -188,7 +189,7 @@ const Doctors = () => {
     }
   ];
 
-  const handleCSVImport = async (data: any[]) => {
+  const handleCSVImport = async (data) => {
     setLoading(true);
     const result = await DoctorService.importFromCSV(data);
     setLoading(false);
@@ -370,7 +371,7 @@ const Doctors = () => {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-4">
                       <Avatar className="w-14 h-14 border-2 border-[#D9CAC2]">
-                        <AvatarImage src="/placeholder.svg" />
+                        <AvatarImage src={doctor.imageProfile} />
                         <AvatarFallback className="bg-[#D9CAC2] text-[#4D3C2D] font-semibold text-lg">
                           {doctor.avatar}
                         </AvatarFallback>

@@ -30,6 +30,7 @@ export interface OvarianStimulationPayload {
     prescription: PrescriptionPayload;
     startDate: string;
     drugResponse: string;
+    status: string;
 }
 
 interface FollicularMonitoringData {
@@ -51,6 +52,20 @@ interface IntraUterineInseminationProcessData {
 
 type UpdateIUIProcessPayload = IntraUterineInseminationProcessData;
 
+interface EmbryoTransferData {
+    prescription: PrescriptionPayload;
+    actionDate: string; // Changed from startDate to actionDate
+    drugResponse: string; // Assuming 'drugResponse' is also applicable here
+    status: string;
+}
+
+interface OocyteRetrievalProcedureData {
+    actionDate: string;
+    totalOocytesRetrieved: number;
+    maturedOocytes: number;
+    frozenOocytes: number;
+    status: string;
+}
 
 
 // =========================================================
@@ -88,6 +103,26 @@ export const updateOvarianStimulationProcess = async (patientId: string, data: O
         return response.data;
     } catch (error) {
         console.error('Failed to update ovarian stimulation process:', error);
+        throw error;
+    }
+};
+
+
+export const completeOvarianStimulationProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-ovarian-stimulation-process?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete Ovarian Stimulation Process  Process:', error);
+        throw error;
+    }
+};
+
+
+export const cancelOvarianStimulationProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-ovarian-stimulation-process?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel Ovarian Stimulation Process Process:', error);
         throw error;
     }
 };
@@ -274,3 +309,190 @@ export const cancelSpermProcessing = async (patientId: string) => {
     }
 };
 
+
+//IVF
+
+export const getOvulationTriggerInjectionProcess = async (patientId: string): Promise<OvarianStimulationPayload | null> => {
+    try {
+        const response = await apiClient.get<OvarianStimulationPayload>(`/doctors/treatment-profile/intervention/ovulation-trigger-injection?patientId=${patientId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch ovarian stimulation process:', error);
+        if (error.response && error.response.status === 404) {
+            return null;
+        }
+        throw error;
+    }
+};
+
+// Loại bỏ 'any'
+export const updateOvulationTriggerInjectionProcess = async (patientId: string, data: OvarianStimulationPayload): Promise<OvarianStimulationPayload> => {
+    try {
+        const response = await apiClient.patch<OvarianStimulationPayload>(`/doctors/treatment-profile/intervention/update-ovulation-trigger-injection?patientId=${patientId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update ovarian stimulation process:', error);
+        throw error;
+    }
+};
+
+
+export const completeOvulationTriggerInjectionProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-ovulation-trigger-injection?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete Ovarian Stimulation Process  Process:', error);
+        throw error;
+    }
+};
+
+
+export const cancelOvulationTriggerInjectionProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-ovulation-trigger-injection?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel Ovarian Stimulation Process Process:', error);
+        throw error;
+    }
+};
+
+
+//Embryo Transfer 
+
+export const getEmbryoTransferProcess = async (patientId: string): Promise<EmbryoTransferData | null> => {
+    try {
+        const response = await apiClient.get<EmbryoTransferData>(`/doctors/treatment-profile/intervention/embryo-transfer?patientId=${patientId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch ovarian stimulation process:', error);
+        if (error.response && error.response.status === 404) {
+            return null;
+        }
+        throw error;
+    }
+};
+
+// Loại bỏ 'any'
+export const updateEmbryoTransferProcess = async (patientId: string, data: EmbryoTransferData): Promise<OvarianStimulationPayload> => {
+    try {
+        const response = await apiClient.patch<OvarianStimulationPayload>(`/doctors/treatment-profile/intervention/update-embryo-transfer?patientId=${patientId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update ovarian stimulation process:', error);
+        throw error;
+    }
+};
+
+
+export const completeEmbryoTransferProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-embryo-transfer?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete Ovarian Stimulation Process  Process:', error);
+        throw error;
+    }
+};
+
+
+export const cancelEmbryoTransferProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-embryo-transfer?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel Ovarian Stimulation Process Process:', error);
+        throw error;
+    }
+};
+
+
+
+// Endometrial
+
+export const getEndometrialPreparationProcess = async (patientId: string): Promise<OvarianStimulationPayload | null> => {
+    try {
+        const response = await apiClient.get<OvarianStimulationPayload>(`/doctors/treatment-profile/intervention/endometrial-preparation?patientId=${patientId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch ovarian stimulation process:', error);
+        if (error.response && error.response.status === 404) {
+            return null;
+        }
+        throw error;
+    }
+};
+
+// Loại bỏ 'any'
+export const updateEndometrialPreparationProcess = async (patientId: string, data: OvarianStimulationPayload): Promise<OvarianStimulationPayload> => {
+    try {
+        const response = await apiClient.patch<OvarianStimulationPayload>(`/doctors/treatment-profile/intervention/update-endometrial-preparation?patientId=${patientId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update ovarian stimulation process:', error);
+        throw error;
+    }
+};
+
+
+export const completeEndometrialPreparationProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-endometrial-preparation?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete Ovarian Stimulation Process  Process:', error);
+        throw error;
+    }
+};
+
+
+export const cancelEndometrialPreparationProcess = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-endometrial-preparation?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel Ovarian Stimulation Process Process:', error);
+        throw error;
+    }
+};
+
+//OocyteRetrieval
+
+export const getOocyteRetrievalProcedure = async (patientId: string): Promise<OocyteRetrievalProcedureData  | null> => {
+    try {
+        const response = await apiClient.get<OocyteRetrievalProcedureData>(`/doctors/treatment-profile/intervention/oocyte-retrieval-procedure?patientId=${patientId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to fetch ovarian stimulation process:', error);
+        if (error.response && error.response.status === 404) {
+            return null;
+        }
+        throw error;
+    }
+};
+
+// Loại bỏ 'any'
+export const updateOocyteRetrievalProcedure = async (patientId: string, data: OocyteRetrievalProcedureData): Promise<OocyteRetrievalProcedureData> => {
+    try {
+        const response = await apiClient.patch<OocyteRetrievalProcedureData>(`/doctors/treatment-profile/intervention/update-oocyte-retrieval-procedure?patientId=${patientId}`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Failed to update ovarian stimulation process:', error);
+        throw error;
+    }
+};
+
+
+export const completeOocyteRetrievalProcedure = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/complete-oocyte-retrieval-procedure?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to complete Ovarian Stimulation Process  Process:', error);
+        throw error;
+    }
+};
+
+
+export const cancelOocyteRetrievalProcedure = async (patientId: string): Promise<void> => {
+    try {
+        await apiClient.patch(`/doctors/treatment-profile/intervention/cancel-oocyte-retrieval-procedure?patientId=${patientId}`);
+    } catch (error) {
+        console.error('Failed to cancel Ovarian Stimulation Process Process:', error);
+        throw error;
+    }
+};
