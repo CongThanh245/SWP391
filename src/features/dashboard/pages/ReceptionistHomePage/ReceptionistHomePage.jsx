@@ -1,20 +1,64 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@components/common/Button/Button";
 import styles from "../../components/ReceptionistDashboard/ReceptionistDashboard.module.css";
 import { useNavigate } from "react-router-dom";
 import { fetchReceptionistProfile } from "@api/receptionistApi";
 import ReceptionistProfile from "@features/profile/pages/ReceptionistProfile/ReceptionistProfile";
-import { AppointmentContext } from "@utils/AppointmentContext"; // Adjust path as needed
+import { useToast } from "@hooks/use-toast";
+import { useAppointments } from "@hooks/useAppointments";
 
 const ReceptionistHomePage = () => {
   const navigate = useNavigate();
   const [receptionistProfile, setReceptionistProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { appointmentCounts } = useContext(AppointmentContext);
+  const { toast } = useToast();
 
-  // Fetch receptionist profile on component mount
+  // Use useAppointments hook with default filters
+  const filters = {
+    dateFilter: "all",
+    specificDate: "",
+  };
+  const {
+    appointments,
+    isLoading: appointmentsLoading,
+    error: appointmentsError,
+    refetchAppointments,
+  } = useAppointments({ filters });
+
+  // Calculate appointment counts
+  const appointmentCounts = React.useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to 00:00:00 for comparison
+
+    const isToday = (appointmentDate) => {
+      if (!appointmentDate) return false; // Handle invalid dates
+      const appointmentDay = new Date(appointmentDate);
+      appointmentDay.setHours(0, 0, 0, 0); // Set time to 00:00:00
+      return appointmentDay.getTime() === today.getTime();
+    };
+
+    return {
+      pending: appointments.filter((app) => app.status === "pending").length,
+      confirmed: appointments.filter((app) => app.status === "confirmed").length,
+      completed: appointments.filter((app) => app.status === "completed").length,
+      cancelled: appointments.filter((app) => app.status === "cancelled").length,
+      today: appointments.filter((app) => isToday(app.date)).length, // Filter today's appointments
+    };
+  }, [appointments]);
+
+  // Fetch receptionist profile and handle toast
   useEffect(() => {
+    const isFreshLogin = localStorage.getItem("isFreshLogin");
+    if (isFreshLogin === "true") {
+      toast({
+        title: "Đăng nhập thành công",
+        description: "Chào mừng bạn đã quay trở lại.",
+        variant: "success",
+      });
+      localStorage.removeItem("isFreshLogin");
+    }
+
     const loadReceptionistProfile = async () => {
       try {
         setLoading(true);
@@ -22,23 +66,21 @@ const ReceptionistHomePage = () => {
         setReceptionistProfile(profileData);
       } catch (err) {
         setError(err.message);
-        console.error('Error fetching receptionist profile:', err);
+        console.error("Error fetching receptionist profile:", err);
       } finally {
         setLoading(false);
       }
     };
 
     loadReceptionistProfile();
-  }, []);
+  }, [toast]);
 
-  // Format name for display
   const getDisplayName = () => {
     if (loading) return "Đang tải...";
     if (error || !receptionistProfile?.receptionistName) return "Receptionist";
     return receptionistProfile.receptionistName;
   };
 
-  // Get greeting message with name
   const getGreetingMessage = () => {
     const name = getDisplayName();
     return `Chào mừng, ${name}`;
@@ -68,9 +110,7 @@ const ReceptionistHomePage = () => {
           </div>
           <div className={styles.userDetails}>
             <div className={styles.userNameSection}>
-              <h2 className={styles.welcomeText}>
-                {getGreetingMessage()}
-              </h2>
+              <h2 className={styles.welcomeText}>{getGreetingMessage()}</h2>
               {receptionistProfile && (
                 <div className={styles.userMeta}>
                   {receptionistProfile.employeeId && (
@@ -126,7 +166,7 @@ const ReceptionistHomePage = () => {
           {[
             {
               label: "Lịch hẹn hôm nay",
-              value: appointmentCounts.pending + appointmentCounts.confirmed, // Tổng pending và confirmed
+              value: appointmentCounts.today,
               color: "blue",
               icon: (
                 <svg
@@ -293,10 +333,7 @@ const ReceptionistHomePage = () => {
                 <p className={styles.actionDescription}>{action.description}</p>
               </div>
               <div className={styles.actionButton}>
-                <Button
-                  variant="primary"
-                  onClick={() => navigate(action.path)}
-                >
+                <Button variant="primary" onClick={() => navigate(action.path)}>
                   Thực hiện
                 </Button>
               </div>

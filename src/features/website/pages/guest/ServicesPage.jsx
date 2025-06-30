@@ -6,10 +6,10 @@ const ServiceInfo = ({ service }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
-    { id: 'overview', label: 'Tổng quan', icon: '📋' },
-    { id: 'process', label: 'Quy trình', icon: '⚡' },
-    { id: 'preparation', label: 'Chuẩn bị', icon: '📝' },
-    { id: 'notes', label: 'Lưu ý', icon: '⚠️' }
+    { id: 'overview', label: 'Tổng quan' },
+    { id: 'process', label: 'Quy trình'},
+    { id: 'preparation', label: 'Chuẩn bị'},
+    { id: 'notes', label: 'Lưu ý' }
   ];
 
   return (
@@ -50,7 +50,6 @@ const ServiceInfo = ({ service }) => {
               <ul className={styles.contentList}>
                 {service.indications.map((indication, index) => (
                   <li key={index} className={styles.listItem}>
-                    <span className={styles.listIcon}>✓</span>
                     {indication}
                   </li>
                 ))}
@@ -129,7 +128,7 @@ const ServiceInfo = ({ service }) => {
               
               <div className={styles.notesGrid}>
                 <div className={styles.noteCard}>
-                  <h4 className={styles.noteTitle}>⚠️ Trước điều trị</h4>
+                  <h4 className={styles.noteTitle}>*Trước điều trị</h4>
                   <ul className={styles.notesList}>
                     {service.notes.before.map((note, index) => (
                       <li key={index} className={styles.noteItem}>{note}</li>
@@ -138,7 +137,7 @@ const ServiceInfo = ({ service }) => {
                 </div>
 
                 <div className={styles.noteCard}>
-                  <h4 className={styles.noteTitle}>🏥 Trong quá trình</h4>
+                  <h4 className={styles.noteTitle}>Trong quá trình</h4>
                   <ul className={styles.notesList}>
                     {service.notes.during.map((note, index) => (
                       <li key={index} className={styles.noteItem}>{note}</li>
@@ -147,7 +146,7 @@ const ServiceInfo = ({ service }) => {
                 </div>
 
                 <div className={styles.noteCard}>
-                  <h4 className={styles.noteTitle}>🔄 Sau điều trị</h4>
+                  <h4 className={styles.noteTitle}>Sau điều trị</h4>
                   <ul className={styles.notesList}>
                     {service.notes.after.map((note, index) => (
                       <li key={index} className={styles.noteItem}>{note}</li>

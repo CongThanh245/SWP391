@@ -20,7 +20,16 @@ const AppointmentManagement = () => {
   const { appointments, isLoading, error, refetchAppointments } = useAppointments({ filters });
 
   const filteredAppointments = useMemo(() => {
-    return appointments.filter((appointment) => appointment.status === activeTab);
+    return appointments
+      .filter((appointment) => appointment.status === activeTab)
+      .map((appointment) => ({
+        ...appointment,
+        date: new Date(appointment.date).toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        }), // Format to DD/MM/YYYY
+      }));
   }, [activeTab, appointments]);
 
   const appointmentCounts = useMemo(() => {
@@ -31,7 +40,9 @@ const AppointmentManagement = () => {
       cancelled: appointments.filter((app) => app.status === 'cancelled').length,
     };
   }, [appointments]);
+
   const contextValue = useMemo(() => ({ appointmentCounts }), [appointmentCounts]);
+
   const handleTabChange = (tabKey) => {
     setActiveTab(tabKey);
   };
