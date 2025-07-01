@@ -14,27 +14,23 @@ const ReceptionistHomePage = () => {
   const [error, setError] = useState(null);
   const { toast } = useToast();
 
-  // Use useAppointments hook with default filters
-  const filters = {
-    dateFilter: "all",
-    specificDate: "",
-  };
+  // Gọi useAppointments mà không truyền filters
   const {
     appointments,
     isLoading: appointmentsLoading,
     error: appointmentsError,
     refetchAppointments,
-  } = useAppointments({ filters });
+  } = useAppointments();
 
-  // Calculate appointment counts
+  // Tính toán số lượng lịch hẹn
   const appointmentCounts = React.useMemo(() => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set time to 00:00:00 for comparison
+    today.setHours(0, 0, 0, 0);
 
     const isToday = (appointmentDate) => {
-      if (!appointmentDate) return false; // Handle invalid dates
+      if (!appointmentDate) return false;
       const appointmentDay = new Date(appointmentDate);
-      appointmentDay.setHours(0, 0, 0, 0); // Set time to 00:00:00
+      appointmentDay.setHours(0, 0, 0, 0);
       return appointmentDay.getTime() === today.getTime();
     };
 
@@ -43,11 +39,11 @@ const ReceptionistHomePage = () => {
       confirmed: appointments.filter((app) => app.status === "confirmed").length,
       completed: appointments.filter((app) => app.status === "completed").length,
       cancelled: appointments.filter((app) => app.status === "cancelled").length,
-      today: appointments.filter((app) => isToday(app.date)).length, // Filter today's appointments
+      today: appointments.filter((app) => isToday(app.date)).length,
     };
   }, [appointments]);
 
-  // Fetch receptionist profile and handle toast
+  // Fetch profile và hiển thị toast
   useEffect(() => {
     const isFreshLogin = localStorage.getItem("isFreshLogin");
     if (isFreshLogin === "true") {
@@ -88,7 +84,7 @@ const ReceptionistHomePage = () => {
 
   return (
     <div className={styles.dashboard}>
-      {/* Header với thông tin user */}
+      {/* Phần còn lại của JSX giữ nguyên */}
       <div className={styles.dashboardHeader}>
         <div className={styles.userInfo}>
           <div className={styles.userAvatar}>
@@ -129,7 +125,6 @@ const ReceptionistHomePage = () => {
       </div>
       <ReceptionistProfile />
 
-      {/* Loading/Error States */}
       {loading && (
         <div className={styles.loadingSection}>
           <div className={styles.loadingSpinner}></div>
@@ -160,7 +155,6 @@ const ReceptionistHomePage = () => {
         </div>
       )}
 
-      {/* Thống kê tổng quan */}
       <div className={styles.statsSection}>
         <div className={styles.statsGrid}>
           {[
@@ -249,7 +243,6 @@ const ReceptionistHomePage = () => {
         </div>
       </div>
 
-      {/* Thao tác nhanh */}
       <div className={styles.quickActionsSection}>
         <h3 className={styles.sectionTitle}>Thao tác nhanh</h3>
         <div className={styles.actionsGrid}>
