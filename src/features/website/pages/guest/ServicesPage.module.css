@@ -1,11 +1,11 @@
-/* ServicesPage.module.css */
+/* ServicesPage.module.css - Đã sửa màu chữ */
 
 /* Page styles */
 .servicesPage {
   min-height: 100vh;
   background-color: var(--primary-background);
   font-family: var(--font-family);
-  color: var(--text-primary);
+  color: var(--deep-taupe);
   padding: 0;
   margin: 0;
   padding-top: 100px;
@@ -22,8 +22,20 @@
 .pageHeader {
   text-align: center;
   margin-bottom: var(--spacing-xxl);
-  border-bottom: 2px solid var(--card-border);
+  border-bottom: 3px solid var(--deep-taupe);
   padding-bottom: var(--spacing-xl);
+  position: relative;
+}
+
+.pageHeader::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--warm-taupe), var(--deep-taupe));
 }
 
 .pageTitle {
@@ -31,11 +43,12 @@
   font-weight: 700;
   color: var(--deep-taupe);
   margin-bottom: var(--spacing-md);
+  position: relative;
 }
 
 .pageSubtitle {
   font-size: var(--font-size-lg);
-  color: var(--text-secondary);
+  color: #5a4a3a; /* Đổi từ var(--text-secondary) thành màu tối hơn */
   line-height: 1.6;
   max-width: 800px;
   margin: 0 auto;
@@ -44,11 +57,23 @@
 /* Service Section */
 .serviceSection {
   margin-bottom: var(--spacing-xxl);
-  background-color: var(--card-background);
-  border-radius: 16px;
+  background: linear-gradient(135deg, var(--card-background) 0%, rgba(248, 246, 243, 0.8) 100%);
+  border-radius: 20px;
   padding: var(--spacing-xl);
-  border: 1px solid var(--card-border);
-  box-shadow: 0 4px 12px var(--shadow-accent);
+  border: 2px solid var(--warm-taupe);
+  box-shadow: 0 8px 32px rgba(158, 142, 123, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.serviceSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--warm-taupe), var(--deep-taupe), var(--warm-taupe));
 }
 
 .serviceHeader {
@@ -56,20 +81,23 @@
   align-items: center;
   margin-bottom: var(--spacing-xl);
   padding-bottom: var(--spacing-lg);
-  border-bottom: 1px solid var(--card-border);
+  border-bottom: 2px solid var(--warm-taupe);
 }
 
 .serviceIcon {
-  width: 80px;
-  height: 80px;
-  background: var(--gradient-accent);
+  width: 90px;
+  height: 90px;
+  background: linear-gradient(135deg, var(--deep-taupe), var(--warm-taupe));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 36px;
   margin-right: var(--spacing-lg);
   flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(158, 142, 123, 0.3);
+  border: 3px solid white;
+  color: white; /* Thêm màu trắng cho icon */
 }
 
 .serviceTitleGroup {
@@ -85,9 +113,10 @@
 
 .serviceShortDesc {
   font-size: var(--font-size-base);
-  color: var(--text-secondary);
+  color: #5a4a3a; /* Đổi từ var(--text-secondary) thành màu tối hơn */
   line-height: 1.5;
   margin: 0;
+  font-style: italic;
 }
 
 /* Tabs */
@@ -97,12 +126,13 @@
 
 .tabsNav {
   display: flex;
-  background-color: var(--secondary-background);
-  border-radius: 12px;
-  padding: var(--spacing-xs);
+  background: linear-gradient(135deg, var(--warm-taupe), rgba(184, 170, 152, 0.9));
+  border-radius: 15px;
+  padding: var(--spacing-sm);
   margin-bottom: var(--spacing-xl);
   flex-wrap: wrap;
   gap: var(--spacing-xs);
+  box-shadow: inset 0 2px 8px rgba(158, 142, 123, 0.2);
 }
 
 .tabButton {
@@ -111,38 +141,45 @@
   padding: var(--spacing-md) var(--spacing-lg);
   border: none;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--deep-taupe)!important ; 
   font-family: var(--font-family);
-  font-weight: 500;
+  font-weight: 600;
   font-size: var(--font-size-sm);
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* Tăng text-shadow để chữ nổi bật hơn */
 }
 
 .tabButton:hover {
-  background-color: var(--hover-accent);
-  color: var(--deep-taupe);
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .tabActive {
-  background-color: var(--card-background) !important;
+  background-color: white !important;
   color: var(--deep-taupe) !important;
-  font-weight: 600;
-  box-shadow: 0 2px 8px var(--shadow-accent);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(158, 142, 123, 0.3);
+  transform: translateY(-2px);
+  text-shadow: none;
 }
 
 .tabIcon {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 /* Tab Content */
 .tabContent {
   min-height: 400px;
+  background: white;
+  border-radius: 15px;
+  padding: var(--spacing-xl);
+  box-shadow: inset 0 2px 8px rgba(158, 142, 123, 0.1);
 }
 
 .tabPanel {
@@ -165,8 +202,11 @@
   font-weight: 700;
   color: var(--deep-taupe);
   margin-bottom: var(--spacing-lg);
-  border-left: 4px solid var(--deep-taupe);
+  border-left: 5px solid var(--deep-taupe);
   padding-left: var(--spacing-md);
+  background: linear-gradient(90deg, rgba(158, 142, 123, 0.1), transparent);
+  padding-top: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
 }
 
 .contentSubtitle {
@@ -174,14 +214,32 @@
   font-weight: 600;
   color: var(--deep-taupe);
   margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+  position: relative;
+  padding-left: var(--spacing-md);
+}
+
+.contentSubtitle::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background: var(--warm-taupe);
+  border-radius: 2px;
 }
 
 .contentText {
   font-size: var(--font-size-base);
-  line-height: 1.7;
-  color: var(--text-secondary);
+  line-height: 1.8;
+  color: #4a4a4a; /* Đổi từ var(--text-secondary) thành màu tối hơn */
   margin-bottom: var(--spacing-lg);
   text-align: justify;
+  padding: var(--spacing-md);
+  background: rgba(248, 246, 243, 0.5);
+  border-radius: 10px;
+  border-left: 4px solid var(--warm-taupe);
 }
 
 /* Lists */
@@ -197,16 +255,24 @@
   margin-bottom: var(--spacing-md);
   font-size: var(--font-size-base);
   line-height: 1.6;
-  color: var(--text-secondary);
+  color: #4a4a4a; /* Đổi từ var(--text-secondary) thành màu tối hơn */
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.listItem:hover {
+  background-color: rgba(248, 246, 243, 0.7);
+  color: #333; /* Màu tối hơn khi hover */
 }
 
 .listIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  background-color: var(--success-green);
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--deep-taupe), var(--warm-taupe));
   color: white;
   border-radius: 50%;
   font-size: 12px;
@@ -225,31 +291,34 @@
 
 .processStep {
   display: flex;
-  background-color: var(--secondary-background);
-  border-radius: 12px;
+  background: linear-gradient(135deg, white, rgba(248, 246, 243, 0.8));
+  border-radius: 15px;
   padding: var(--spacing-lg);
-  border-left: 4px solid var(--deep-taupe);
+  border-left: 5px solid var(--deep-taupe);
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(158, 142, 123, 0.1);
 }
 
 .processStep:hover {
-  transform: translateX(8px);
-  box-shadow: 0 4px 12px var(--shadow-accent);
+  transform: translateX(10px);
+  box-shadow: 0 6px 20px rgba(158, 142, 123, 0.2);
+  border-left-color: var(--warm-taupe);
 }
 
 .stepNumber {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: var(--gradient-accent);
-  color: white;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--deep-taupe), var(--warm-taupe));
+  color: var(--deep-taupe);
   border-radius: 50%;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg);
   font-weight: 700;
   margin-right: var(--spacing-lg);
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(158, 142, 123, 0.3);
 }
 
 .stepContent {
@@ -266,18 +335,19 @@
 .stepDescription {
   font-size: var(--font-size-sm);
   line-height: 1.6;
-  color: var(--text-secondary);
+  color: #4a4a4a; /* Đổi từ var(--text-secondary) thành màu tối hơn */
   margin-bottom: var(--spacing-sm);
 }
 
 .stepDuration {
   display: inline-block;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background-color: var(--hover-accent);
-  color: var(--deep-taupe);
-  border-radius: 6px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: linear-gradient(135deg, var(--warm-taupe), rgba(184, 170, 152, 0.8));
+  border-radius: 20px;
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(158, 142, 123, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Thêm text-shadow cho stepDuration */
 }
 
 /* Preparation Grid */
@@ -289,20 +359,29 @@
 }
 
 .preparationCard {
-  background-color: var(--secondary-background);
-  border-radius: 12px;
+  background: linear-gradient(135deg, white, rgba(248, 246, 243, 0.9));
+  border-radius: 15px;
   padding: var(--spacing-lg);
-  border: 1px solid var(--card-border);
+  border: 2px solid var(--warm-taupe);
+  box-shadow: 0 4px 12px rgba(158, 142, 123, 0.1);
+  transition: all 0.3s ease;
+}
+
+.preparationCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(158, 142, 123, 0.2);
 }
 
 .preparationTitle {
   font-size: var(--font-size-base);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--deep-taupe);
   margin-bottom: var(--spacing-md);
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--warm-taupe);
 }
 
 .preparationList {
@@ -313,12 +392,13 @@
 
 .preparationItem {
   padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid var(--card-border);
+  border-bottom: 1px solid rgba(184, 170, 152, 0.3);
   font-size: var(--font-size-sm);
   line-height: 1.5;
-  color: var(--text-secondary);
+  color: #4a4a4a; /* Đổi từ var(--text-secondary) thành màu tối hơn */
   position: relative;
   padding-left: var(--spacing-lg);
+  transition: all 0.2s ease;
 }
 
 .preparationItem:last-child {
@@ -326,11 +406,20 @@
 }
 
 .preparationItem::before {
-  content: '•';
+  content: '';
   position: absolute;
   left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--deep-taupe);
+  border-radius: 50%;
+}
+
+.preparationItem:hover {
   color: var(--deep-taupe);
-  font-weight: bold;
+  padding-left: var(--spacing-xl);
 }
 
 /* Notes Grid */
@@ -341,12 +430,14 @@
 }
 
 .noteCard {
-  background: linear-gradient(135deg, var(--card-background) 0%, var(--secondary-background) 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, white 0%, rgba(248, 246, 243, 0.9) 100%);
+  border-radius: 15px;
   padding: var(--spacing-lg);
-  border: 1px solid var(--card-border);
+  border: 2px solid var(--warm-taupe);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(158, 142, 123, 0.1);
+  transition: all 0.3s ease;
 }
 
 .noteCard::before {
@@ -356,17 +447,24 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--gradient-accent);
+  background: linear-gradient(90deg, var(--deep-taupe), var(--warm-taupe));
+}
+
+.noteCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(158, 142, 123, 0.2);
 }
 
 .noteTitle {
   font-size: var(--font-size-base);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--deep-taupe);
   margin-bottom: var(--spacing-md);
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--warm-taupe);
 }
 
 .notesList {
@@ -379,10 +477,11 @@
   padding: var(--spacing-sm) 0;
   font-size: var(--font-size-sm);
   line-height: 1.6;
-  color: var(--text-secondary);
+  color: #4a4a4a; /* Đổi từ var(--text-secondary) thành màu tối hơn */
   position: relative;
   padding-left: var(--spacing-lg);
-  border-bottom: 1px solid rgba(158, 142, 123, 0.1);
+  border-bottom: 1px solid rgba(184, 170, 152, 0.2);
+  transition: all 0.2s ease;
 }
 
 .noteItem:last-child {
@@ -390,11 +489,20 @@
 }
 
 .noteItem::before {
-  content: '→';
+  content: '';
   position: absolute;
   left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--warm-taupe);
+  border-radius: 50%;
+}
+
+.noteItem:hover {
   color: var(--deep-taupe);
-  font-weight: bold;
+  padding-left: var(--spacing-xl);
 }
 
 /* Responsive Design */
@@ -448,6 +556,10 @@
   .notesGrid {
     grid-template-columns: 1fr;
   }
+
+  .tabContent {
+    padding: var(--spacing-lg);
+  }
 }
 
 @media (max-width: 480px) {
@@ -468,11 +580,15 @@
   .noteCard {
     padding: var(--spacing-md);
   }
+
+  .tabContent {
+    padding: var(--spacing-md);
+  }
 }
 
 /* Accessibility */
 .tabButton:focus {
-  outline: 2px solid var(--deep-taupe);
+  outline: 3px solid var(--deep-taupe);
   outline-offset: 2px;
 }
 

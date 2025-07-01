@@ -1,111 +1,122 @@
-/* ProfileContent.module.css */
-
 .pageTitle {
-  font-size: var(--font-size-xxl);
+  font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 20px;
   font-family: var(--font-family);
 }
 
 /* Modal Styles */
 .editForm {
-  width: 100%;
-  max-width: 680px;
+  width: 55vw;
+  height: 80vh;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
   margin: 0 auto;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-2xl);
+  background: var(--card-background);
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .detailGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr ;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
+  grid-template-columns: minmax(271px, 210px) 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
+  flex: 1;
+  align-items: flex-start;
 }
 
 .detailItem {
+  display: contents;
+  gap: var(--spacing-sm);
+  /* Reduced gap within items */
+}
+
+/* Full width items */
+.detailItemFull {
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
 }
 
-.detailItemFull {
-  /* grid-column: 1 / -1; */
+/* Half width items (no longer needed, removed span) */
+.detailItemHalf {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
 }
 
+/* Labels */
 .detailLabel {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   color: var(--text-accent);
-  margin-bottom: var(--spacing-xs);
   font-family: var(--font-family);
+  text-align: right;
+  padding-right: var(--spacing-sm);
+  align-self: flex-start;
+  /* Ensure labels align at the top */
 }
 
-.formInput {
-  padding: var(--spacing-md);
-  border: 2px solid var(--card-border);
-  border-radius: var(--border-radius-1);
-  font-size: var(--font-size-sm);
-  font-family: var(--font-family);
-  transition: all 0.3s ease;
-  background-color: var(--card-background);
-  color: var(--text-primary);
-}
-
-.formInput:focus {
-  outline: none;
-  border-color: var(--deep-taupe);
-  box-shadow: 0 0 0 3px var(--hover-accent);
-}
-
-.formInput:hover {
-  border-color: var(--card-hover-border);
-}
-
+/* Inputs */
+.formInput,
 .formSelect {
-  padding: var(--spacing-md);
-  border: 2px solid var(--card-border);
+  padding: 5px;
+  border: 1px solid var(--card-border);
   border-radius: var(--border-radius-1);
-  font-size: var(--font-size-sm);
+  font-size: 15px;
   font-family: var(--font-family);
   background-color: var(--card-background);
   color: var(--text-primary);
   transition: all 0.3s ease;
-  cursor: pointer;
+  height: 40px;
+  width: 100%;
+  max-width: 400px; 
+  box-sizing: border-box;
 }
 
+.formInput:focus,
 .formSelect:focus {
   outline: none;
   border-color: var(--deep-taupe);
   box-shadow: 0 0 0 3px var(--hover-accent);
 }
 
+.formInput:hover,
 .formSelect:hover {
   border-color: var(--card-hover-border);
 }
 
+/* Modal Actions */
 .modalActions {
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   justify-content: flex-end;
-  margin-top: var(--spacing-xl);
-  padding-top: var(--spacing-lg);
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-xl);
   border-top: 1px solid var(--card-border);
 }
 
 .btnBase {
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: 10px 10px;
   border: none;
   border-radius: var(--border-radius-1);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   font-family: var(--font-family);
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 120px;
+  min-width: 180px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 20px;
 }
 
 .btnUpdate {
@@ -116,8 +127,8 @@
 
 .btnUpdate:hover {
   background: var(--button-hover-bg);
-  box-shadow: 0 4px 12px var(--shadow-accent);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--shadow-accent);
+  transform: translateY(-1px);
 }
 
 .btnUpdate:active {
@@ -137,49 +148,91 @@
   border-color: var(--card-hover-border);
 }
 
-.btnCancel:active {
-  background-color: var(--card-border);
+/* Error message styles */
+.errorMessage {
+  color: var(--warning-red);
+  font-size: var(--font-size-md);
+  margin-top: var(--spacing-sm);
+  font-family: var(--font-family);
+}
+
+/* Section separators */
+.sectionTitle {
+  grid-column: 1 / -1;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 5px 20px;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--card-border);
+  font-family: var(--font-family);
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .editForm {
-    padding: var(--spacing-md);
+    padding: var(--spacing-xl);
   }
-  
+
   .detailGrid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
+    /* Single column layout */
+    gap: var(--spacing-lg);
   }
-  
+
+  .detailItemFull {
+    grid-column: 1 / -1;
+  }
+
+  .detailLabel {
+    text-align: left;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .editForm {
+    padding: var(--spacing-lg);
+  }
+
   .modalActions {
     flex-direction: column-reverse;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
   }
-  
+
   .btnBase {
     width: 100%;
-    justify-content: center;
   }
-  
+
   .pageTitle {
-    font-size: var(--font-size-xl);
-    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-lg);
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-md);
+  }
+
+  .formInput,
+  .formSelect {
+    font-size: var(--font-size-md);
+    height: 36px;
+  }
+
+  .btnBase {
+    font-size: var(--font-size-md);
+    height: 48px;
   }
 }
 
 /* Form validation styles */
-.formInput:invalid {
-  border-color: var(--warning-red);
-}
-
-.formInput:invalid:focus {
-  border-color: var(--warning-red);
-  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
-}
-
+.formInput:invalid,
 .formSelect:invalid {
   border-color: var(--warning-red);
+}
+
+.formInput:invalid:focus,
+.formSelect:invalid:focus {
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
 }
 
 /* Loading state */
@@ -189,10 +242,3 @@
   transform: none;
   box-shadow: none;
 }
-
-.btnUpdate:disabled:hover {
-  background: var(--color-dark-variant);
-  transform: none;
-  box-shadow: none;
-}
-

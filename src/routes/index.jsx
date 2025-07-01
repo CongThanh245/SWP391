@@ -23,6 +23,8 @@ import AppointmentSchedulePage from "@features/appointment/pages/AppointmentSche
 import ServicesPage from "@features/website/pages/guest/ServicesPage.jsx";
 import AdminDashboard from "@features/AdminDashboard.tsx";
 import LoginPage from "@features/auth/pages/LoginPage/LoginPage.jsx";
+import PatientAppointmentResults from "@features/test-result/pages/PatientAppointmentResults.jsx";
+import MedicineViewPage from "@features/medicine/pages/MedicineViewPage.jsx";
 
 const AppRoutes = () => {
   return (
@@ -42,9 +44,9 @@ const AppRoutes = () => {
         >
           <Route index element={<ProfileContent />} />
           <Route path="profile" element={<ProfileContent />} />
-          <Route path="medical-records" element={<AppointmentsContent />} />
+          <Route path="medical-records" element={<PatientAppointmentResults />} />
           <Route path="appointments" element={<AppointmentSchedulePage />} />
-          <Route path="health-monitoring" element={<AppointmentsContent />} />
+          <Route path="health-monitoring" element={<MedicineViewPage />} />
           <Route path="notifications" element={<AppointmentsContent />} />
         </Route>
       </Route>
