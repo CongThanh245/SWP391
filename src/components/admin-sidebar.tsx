@@ -25,7 +25,7 @@ import {
 } from "@components/ui/sidebar";
 
 interface AdminSidebarProps {
-  activeTab: 'dashboard' | 'doctors' | 'patients' | 'appointments' | 'schedule' | 'records';
+  activeTab: 'dashboard' | 'doctors' | 'patients';
   onTabChange: (tab: AdminSidebarProps['activeTab']) => void;
 }
 
@@ -33,16 +33,10 @@ const menuItems: { title: string; key: AdminSidebarProps['activeTab']; icon: Rea
   { title: "Dashboard", key: "dashboard", icon: BarChart3 },
   { title: "Doctors", key: "doctors", icon: UserCheck },
   { title: "Patients", key: "patients", icon: Users },
-  { title: "Appointments", key: "appointments", icon: ClipboardList },
-  { title: "Schedule", key: "schedule", icon: Calendar },
-  { title: "Doctors' Schedule", key: "schedule", icon: CalendarDays },
-  { title: "Medical Records", key: "records", icon: Heart },
 ];
 
 const managementItems = [
-  { title: "Treatment Protocols", icon: FileText },
   { title: "Documents", icon: FileText },
-  { title: "Settings", icon: Settings },
 ];
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange }) => {

@@ -5,37 +5,124 @@ import { Button } from "@components/ui/button";
 import { Calendar, Users, UserCheck, TrendingUp, TrendingDown, Clock, MapPin, Activity, Heart, AlertTriangle, CheckCircle, XCircle, Star, FileText, Phone, Mail } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Area, AreaChart } from "recharts";
 import { AddScheduleDialog } from "@components/AddScheduleDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getAdminDashboard } from '@api/adminApi'
 
 const Dashboard = () => {
   const [isAddScheduleOpen, setIsAddScheduleOpen] = useState(false);
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await getAdminDashboard();
+        setDashboardData(data);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Default values for when data is not yet loaded or is missing
+  const defaultDashboardData = {
+    activePatients: 0,
+    diffFromLastMonthPercentage: 0,
+    todayAppointments: 0,
+    appointmentChangeFromYesterdayPercentage: 0,
+    topSuccessProtocol: "N/A",
+    successRate: 0,
+    rateChangeFromLastMonth: 0,
+    onDutyDoctors: 0,
+    totalDoctors: 0,
+    onDutyDoctorRatioPercentage: 0,
+    weeklyTreatmentOverview: {
+      "MON": { "ivfCount": 0, "iuiCount": 0 },
+      "TUE": { "ivfCount": 0, "iuiCount": 0 },
+      "WED": { "ivfCount": 0, "iuiCount": 0 },
+      "THU": { "ivfCount": 0, "iuiCount": 0 },
+      "FRI": { "ivfCount": 0, "iuiCount": 0 },
+      "SAT": { "ivfCount": 0, "iuiCount": 0 },
+      "SUN": { "ivfCount": 0, "iuiCount": 0 }
+    },
+    treatmentSuccessRates: {} // This is empty in your API
+  };
+
+
+  const dataToUse = dashboardData || defaultDashboardData;
+
+  // Helper to determine trend icon and color
+  const getTrend = (percentage: number) => {
+    if (percentage > 0) return { icon: TrendingUp, trend: "up", color: "text-green-600" };
+    if (percentage < 0) return { icon: TrendingDown, trend: "down", color: "text-red-600" };
+    return { icon: null, trend: "stable", color: "text-gray-600" };
+  };
+
+  const patientsTrend = getTrend(dataToUse.diffFromLastMonthPercentage);
+  const appointmentsTrend = getTrend(dataToUse.appointmentChangeFromYesterdayPercentage);
+  const successRateTrend = getTrend(dataToUse.rateChangeFromLastMonth)
 
   // Core hospital metrics for fertility treatment
   const statsData = [
-    { title: "Total Patients", value: "1,247", change: "+8.2%", trend: "up", icon: Users, subtitle: "Active treatment patients" },
-    { title: "Daily Appointments", value: "32", change: "+5.1%", trend: "up", icon: Calendar, subtitle: "Today's consultations" },
-    { title: "Treatment Success Rate", value: "68%", change: "+2.3%", trend: "up", icon: Heart, subtitle: "IVF success this month" },
-    { title: "Available Doctors", value: "18", change: "0%", trend: "stable", icon: UserCheck, subtitle: "Currently on duty" },
+    {
+      title: "Total Patients",
+      value: dataToUse.activePatients.toLocaleString(),
+      change: `${patientsTrend.trend === 'up' ? '+' : ''}${dataToUse.diffFromLastMonthPercentage}%`,
+      trend: patientsTrend.trend,
+      icon: Users,
+      subtitle: "Active treatment patients"
+    },
+    {
+      title: "Daily Appointments",
+      value: dataToUse.todayAppointments.toLocaleString(),
+      change: `${appointmentsTrend.trend === 'up' ? '+' : ''}${dataToUse.appointmentChangeFromYesterdayPercentage}%`,
+      trend: appointmentsTrend.trend,
+      icon: Calendar,
+      subtitle: "Today's consultations"
+    },
+    {
+      title: "Treatment Success Rate",
+      value: `${dataToUse.successRate}%`,
+      change: `${successRateTrend.trend === 'up' ? '+' : ''}${dataToUse.rateChangeFromLastMonth}%`,
+      trend: successRateTrend.trend,
+      icon: Heart,
+      subtitle: dataToUse.topSuccessProtocol && dataToUse.topSuccessProtocol !== "N/A"
+        ? `Top protocol: ${dataToUse.topSuccessProtocol}`
+        : "Overall success rate"
+    },
+    {
+      title: "Available Doctors",
+      value: dataToUse.onDutyDoctors.toLocaleString(),
+      change: `${dataToUse.onDutyDoctorRatioPercentage}%`,
+      trend: dataToUse.onDutyDoctorRatioPercentage === 100 ? "up" : "stable",
+      icon: UserCheck,
+      subtitle: "Currently on duty"
+    },
   ];
 
   // Treatment methods success rates for the week
   const treatmentSuccessData = [
     { name: "IVF", successful: 45, total: 67, rate: 67.2 },
     { name: "IUI", successful: 28, total: 52, rate: 53.8 },
-    { name: "ICSI", successful: 31, total: 42, rate: 73.8 },
-    { name: "FET", successful: 22, total: 35, rate: 62.9 },
     { name: "Natural Cycle", successful: 12, total: 28, rate: 42.9 },
   ];
 
   // Patient overview by treatment type over the week
   const weeklyTreatmentData = [
-    { day: "Mon", IVF: 12, IUI: 8, ICSI: 6, Consultation: 15 },
-    { day: "Tue", IVF: 15, IUI: 10, ICSI: 8, Consultation: 18 },
-    { day: "Wed", IVF: 10, IUI: 12, ICSI: 5, Consultation: 20 },
-    { day: "Thu", IVF: 18, IUI: 9, ICSI: 7, Consultation: 16 },
-    { day: "Fri", IVF: 14, IUI: 11, ICSI: 9, Consultation: 22 },
-    { day: "Sat", IVF: 8, IUI: 6, ICSI: 4, Consultation: 12 },
-    { day: "Sun", IVF: 5, IUI: 4, ICSI: 2, Consultation: 8 },
+    { day: "Mon", IVF: dataToUse.weeklyTreatmentOverview.MON.ivfCount, IUI: dataToUse.weeklyTreatmentOverview.MON.iuiCount, ICSI: 0, Consultation: 0 },
+    { day: "Tue", IVF: dataToUse.weeklyTreatmentOverview.TUE.ivfCount, IUI: dataToUse.weeklyTreatmentOverview.TUE.iuiCount, ICSI: 0, Consultation: 0 },
+    { day: "Wed", IVF: dataToUse.weeklyTreatmentOverview.WED.ivfCount, IUI: dataToUse.weeklyTreatmentOverview.WED.iuiCount, ICSI: 0, Consultation: 0 },
+    { day: "Thu", IVF: dataToUse.weeklyTreatmentOverview.THU.ivfCount, IUI: dataToUse.weeklyTreatmentOverview.THU.iuiCount, ICSI: 0, Consultation: 0 },
+    { day: "Fri", IVF: dataToUse.weeklyTreatmentOverview.FRI.ivfCount, IUI: dataToUse.weeklyTreatmentOverview.FRI.iuiCount, ICSI: 0, Consultation: 0 },
+    { day: "Sat", IVF: dataToUse.weeklyTreatmentOverview.SAT.ivfCount, IUI: dataToUse.weeklyTreatmentOverview.SAT.iuiCount, ICSI: 0, Consultation: 0 },
+    { day: "Sun", IVF: dataToUse.weeklyTreatmentOverview.SUN.ivfCount, IUI: dataToUse.weeklyTreatmentOverview.SUN.iuiCount, ICSI: 0, Consultation: 0 },
   ];
 
   // Doctor schedule for today
@@ -118,10 +205,27 @@ const Dashboard = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex flex-col h-screen bg-[#EAE4E1] items-center justify-center">
+        <p className="text-[#4D3C2D] text-lg">Loading dashboard data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col h-screen bg-[#EAE4E1] items-center justify-center">
+        <p className="text-red-600 text-lg">Error: {error}</p>
+        <p className="text-[#4D3C2D]">Please try again later or check the API.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen bg-[#EAE4E1]">
       <Header title="Fertility Center Dashboard" subtitle="Real-time overview of hospital operations and treatment progress" />
-      
+
       <div className="flex-1 overflow-auto p-6 space-y-6">
         {/* Key Performance Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -170,7 +274,7 @@ const Dashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="#D9CAC2" />
                   <XAxis dataKey="day" stroke="#4D3C2D" />
                   <YAxis stroke="#4D3C2D" />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{
                       backgroundColor: "white",
                       border: "1px solid #D9CAC2",
@@ -203,8 +307,8 @@ const Dashboard = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 bg-[#EAE4E1] rounded-full h-2">
-                        <div 
-                          className="bg-[#4D3C2D] h-2 rounded-full" 
+                        <div
+                          className="bg-[#4D3C2D] h-2 rounded-full"
                           style={{ width: `${treatment.rate}%` }}
                         ></div>
                       </div>
@@ -217,112 +321,7 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Doctor Schedule Today */}
-          <Card className="bg-white/90 border-[#D9CAC2]">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-[#4D3C2D]">Today's Doctor Schedule</CardTitle>
-                  <p className="text-sm text-[#4D3C2D]/70">Current status and availability</p>
-                </div>
-                <Button size="sm" onClick={() => setIsAddScheduleOpen(true)} className="bg-[#4D3C2D] hover:bg-[#4D3C2D]/90">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Add Schedule
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {todayDoctorSchedule.map((schedule, index) => (
-                <div key={index} className="p-4 rounded-lg border border-[#D9CAC2] bg-[#EAE4E1]/30">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-[#4D3C2D] rounded-full flex items-center justify-center">
-                      <span className="text-sm font-medium text-white">{schedule.avatar}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-[#4D3C2D] text-sm">{schedule.doctor}</div>
-                      <div className="text-xs text-[#4D3C2D]/60">{schedule.specialty}</div>
-                      <div className="text-xs text-[#4D3C2D]/60 flex items-center gap-1 mt-1">
-                        <Clock className="w-3 h-3" />
-                        {schedule.time} | {schedule.appointments} appointments
-                      </div>
-                      <div className="text-xs text-[#4D3C2D]/80 mt-1">{schedule.nextPatient}</div>
-                    </div>
-                    <div className="flex-shrink-0">
-                      {getStatusBadge(schedule.status)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Today's Appointments */}
-          <Card className="bg-white/90 border-[#D9CAC2]">
-            <CardHeader>
-              <CardTitle className="text-[#4D3C2D]">Today's Appointments</CardTitle>
-              <p className="text-sm text-[#4D3C2D]/70">Breakdown by appointment type</p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex justify-center">
-                  <ResponsiveContainer width={200} height={200}>
-                    <PieChart>
-                      <Pie
-                        data={appointmentsByType}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={100}
-                        dataKey="count"
-                      >
-                        {appointmentsByType.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="space-y-3">
-                  {appointmentsByType.map((apt, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: apt.color }}></div>
-                        <span className="text-sm text-[#4D3C2D]">{apt.type}</span>
-                      </div>
-                      <span className="text-sm font-medium text-[#4D3C2D]">{apt.count}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Reports & Feedback */}
-          <Card className="bg-white/90 border-[#D9CAC2]">
-            <CardHeader>
-              <CardTitle className="text-[#4D3C2D]">Reports & Alerts</CardTitle>
-              <p className="text-sm text-[#4D3C2D]/70">Recent feedback and system notifications</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentReports.map((report, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 rounded-lg border border-[#D9CAC2] bg-[#EAE4E1]/30">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    report.priority === 'high' ? 'bg-red-100' : 
-                    report.priority === 'medium' ? 'bg-yellow-100' : 'bg-green-100'
-                  }`}>
-                    <report.icon className={`w-4 h-4 ${getPriorityColor(report.priority)}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm text-[#4D3C2D]">{report.type}</div>
-                    <div className="text-xs text-[#4D3C2D]/70 mt-1">{report.message}</div>
-                    <div className="text-xs text-[#4D3C2D]/50 mt-1">{report.time}</div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
+      
       </div>
 
       <AddScheduleDialog open={isAddScheduleOpen} onOpenChange={setIsAddScheduleOpen} />

@@ -9,7 +9,7 @@ import Schedule from '@/pages/Schedule';
 import MedicalRecords from '@/pages/MedicalRecords';*/
 
 const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'doctors' | 'patients' | 'appointments' | 'schedule' | 'records'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'doctors' | 'patients'>('dashboard');
 
   const renderContent = () => {
     switch (activeTab) {
