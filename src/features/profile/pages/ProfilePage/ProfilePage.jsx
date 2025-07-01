@@ -17,7 +17,7 @@ const ProfilePage = () => {
       setLoading(true);
       try {
         const parsed = await getPatientProfile();
-        const genderMap = { MALE: 'Nam', FEMALE: 'Nữ', OTHER: 'Khác', PREFER_NOT_TO_SAY: 'Không tiết lộ' };
+        const genderMap = { MALE: 'Nam', FEMALE: 'Nữ', OTHER: 'Khác' };
         const maritalStatusMap = { SINGLE: 'Độc thân', MARRIED: 'Đã kết hôn', DIVORCED: 'Đã ly hôn', WIDOWED: 'Goá' };
 
         // Lưu dữ liệu thô từ API

@@ -159,7 +159,7 @@
 /* Section separators */
 .sectionTitle {
   grid-column: 1 / -1;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
   margin: 5px 20px;
