@@ -198,7 +198,6 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   const [wifeLabTests, setWifeLabTests] = useState<TestItem[]>([
     { id: 'cbc', name: 'Xét nghiệm máu toàn bộ (CBC)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
     { id: 'amh', name: 'Đánh giá dự trữ buồng trứng (AMH)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
-    { id: 'thyroid', name: 'Xét nghiệm tuyến giáp (TSH, T3, FT4)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
     { id: 'esr', name: 'Xét nghiệm tỉ lệ hồng cầu lắng (ESR)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
     { id: 'chlamydia', name: 'Xét nghiệm Chlamydia', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
     { id: 'vdrl', name: 'Xét nghiệm VDRL', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
@@ -590,11 +589,13 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   };
 
   const handleSaveRecord = async (): Promise<void> => {
-    await saveGeneralInfo();
     await saveProtocols();
 
   };
 
+  const handleSaveInformation = async () : Promise<void> => {
+    await saveGeneralInfo();
+  }
 
 
   const renderSpecialtySubTabs = () => (
@@ -740,10 +741,19 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
 
       <div className="flex justify-end pt-6">
         <Button
+          onClick={handleSaveInformation}
+          className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
+        >
+          Lưu Thông tin chung
+        </Button>
+      </div>
+
+       <div className="flex justify-end pt-6">
+        <Button
           onClick={handleSaveRecord}
           className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
         >
-          Lưu hồ sơ
+          Lưu Kết quả xét nghiệm
         </Button>
       </div>
     </div>

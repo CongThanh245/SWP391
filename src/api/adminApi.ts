@@ -29,3 +29,17 @@ export const getDoctorStats = async () => {
     throw new Error(message);
   }
 };
+
+export const getAdminDashboard = async () => {
+  try {
+    const response = await apiClient.get('/admin/dashboard');
+    return response.data;
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Failed to fetch admin dashboard '
+        : 'An unknown error occurred while fetching admin dashboard';
+
+    throw new Error(message);
+  }
+}
