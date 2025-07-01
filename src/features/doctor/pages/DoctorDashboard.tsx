@@ -13,13 +13,32 @@ interface DoctorDashBoardProps {
     onPatientSelect?: (patientId: string) => void;
 }
 
-interface DoctorStats {
-    ivfThisMonth: number;
-    iuiThisMonth: number;
-    completedTreatments: number;
-    totalPatients: number;
-    activePatients: number;
-    todayAppointments: number;
+export interface DoctorStats {
+  todayAppointments: number;
+  diffFromYesterday: number;
+  activePatients: number;
+  newThisWeek: number;
+  completedTreatments: number;
+  completedRateChangeFromLastMonth: number;
+  successRateThisMonth: number;
+  successRateChangeFromLastMonth: number;
+  successRateByProtocol: {
+    // Tùy thuộc vào việc bạn có dùng dữ liệu này không, giữ hoặc xóa
+    additionalProp1?: number;
+    additionalProp2?: number;
+    additionalProp3?: number;
+    // Nếu API trả về trực tiếp
+    IVF?: number;
+    IUI?: number;
+  };
+  treatmentDistribution: {
+    // API của bạn trả về các key cụ thể này
+    IVF: number;
+    IUI: number;
+    // Thêm các loại điều trị khác nếu API của bạn cung cấp
+    // Ví dụ: "Other" nếu có
+    Other?: number;
+  };
 }
 
 const DoctorDashboard: React.FC<DoctorDashBoardProps> = ({
