@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/card';
 import { Badge } from '@components/ui/badge';
-// Import các icon cần dùng
 import {
   Calendar,
   Users,
@@ -10,10 +9,11 @@ import {
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, Sector, BarChart, Bar
+  PieChart, Pie, Cell, BarChart, Bar
 } from 'recharts';
+import { getDoctorTreatmentStats } from '@api/statsApi'; // Điều chỉnh đường dẫn nhập
 
-// Corrected DoctorStats interface based on the exact API response provided from network tab
+// Giao diện DoctorStats
 export interface DoctorStats {
   todayAppointments: number;
   diffFromYesterday: number;
@@ -23,25 +23,15 @@ export interface DoctorStats {
   completedRateChangeFromLastMonth: number;
   successRateThisMonth: number;
   successRateChangeFromLastMonth: number;
-  successRateByProtocol: {
-    // API của bạn trả về các key cụ thể này
-    IVF?: number; // Có thể có hoặc không
-    IUI?: number; // Có thể có hoặc không
-    // Thêm các loại phác đồ khác nếu API của bạn cung cấp
-  };
-  treatmentDistribution: {
-    // API của bạn trả về các key cụ thể này
-    IVF: number;
-    IUI: number;
-    Other?: number; // Thêm nếu API của bạn có key 'Other'
-  };
+  successRateByProtocol: { [key: string]: number };
+  treatmentDistribution: { [key: string]: number };
 }
 
 interface DashboardContentProps {
-  stats: DoctorStats;
+  // Không cần props vì dữ liệu được lấy trực tiếp trong component
 }
 
-// Dummy data for charts - these would ideally come from your API
+// Dữ liệu giả lập cho biểu đồ
 const monthlyAppointmentsData = [
   { name: 'Tháng 1', appointments: 0, completed: 0 },
   { name: 'Tháng 2', appointments: 0, completed: 0 },
@@ -60,18 +50,53 @@ const successRateTrendData = [
   { name: 'Tháng 6', rate: 0 },
 ];
 
-const COLORS = ['#4D3C2D', '#D9CAC2', '#C2D9CA', '#A2D9CC', '#B2D9C2']; // Custom colors for charts
+const COLORS = ['#4D3C2D', '#D9CAC2', '#C2D9CA', '#A2D9CC', '#B2D9C2'];
 
-export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => {
+export const DashboardContent: React.FC<DashboardContentProps> = () => {
+  const [stats, setStats] = useState<DoctorStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Map actual treatmentDistribution properties to meaningful labels for the chart
-  const treatmentDistributionData = [
-    { name: 'IVF', value: stats.treatmentDistribution?.IVF || 0 },
-    { name: 'IUI', value: stats.treatmentDistribution?.IUI || 0 },
-    { name: 'Khác', value: stats.treatmentDistribution?.Other || 0 }, // Thêm dòng này nếu có key 'Other' trong API
-  ].filter(item => item.value > 0); // Filter out categories with 0 value for cleaner charts
+  // Gọi API khi component được gắn
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await getDoctorTreatmentStats();
+        setStats(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message || 'Đã xảy ra lỗi khi lấy dữ liệu');
+        setLoading(false);
+      }
+    };
 
-  // Calculate total patients (active + completed treatments)
+    fetchStats();
+  }, []);
+
+  // Hiển thị khi đang tải
+  if (loading) {
+    return <div className="text-center">Đang tải...</div>;
+  }
+
+  // Hiển thị khi có lỗi
+  if (error) {
+    return <div className="text-center text-red-600">{error}</div>;
+  }
+
+  // Hiển thị khi không có dữ liệu
+  if (!stats) {
+    return <div className="text-center">Không có dữ liệu</div>;
+  }
+
+  // Ánh xạ dữ liệu phân bổ điều trị
+  const treatmentDistributionData = Object.keys(stats.treatmentDistribution)
+    .map((key) => ({
+      name: key,
+      value: stats.treatmentDistribution[key] || 0,
+    }))
+    .filter((item) => item.value > 0);
+
+  // Tính tổng số bệnh nhân
   const totalPatients = stats.activePatients + stats.completedTreatments;
 
   return (
@@ -85,7 +110,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols- лично grid-cols-4 gap-6">
         <Card className="theme-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Lịch hẹn hôm nay</CardTitle>
@@ -121,10 +146,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{Math.round(stats.successRateThisMonth)}%</div>
+            <div className="text-2xl font-bold text-green-600">{Math.round(stats.successRateThisMonth * 100)}%</div>
             <p className="text-xs text-gray-500 mt-1">
               <span className={stats.successRateChangeFromLastMonth >= 0 ? "text-green-600" : "text-red-600"}>
-                {stats.successRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.successRateChangeFromLastMonth)}%` : `${Math.round(stats.successRateChangeFromLastMonth * 100)}%`}
+                {stats.successRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.successRateChangeFromLastMonth * 100)}%` : `${Math.round(stats.successRateChangeFromLastMonth * 100)}%`}
               </span>{' '}
               so với tháng trước
             </p>
@@ -140,7 +165,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
             <div className="text-2xl font-bold text-green-600">{stats.completedTreatments}</div>
             <p className="text-xs text-gray-500 mt-1">
               <span className={stats.completedRateChangeFromLastMonth >= 0 ? "text-green-600" : "text-red-600"}>
-                {stats.completedRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.completedRateChangeFromLastMonth)}%` : `${Math.round(stats.completedRateChangeFromLastMonth * 100)}%`}
+                {stats.completedRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.completedRateChangeFromLastMonth)}%` : `${Math.round(stats.completedRateChangeFromLastMonth)}%`}
               </span>{' '}
               so với tháng trước
             </p>
@@ -161,7 +186,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart
-                data={monthlyAppointmentsData} // This is currently dummy data
+                data={monthlyAppointmentsData}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#D9CAC2" />
@@ -173,8 +198,8 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
                 <Line type="monotone" dataKey="completed" stroke="#82ca9d" name="Hoàn thành" />
               </LineChart>
             </ResponsiveContainer>
-             <p className="text-sm text-gray-500 text-center mt-2">
-                (Dữ liệu xu hướng cần API cung cấp thông tin theo tháng)
+            <p className="text-sm text-gray-500 text-center mt-2">
+              (Dữ liệu xu hướng cần API cung cấp thông tin theo tháng)
             </p>
           </CardContent>
         </Card>
@@ -212,7 +237,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
           </CardContent>
         </Card>
 
-        {/* Success Rate Trend Chart (Bar Chart) */}
+        {/* Success Rate Trend Chart */}
         <Card className="lg:col-span-1 theme-card">
           <CardHeader>
             <CardTitle style={{ color: '#4D3C2D' }}>Xu hướng Tỷ lệ thành công</CardTitle>
@@ -220,7 +245,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart
-                data={successRateTrendData} // This is currently dummy data
+                data={successRateTrendData}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#D9CAC2" />
@@ -231,39 +256,33 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
               </BarChart>
             </ResponsiveContainer>
             <p className="text-sm text-gray-500 text-center mt-2">
-                (Dữ liệu xu hướng cần API cung cấp thông tin theo tháng)
+              (Dữ liệu xu hướng cần API cung cấp thông tin theo tháng)
             </p>
           </CardContent>
         </Card>
 
-        {/* Treatment Stats - Updated to include success rate by protocol */}
+        {/* Treatment Stats */}
         <Card className="theme-card">
           <CardHeader>
             <CardTitle style={{ color: '#4D3C2D' }}>Thống kê điều trị</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">IVF tháng này:</span>
-              <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.treatmentDistribution?.IVF || 0} ca</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">IUI tháng này:</span>
-              <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.treatmentDistribution?.IUI || 0} ca</span>
-            </div>
-            {/* Display success rate by protocol if available */}
-            {(stats.successRateByProtocol?.IVF !== undefined) && (
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Tỷ lệ thành công IVF:</span>
-                <span className="font-semibold text-green-600">{Math.round(stats.successRateByProtocol.IVF)}%</span>
+            {Object.keys(stats.treatmentDistribution).map((key) => (
+              <div key={key} className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">{key} tháng này:</span>
+                <span className="font-semibold" style={{ color: '#4D3C2D' }}>
+                  {stats.treatmentDistribution[key] || 0} ca
+                </span>
               </div>
-            )}
-            {(stats.successRateByProtocol?.IUI !== undefined) && (
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Tỷ lệ thành công IUI:</span>
-                <span className="font-semibold text-green-600">{Math.round(stats.successRateByProtocol.IUI)}%</span>
+            ))}
+            {Object.keys(stats.successRateByProtocol).map((key) => (
+              <div key={key} className="flex justify-between items-center text-sm">
+                <span className="text-gray-600">Tỷ lệ thành công {key}:</span>
+                <span className="font-semibold text-green-600">
+                  {Math.round(stats.successRateByProtocol[key] * 100)}%
+                </span>
               </div>
-            )}
-
+            ))}
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Hoàn tất điều trị:</span>
               <span className="font-semibold text-green-600">{stats.completedTreatments} ca</span>
@@ -271,7 +290,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
             <div className="pt-2 border-t" style={{ borderColor: '#D9CAC2' }}>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Tổng bệnh nhân:</span>
-                <span className="font-semibold" style={{ color: '#4D3C2D' }}>{totalPatients}</span>
+                <span className="font-semibold" style={{ color: '#4D3C2D' }}>
+                  {totalPatients}
+                </span>
               </div>
             </div>
           </CardContent>
