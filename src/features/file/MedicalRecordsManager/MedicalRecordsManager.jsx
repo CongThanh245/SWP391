@@ -26,12 +26,12 @@ const ATTACHMENT_TYPES = [
 ];
 
 const MedicalRecordsManager = () => {
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [selectedFiles, setSelectedFiles] = useState([]);
-  const [dragActive, setDragActive] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]); // State lưu danh sách các tệp đã tải lên server
+  const [selectedFiles, setSelectedFiles] = useState([]); // State lưu các tệp người dùng đã chọn nhưng chưa tải lên
+  const [dragActive, setDragActive] = useState(false); // State để theo dõi trạng thái kéo-thả (drag-and-drop)
+  const [loading, setLoading] = useState(false); // State để quản lý trạng thái đang tải (loading)
   const [activeTab, setActiveTab] = useState("upload"); // Quản lý tab
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef(null); // Tham chiếu đến input tệp ẩn để kích hoạt chọn tệp
   const { toast } = useToast();
 
   const getPatientId = () => {
@@ -70,27 +70,28 @@ const MedicalRecordsManager = () => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
+      setDragActive(true); // Tô sáng vùng thả khi kéo tệp vào
     } else if (e.type === "dragleave") {
-      setDragActive(false);
+      setDragActive(false); // Bỏ tô sáng khi kéo tệp ra
     }
   };
-
+  // Xử lý sự kiện thả tệp vào vùng kéo-thả
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragActive(false);
+    setDragActive(false); // Đặt lại trạng thái kéo-thả
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileSelect(e.dataTransfer.files);
+      handleFileSelect(e.dataTransfer.files); // Dòng chính: Kích hoạt logic chọn tệp
     }
   };
-
+  // Xử lý sự kiện chọn tệp từ input
   const handleFileInput = (e) => {
     if (e.target.files) {
-      handleFileSelect(e.target.files);
+      handleFileSelect(e.target.files); // Dòng chính: Kích hoạt logic chọn tệp
     }
   };
 
+  // Xử lý danh sách tệp được chọn (từ kéo-thả hoặc input)
   const handleFileSelect = (fileList) => {
     const maxSize = 10 * 1024 * 1024; // 10MB
     const newFiles = Array.from(fileList)
@@ -102,16 +103,17 @@ const MedicalRecordsManager = () => {
         return true;
       })
       .map((file) => ({
-        id: `temp-${Date.now()}-${Math.random()}`,
+        id: `temp-${Date.now()}-${Math.random()}`, // ID tạm thời
         name: file.name,
         size: file.size,
-        file,
+        file, // Đối tượng tệp gốc
         type: file.type,
-        attachmentType: "OTHER",
+        attachmentType: "OTHER", // Loại tài liệu mặc định
       }));
-    setSelectedFiles((prev) => [...prev, ...newFiles]);
+    setSelectedFiles((prev) => [...prev, ...newFiles]); // Cập nhật state với danh sách tệp mới
   };
 
+  // Cập nhật loại tài liệu cho tệp đã chọn
   const handleAttachmentTypeChange = (fileId, newType) => {
     setSelectedFiles((prev) =>
       prev.map((file) =>
@@ -120,6 +122,7 @@ const MedicalRecordsManager = () => {
     );
   };
 
+  // Xử lý việc gửi (tải lên) tệp
   const handleSubmit = async () => {
     const patientId = getPatientId();
     if (!patientId) {
@@ -152,6 +155,7 @@ const MedicalRecordsManager = () => {
         url: file.url,
       }));
       setUploadedFiles(mappedFiles);
+      // Đặt lại form sau khi tải lên thành công
       setSelectedFiles([]);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -159,7 +163,6 @@ const MedicalRecordsManager = () => {
       toast({
         title: "Tải lên file thành công",
         description: "file đã được tải lên.",
-        variant: "success",
       });
       setActiveTab("files"); // Chuyển sang tab danh sách sau khi tải lên
     } catch (error) {
@@ -173,16 +176,18 @@ const MedicalRecordsManager = () => {
     }
   };
 
+  // Xóa tệp khỏi danh sách đã chọn (trước khi tải lên)
   const removeSelectedFile = (id) => {
     setSelectedFiles(selectedFiles.filter((file) => file.id !== id));
   };
 
+  // Xóa tệp đã tải lên (chỉ cập nhật giao diện, chưa có API)
   const deleteUploadedFile = (id) => {
     if (confirm("Bạn có chắc chắn muốn xóa file này không?")) {
       setUploadedFiles(uploadedFiles.filter((file) => file.id !== id));
     }
   };
-
+  // Định dạng kích thước tệp để hiển thị
   const formatFileSize = (bytes) => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -191,6 +196,7 @@ const MedicalRecordsManager = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  // Lấy tên hiển thị của loại tài liệu
   const getTypeDisplayName = (type) => {
     const typeObj = ATTACHMENT_TYPES.find((t) => t.value === type);
     return typeObj ? typeObj.displayName : "Tài liệu khác";
