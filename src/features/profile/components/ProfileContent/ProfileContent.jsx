@@ -91,7 +91,6 @@ const ProfileContent = () => {
     MALE: "Nam",
     FEMALE: "Nữ",
     OTHER: "Khác",
-    PREFER_NOT_TO_SAY: "Không tiết lộ",
   };
 
   const maritalStatusMap = {
@@ -191,7 +190,6 @@ const ProfileContent = () => {
 
   return (
     <div>
-      <h1 className={styles.pageTitle}>Hồ sơ của tôi</h1>
       <ProfileCard user={displayData} onEdit={handleEdit} />
       <PatientInfo user={displayData} onEdit={handleEdit} />
 
@@ -245,7 +243,6 @@ const ProfileContent = () => {
                       <option value="MALE">Nam</option>
                       <option value="FEMALE">Nữ</option>
                       <option value="OTHER">Khác</option>
-                      <option value="PREFER_NOT_TO_SAY">Không tiết lộ</option>
                     </Field>
                     <ErrorMessage
                       name="gender"
@@ -359,7 +356,6 @@ const ProfileContent = () => {
                       <option value="MALE">Nam</option>
                       <option value="FEMALE">Nữ</option>
                       <option value="OTHER">Khác</option>
-                      <option value="PREFER_NOT_TO_SAY">Không tiết lộ</option>
                     </Field>
                     <ErrorMessage
                       name="spouseGender"

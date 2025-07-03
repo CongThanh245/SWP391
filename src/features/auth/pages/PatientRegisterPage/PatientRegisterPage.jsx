@@ -156,7 +156,6 @@ const RegisterPage = () => {
                   <option value="MALE">Nam</option>
                   <option value="FEMALE">Nữ</option>
                   <option value="OTHER">Khác</option>
-                  <option value="PREFER_NOT_TO_SAY">Không tiết lộ</option>
                 </Field>
                 <ErrorMessage
                   name="gender"

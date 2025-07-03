@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/card';
 import { Badge } from '@components/ui/badge';
-// Import các icon cần dùng
 import {
   Calendar,
   Users,
@@ -9,11 +8,12 @@ import {
   LineChart as LineChartIcon,
 } from 'lucide-react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, Sector, BarChart, Bar
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell,
 } from 'recharts';
+import { getDoctorTreatmentStats } from '@api/statsApi'; // Đường dẫn đã đúng theo query
 
-// Corrected DoctorStats interface based on the exact API response provided from network tab
+// Giao diện DoctorStats từ API
 export interface DoctorStats {
   todayAppointments: number;
   diffFromYesterday: number;
@@ -23,56 +23,62 @@ export interface DoctorStats {
   completedRateChangeFromLastMonth: number;
   successRateThisMonth: number;
   successRateChangeFromLastMonth: number;
-  successRateByProtocol: {
-    // API của bạn trả về các key cụ thể này
-    IVF?: number; // Có thể có hoặc không
-    IUI?: number; // Có thể có hoặc không
-    // Thêm các loại phác đồ khác nếu API của bạn cung cấp
-  };
-  treatmentDistribution: {
-    // API của bạn trả về các key cụ thể này
-    IVF: number;
-    IUI: number;
-    Other?: number; // Thêm nếu API của bạn có key 'Other'
-  };
+  successRateByProtocol: { [key: string]: number };
+  treatmentDistribution: { [key: string]: number };
 }
 
 interface DashboardContentProps {
-  stats: DoctorStats;
+  // Không cần props vì dữ liệu lấy trực tiếp trong component
 }
 
-// Dummy data for charts - these would ideally come from your API
-const monthlyAppointmentsData = [
-  { name: 'Tháng 1', appointments: 0, completed: 0 },
-  { name: 'Tháng 2', appointments: 0, completed: 0 },
-  { name: 'Tháng 3', appointments: 0, completed: 0 },
-  { name: 'Tháng 4', appointments: 0, completed: 0 },
-  { name: 'Tháng 5', appointments: 0, completed: 0 },
-  { name: 'Tháng 6', appointments: 0, completed: 0 },
-];
+const COLORS = ['#4D3C2D', '#D9CAC2', '#C2D9CA', '#A2D9CC', '#B2D9C2'];
 
-const successRateTrendData = [
-  { name: 'Tháng 1', rate: 0 },
-  { name: 'Tháng 2', rate: 0 },
-  { name: 'Tháng 3', rate: 0 },
-  { name: 'Tháng 4', rate: 0 },
-  { name: 'Tháng 5', rate: 0 },
-  { name: 'Tháng 6', rate: 0 },
-];
+export const DashboardContent: React.FC<DashboardContentProps> = () => {
+  const [stats, setStats] = useState<DoctorStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const COLORS = ['#4D3C2D', '#D9CAC2', '#C2D9CA', '#A2D9CC', '#B2D9C2']; // Custom colors for charts
+  // Gọi API khi component mount
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await getDoctorTreatmentStats();
+        setStats(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message || 'Đã xảy ra lỗi khi lấy dữ liệu');
+        setLoading(false);
+      }
+    };
 
-export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => {
+    fetchStats();
+  }, []);
 
-  // Map actual treatmentDistribution properties to meaningful labels for the chart
-  const treatmentDistributionData = [
-    { name: 'IVF', value: stats.treatmentDistribution?.IVF || 0 },
-    { name: 'IUI', value: stats.treatmentDistribution?.IUI || 0 },
-    { name: 'Khác', value: stats.treatmentDistribution?.Other || 0 }, // Thêm dòng này nếu có key 'Other' trong API
-  ].filter(item => item.value > 0); // Filter out categories with 0 value for cleaner charts
+  if (loading) {
+    return <div className="text-center">Đang tải...</div>;
+  }
 
-  // Calculate total patients (active + completed treatments)
-  const totalPatients = stats.activePatients + stats.completedTreatments;
+  if (error) {
+    return <div className="text-center text-red-600">{error}</div>;
+  }
+
+  if (!stats) {
+    return <div className="text-center">Không có dữ liệu</div>;
+  }
+
+  // Chuẩn bị dữ liệu cho biểu đồ Tỉ lệ thành công theo phác đồ
+  const successRateByProtocolData = Object.keys(stats.successRateByProtocol).map((key) => ({
+    protocol: key,
+    rate: Math.round(stats.successRateByProtocol[key] * 100), // Chuyển thành phần trăm
+  }));
+
+  // Chuẩn bị dữ liệu cho biểu đồ phân bổ điều trị
+  const treatmentDistributionData = Object.keys(stats.treatmentDistribution)
+    .map((key) => ({
+      name: key,
+      value: stats.treatmentDistribution[key] || 0,
+    }))
+    .filter((item) => item.value > 0);
 
   return (
     <div className="space-y-6 theme-gradient-bg min-h-screen p-6">
@@ -121,10 +127,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{Math.round(stats.successRateThisMonth)}%</div>
+            <div className="text-2xl font-bold text-green-600">{Math.round(stats.successRateThisMonth * 100)}%</div>
             <p className="text-xs text-gray-500 mt-1">
               <span className={stats.successRateChangeFromLastMonth >= 0 ? "text-green-600" : "text-red-600"}>
-                {stats.successRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.successRateChangeFromLastMonth)}%` : `${Math.round(stats.successRateChangeFromLastMonth * 100)}%`}
+                {stats.successRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.successRateChangeFromLastMonth * 100)}%` : `${Math.round(stats.successRateChangeFromLastMonth * 100)}%`}
               </span>{' '}
               so với tháng trước
             </p>
@@ -140,7 +146,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
             <div className="text-2xl font-bold text-green-600">{stats.completedTreatments}</div>
             <p className="text-xs text-gray-500 mt-1">
               <span className={stats.completedRateChangeFromLastMonth >= 0 ? "text-green-600" : "text-red-600"}>
-                {stats.completedRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.completedRateChangeFromLastMonth)}%` : `${Math.round(stats.completedRateChangeFromLastMonth * 100)}%`}
+                {stats.completedRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.completedRateChangeFromLastMonth)}%` : `${Math.round(stats.completedRateChangeFromLastMonth)}%`}
               </span>{' '}
               so với tháng trước
             </p>
@@ -148,38 +154,34 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
         </Card>
       </div>
 
-      {/* Main Content Grid with Charts */}
+      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Appointments Trend Chart */}
+        {/* Biểu đồ Tỉ lệ thành công theo phác đồ */}
         <Card className="lg:col-span-2 theme-card">
           <CardHeader>
             <CardTitle className="flex items-center" style={{ color: '#4D3C2D' }}>
               <LineChartIcon className="mr-2 h-5 w-5" />
-              Xu hướng Lịch hẹn và Hoàn thành Điều trị
+              Tỉ lệ thành công theo phác đồ
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={monthlyAppointmentsData} // This is currently dummy data
+              <BarChart
+                data={successRateByProtocolData}
+                layout="vertical"
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#D9CAC2" />
-                <XAxis dataKey="name" stroke="#4D3C2D" />
-                <YAxis stroke="#4D3C2D" />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="appointments" stroke="#4D3C2D" name="Tổng lịch hẹn" activeDot={{ r: 8 }} />
-                <Line type="monotone" dataKey="completed" stroke="#82ca9d" name="Hoàn thành" />
-              </LineChart>
+                <XAxis type="number" unit="%" stroke="#4D3C2D" />
+                <YAxis dataKey="protocol" type="category" stroke="#4D3C2D" />
+                <Tooltip formatter={(value) => `${value}%`} />
+                <Bar dataKey="rate" fill="#4D3C2D" />
+              </BarChart>
             </ResponsiveContainer>
-             <p className="text-sm text-gray-500 text-center mt-2">
-                (Dữ liệu xu hướng cần API cung cấp thông tin theo tháng)
-            </p>
           </CardContent>
         </Card>
 
-        {/* Treatment Distribution Chart */}
+        {/* Biểu đồ Phân bổ loại điều trị */}
         <Card className="theme-card">
           <CardHeader>
             <CardTitle style={{ color: '#4D3C2D' }}>Phân bổ loại điều trị</CardTitle>
@@ -209,71 +211,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ stats }) => 
             ) : (
               <p className="text-center text-gray-500 pt-10">Không có dữ liệu phân bổ điều trị.</p>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Success Rate Trend Chart (Bar Chart) */}
-        <Card className="lg:col-span-1 theme-card">
-          <CardHeader>
-            <CardTitle style={{ color: '#4D3C2D' }}>Xu hướng Tỷ lệ thành công</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart
-                data={successRateTrendData} // This is currently dummy data
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#D9CAC2" />
-                <XAxis dataKey="name" stroke="#4D3C2D" />
-                <YAxis unit="%" stroke="#4D3C2D" />
-                <Tooltip formatter={(value) => `${value}%`} />
-                <Bar dataKey="rate" fill="#4D3C2D" />
-              </BarChart>
-            </ResponsiveContainer>
-            <p className="text-sm text-gray-500 text-center mt-2">
-                (Dữ liệu xu hướng cần API cung cấp thông tin theo tháng)
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Treatment Stats - Updated to include success rate by protocol */}
-        <Card className="theme-card">
-          <CardHeader>
-            <CardTitle style={{ color: '#4D3C2D' }}>Thống kê điều trị</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">IVF tháng này:</span>
-              <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.treatmentDistribution?.IVF || 0} ca</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">IUI tháng này:</span>
-              <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.treatmentDistribution?.IUI || 0} ca</span>
-            </div>
-            {/* Display success rate by protocol if available */}
-            {(stats.successRateByProtocol?.IVF !== undefined) && (
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Tỷ lệ thành công IVF:</span>
-                <span className="font-semibold text-green-600">{Math.round(stats.successRateByProtocol.IVF)}%</span>
-              </div>
-            )}
-            {(stats.successRateByProtocol?.IUI !== undefined) && (
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Tỷ lệ thành công IUI:</span>
-                <span className="font-semibold text-green-600">{Math.round(stats.successRateByProtocol.IUI)}%</span>
-              </div>
-            )}
-
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Hoàn tất điều trị:</span>
-              <span className="font-semibold text-green-600">{stats.completedTreatments} ca</span>
-            </div>
-            <div className="pt-2 border-t" style={{ borderColor: '#D9CAC2' }}>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Tổng bệnh nhân:</span>
-                <span className="font-semibold" style={{ color: '#4D3C2D' }}>{totalPatients}</span>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
