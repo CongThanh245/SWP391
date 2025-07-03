@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '@components/common/Sidebar/PatientSidebar';
 import CommonLayout from '@components/layout/CommonLayout/CommonLayout';
 import { Outlet } from 'react-router-dom';
-import { User, Calendar, FileText, Activity } from 'lucide-react';
+import { User, Calendar, FileText, Activity, CloudUpload  } from 'lucide-react';
 import { formatDate } from '@utils/format';
 import { getPatientProfile } from '@api/patientApi';
 
@@ -62,6 +62,7 @@ const ProfilePage = () => {
     { key: 'medical-records', label: 'Kết quả điều trị', icon: FileText, path: '/health-records/medical-records' },
     { key: 'appointments', label: 'Lịch khám', icon: Calendar, path: '/health-records/appointments' },
     { key: 'health-monitoring', label: 'Đơn thuốc', icon: Activity, path: '/health-records/health-monitoring' },
+    { key: 'attachments', label: 'Hồ sơ đính kèm', icon: CloudUpload, path: '/health-records/attachments' },
   ];
 
   const sidebar = (

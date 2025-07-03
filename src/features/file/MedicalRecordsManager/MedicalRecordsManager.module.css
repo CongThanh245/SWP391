@@ -1,0 +1,314 @@
+/* Main Layout */
+.container {
+  min-height: 100vh;
+  background: var(--primary-background);
+  font-family: var(--font-family);
+  color: var(--text-primary);
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-md);
+}
+
+/* Tabs */
+.tabContainer {
+  display: flex;
+  border-bottom: 1px solid var(--card-border);
+  margin-bottom: var(--spacing-md);
+}
+
+.tab {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.tab.active {
+  color: var(--deep-taupe);
+  border-bottom: 2px solid var(--deep-taupe);
+}
+
+.tabContent {
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-2);
+  padding: var(--spacing-md);
+}
+
+/* Upload Section */
+.uploadSection {
+  padding: var(--spacing-md);
+}
+
+.dropZone {
+  border: 2px dashed var(--card-border);
+  border-radius: var(--border-radius-1);
+  padding: var(--spacing-lg);
+  text-align: center;
+  background: var(--secondary-background);
+  transition: all 0.3s ease;
+  position: relative;
+  /* Thêm này để làm container cho input */
+}
+
+.dropZone:hover,
+.dropZone.dragActive {
+  border-color: var(--deep-taupe);
+  background: var(--hover-accent);
+}
+
+.fileInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+  /* Đảm bảo input nằm trên cùng */
+}
+
+
+.dropZoneContent {
+  position: relative;
+  z-index: 2; /* Đảm bảo content hiển thị trên input */
+  pointer-events: none; /* Ngăn chặn các phần tử con nhận sự kiện click */
+}
+
+.uploadIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--deep-taupe);
+  margin-bottom: var(--spacing-md);
+  justify-self: center;
+}
+
+.dropZoneContent p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.supportText {
+  font-size: var(--font-size-xs);
+}
+
+.selectButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--deep-taupe);
+  color: var(--button-primary-text);
+  border: none;
+  border-radius: var(--border-radius-1);
+  font-weight: 500;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  pointer-events: auto; /* Cho phép nút này nhận sự kiện click */
+}
+/* Pending Files */
+.pendingFileList {
+  margin-top: var(--spacing-md);
+}
+
+.pendingFileList h3 {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.pendingFiles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.pendingFileItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm);
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+}
+
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.fileName {
+  font-size: var(--font-size-sm);
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileSize {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.attachmentTypeSelect {
+  flex: 0 0 auto;
+}
+
+.categorySelect {
+  padding: var(--spacing-xs);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-xs);
+  min-width: 120px;
+}
+
+.removeButton {
+  padding: var(--spacing-xs);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  color: var(--warning-red);
+  cursor: pointer;
+}
+
+/* Submit Button */
+.submitContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-md);
+}
+
+.submitButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--deep-taupe);
+  color: var(--button-primary-text);
+  border: none;
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.submitButton.disabled {
+  background: var(--button-secondary-text);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--button-primary-text);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Files Section */
+.filesSection {
+  padding: var(--spacing-md);
+}
+
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-lg);
+}
+
+.emptyState p {
+  font-size: var(--font-size-sm);
+}
+
+/* File Table */
+.fileTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fileTable th,
+.fileTable td {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--card-border);
+  font-size: var(--font-size-sm);
+  text-align: left;
+}
+
+.fileTable th {
+  font-weight: 600;
+  color: var(--deep-taupe);
+}
+
+.fileTable td a,
+.fileTable td button {
+  margin-right: var(--spacing-sm);
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main {
+    padding: var(--spacing-sm);
+  }
+
+  .tabContainer {
+    flex-direction: column;
+  }
+
+  .tab {
+    width: 100%;
+    text-align: left;
+  }
+
+  .pendingFileItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fileName {
+    max-width: 100px;
+  }
+
+  .attachmentTypeSelect {
+    width: 100%;
+  }
+
+  .categorySelect {
+    width: 100%;
+  }
+
+  .submitButton {
+    width: 100%;
+  }
+
+  .fileTable {
+    font-size: var(--font-size-xs);
+  }
+
+  .fileTable th,
+  .fileTable td {
+    padding: var(--spacing-xs);
+  }
+}
