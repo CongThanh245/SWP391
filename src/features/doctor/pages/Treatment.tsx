@@ -589,13 +589,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   };
 
   const handleSaveRecord = async (): Promise<void> => {
+    await saveGeneralInfo();
     await saveProtocols();
-
   };
 
-  const handleSaveInformation = async () : Promise<void> => {
-    await saveGeneralInfo();
-  }
+  
 
 
   const renderSpecialtySubTabs = () => (
@@ -739,21 +737,13 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsContent>
       </Tabs>
 
-      <div className="flex justify-end pt-6">
-        <Button
-          onClick={handleSaveInformation}
-          className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
-        >
-          Lưu Thông tin chung
-        </Button>
-      </div>
 
        <div className="flex justify-end pt-6">
         <Button
           onClick={handleSaveRecord}
           className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
         >
-          Lưu Kết quả xét nghiệm
+          Lưu hồ sơ
         </Button>
       </div>
     </div>
@@ -804,14 +794,6 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsContent>
       </Tabs>
 
-      <div className="flex justify-end pt-6">
-        <Button
-          onClick={handleSaveRecord}
-          className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
-        >
-          Lưu hồ sơ
-        </Button>
-      </div>
     </div>
   );
 
