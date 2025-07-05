@@ -70,9 +70,9 @@ const MedicalRecordsManager = () => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true); // Tô sáng vùng thả khi kéo tệp vào
+      setDragActive(true);
     } else if (e.type === "dragleave") {
-      setDragActive(false); // Bỏ tô sáng khi kéo tệp ra
+      setDragActive(false); 
     }
   };
   // Xử lý sự kiện thả tệp vào vùng kéo-thả
