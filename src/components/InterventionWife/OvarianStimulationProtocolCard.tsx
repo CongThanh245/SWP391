@@ -423,7 +423,7 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                         {/* Status field - only display, not editable directly here */}
                         <div className="space-y-2 col-span-2">
                             <Label>Trạng thái phác đồ</Label>
-                            <p className="font-medium text-[color:var(--text-accent)]">
+                            <p className="text-sm font-medium text-[color:var(--text-accent)]">
                                 {renderStatusInVietnamese(ovarianStimulationData.status)}
                             </p>
                         </div>
@@ -480,7 +480,7 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                             </div>
                         </div>
                     </div>
-                    <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-4">
+                    <DialogFooter className="sticky bottom-[-15px] bg-white z-10 border-t pt-4">
                         {isOperationInProgress && <Loader2 className="h-5 w-5 animate-spin mr-2" />}
                         {saveErrorOvarianStimulation && <p className="text-red-500 text-sm mr-2">{saveErrorOvarianStimulation}</p>}
                         {saveSuccessOvarianStimulation && <p className="text-green-500 text-sm mr-2">Lưu thành công!</p>}
@@ -494,21 +494,17 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                                     disabled={isOperationInProgress}
                                     className="text-orange-600 hover:text-orange-800"
                                 >
-                                    <Ban className="w-4 h-4 mr-2" /> {isCancelling ? 'Đang hủy...' : 'Hủy phác đồ'}
+                                     {isCancelling ? 'Đang hủy...' : 'Hủy phác đồ'}
                                 </Button>
                                 <Button
                                     onClick={handleCompleteOvarianStimulation}
                                     disabled={isOperationInProgress}
-                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    className="bg-[#6C9BCF] text-white border-[#6C9BCF]  hover:bg-[#4A7BC0] text-white"
                                 >
-                                    <CheckCircle className="w-4 h-4 mr-2" /> {isCompleting ? 'Đang hoàn thành...' : 'Hoàn thành phác đồ'}
+                                     {isCompleting ? 'Đang hoàn thành...' : 'Hoàn thành phác đồ'}
                                 </Button>
                             </>
                         )}
-
-                        <Button variant="outline" onClick={() => setIsOvarianStimulationDialogOpen(false)} disabled={isOperationInProgress}>
-                            <X className="w-4 h-4 mr-2" /> {isEditable ? 'Hủy' : 'Đóng'}
-                        </Button>
                         {isEditable && (
                             <Button onClick={handleSaveOvarianStimulation} disabled={isSavingOvarianStimulation}>
                                 <Save className="w-4 h-4 mr-2" /> {isSavingOvarianStimulation ? 'Đang lưu...' : 'Lưu'}
