@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getDoctorList } from "@api/doctorApi";
 import apiClient from "@api/axiosConfig";
 import { createAppointment } from "@api/appointmentApi";
+import usePatientFiles from "./usePatientFiles";
 
 const useBookingForm = (onClose) => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const useBookingForm = (onClose) => {
     date: "",
     timeSlot: "",
     notes: "",
+    files: [],
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,7 +20,21 @@ const useBookingForm = (onClose) => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
+  // Get patientId from localStorage
+  const user = JSON.parse(localStorage.getItem('user'));
+  const patientId = user?.id; // Use user.id as specified
+  const { uploadedFiles, fileErrorMessage } = usePatientFiles(patientId);
+
   const today = new Date().toISOString().split("T")[0];
+
+  // Sync file error message with main error message
+  useEffect(() => {
+    if (!patientId) {
+      setErrorMessage("Không tìm thấy thông tin bệnh nhân trong bộ nhớ.");
+    } else if (fileErrorMessage) {
+      setErrorMessage(fileErrorMessage);
+    }
+  }, [fileErrorMessage, patientId]);
 
   // Fetch doctors
   useEffect(() => {
@@ -51,41 +67,34 @@ const useBookingForm = (onClose) => {
       try {
         console.log(`Fetching slots for doctorId: ${doctorId}, date: ${date}`);
         
-        // Lấy slots hiện có
         let response = await apiClient.get('/slot', { 
           params: { doctorId, date } 
         });
         
-        // Nếu không có slots thì generate
         if (!response.data || response.data.length === 0) {
           console.log('No slots found, generating...');
           await apiClient.post('/slot/generate', null, { 
             params: { doctorId, date } 
           });
           
-          // Fetch lại sau khi generate
           response = await apiClient.get('/slot', { 
             params: { doctorId, date } 
           });
         }
 
         if (Array.isArray(response.data)) {
-          // Xử lý duplicate slots - chỉ giữ lại 1 slot cho mỗi thời gian
           const uniqueSlots = response.data.reduce((acc, slot) => {
             const existingSlot = acc.find(s => s.time === slot.startTime);
             
             if (!existingSlot) {
-              // Chưa có slot này, thêm vào
               acc.push({
                 id: slot.id,
                 time: slot.startTime,
                 available: !slot.booked
               });
             } else if (existingSlot.available && !slot.booked) {
-              // Nếu có duplicate và cả 2 đều available, ưu tiên slot đầu tiên
-              // (không làm gì)
+              // Do nothing
             } else if (!existingSlot.available && !slot.booked) {
-              // Nếu slot cũ đã booked mà slot mới chưa booked, thay thế
               const index = acc.findIndex(s => s.time === slot.startTime);
               acc[index] = {
                 id: slot.id,
@@ -97,7 +106,6 @@ const useBookingForm = (onClose) => {
             return acc;
           }, []);
 
-          // Sort theo thời gian
           uniqueSlots.sort((a, b) => a.time.localeCompare(b.time));
           
           setTimeSlots(uniqueSlots);
@@ -113,7 +121,6 @@ const useBookingForm = (onClose) => {
       } catch (err) {
         console.error('Error fetching slots:', err);
         if (err.response?.status === 409) {
-          // Conflict - có thể do generate duplicate, thử fetch lại
           try {
             const response = await apiClient.get('/slot', { 
               params: { doctorId, date } 
@@ -154,21 +161,21 @@ const useBookingForm = (onClose) => {
     if (!formData.doctorId) errs.doctorId = "Chọn bác sĩ";
     if (!formData.date) errs.date = "Chọn ngày";
     if (!formData.timeSlot) errs.timeSlot = "Chọn giờ khám";
+    // Optional: Require at least one file if needed
+    // if (!formData.files.length) errs.files = "Chọn ít nhất một tài liệu";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  // Handle time slot focus - check if doctor and date are selected
+  // Handle time slot focus
   const handleTimeSlotFocus = (e) => {
     if (!formData.doctorId || !formData.date) {
       e.target.blur(); 
       
-      // Set specific error messages
       const newErrors = {};
       if (!formData.doctorId && !formData.date) {
         setErrorMessage("Vui lòng chọn bác sĩ và ngày khám trước khi chọn giờ khám.");
       } else if (!formData.doctorId) {
-        newErrors.doctorId = "Vui lòng chọn bác sĩ trước";
         setErrorMessage("Vui lòng chọn bác sĩ trước khi chọn giờ khám.");
       } else if (!formData.date) {
         newErrors.date = "Vui lòng chọn ngày trước";
@@ -177,6 +184,18 @@ const useBookingForm = (onClose) => {
       
       setErrors(prev => ({ ...prev, ...newErrors }));
     }
+  };
+
+  // Handle file selection
+  const handleFileSelection = (fileId) => {
+    setFormData((prev) => {
+      const files = prev.files.includes(fileId)
+        ? prev.files.filter((id) => id !== fileId)
+        : [...prev.files, fileId];
+      return { ...prev, files };
+    });
+    setErrors((prev) => ({ ...prev, files: "" }));
+    setErrorMessage("");
   };
 
   // Handle submit
@@ -193,13 +212,14 @@ const useBookingForm = (onClose) => {
         appointmentDate: formData.date,
         appointmentTime: formData.timeSlot,
         note: formData.notes || "",
+        fileIds: formData.files,
       };
       
       console.log("Creating appointment:", payload);
       await createAppointment(payload);
       
       setShowSuccess(true);
-      (handleClose, 1000);
+      setTimeout(handleClose, 1000);
       
     } catch (err) {
       console.error("Create appointment error:", err);
@@ -224,7 +244,6 @@ const useBookingForm = (onClose) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
-      // Reset timeSlot khi đổi doctor hoặc date
       ...(field === "doctorId" || field === "date" ? { timeSlot: "" } : {}),
     }));
     
@@ -234,7 +253,7 @@ const useBookingForm = (onClose) => {
 
   // Handle close
   const handleClose = () => {
-    setFormData({ doctorId: "", date: "", timeSlot: "", notes: "" });
+    setFormData({ doctorId: "", date: "", timeSlot: "", notes: "", files: [] });
     setErrors({});
     setShowSuccess(false);
     setErrorMessage("");
@@ -250,12 +269,14 @@ const useBookingForm = (onClose) => {
     errorMessage,
     doctors,
     timeSlots,
+    uploadedFiles,
     loadingSlots,
     today,
     handleInputChange,
     handleSubmit,
     handleClose,
-    handleTimeSlotFocus, 
+    handleTimeSlotFocus,
+    handleFileSelection,
   };
 };
 

@@ -25,6 +25,7 @@ export const uploadFiles = async (patientId, filesWithTypes) => {
     throw error;
   }
 };
+
 export const getPatientFiles = async (patientId) => {
   if (!patientId) {
     throw new Error("patientId is required");
@@ -34,6 +35,21 @@ export const getPatientFiles = async (patientId) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching patient files:", error.message);
+    throw error;
+  }
+};
+
+export const deletePatientFile = async (patientId, attachmentId) => {
+  if (!patientId || !attachmentId) {
+    throw new Error("patientId and attachmentId are required");
+  }
+  try {
+    const response = await apiClient.delete(
+      `/patients/${patientId}/files/${attachmentId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting patient file:", error.message);
     throw error;
   }
 };
