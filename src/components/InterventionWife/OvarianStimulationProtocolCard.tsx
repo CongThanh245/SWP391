@@ -421,7 +421,7 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                             </Select>
                         </div>
                         {/* Status field - only display, not editable directly here */}
-                        <div className="space-y-2 col-span-2">
+                        <div className="col-span-2 flex items-center gap-2">
                             <Label>Trạng thái phác đồ</Label>
                             <p className="text-sm font-medium text-[color:var(--text-accent)]">
                                 {renderStatusInVietnamese(ovarianStimulationData.status)}

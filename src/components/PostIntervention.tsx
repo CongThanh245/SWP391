@@ -636,13 +636,13 @@ const PostInterventionCard: React.FC<PostInterventionCardProps> = ({ patientId, 
                         {/* Current Status Display in Dialog */}
                         <div className="space-y-2 pt-4">
                             <Label>Trạng thái hiện tại</Label>
-                            <p className="font-medium text-[color:var(--text-accent)]">
+                             <p className="font-medium text-sm text-[color:#6C9BCF]">
                                 {renderStatusInVietnamese(data.status)}
                             </p>
                         </div>
                     </div>
 
-                    <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-4">
+                   <DialogFooter className="sticky bottom-[-18px] bg-white z-10 border-t pt-4">
                         {isOperationInProgress && <Loader2 className="h-5 w-5 animate-spin mr-2" />}
                         {saveError && <p className="text-red-500 text-sm mr-2">{saveError}</p>}
                         {saveSuccess && <p className="text-green-500 text-sm mr-2">Lưu thành công!</p>}
@@ -655,21 +655,18 @@ const PostInterventionCard: React.FC<PostInterventionCardProps> = ({ patientId, 
                                     disabled={isOperationInProgress}
                                     className="text-orange-600 hover:text-orange-800"
                                 >
-                                    <Ban className="w-4 h-4 mr-2" /> {isCancelling ? 'Đang hủy...' : 'Hủy quá trình'}
+                                      {isCancelling ? 'Đang hủy...' : 'Hủy quá trình'}
                                 </Button>
                                 <Button
                                     onClick={handleComplete}
                                     disabled={isOperationInProgress}
-                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    className="bg-[#6C9BCF] hover:bg-[#4F7AA3] text-white"
                                 >
-                                    <CheckCircle className="w-4 h-4 mr-2" /> {isCompleting ? 'Đang hoàn thành...' : 'Hoàn thành quá trình'}
+                                      {isCompleting ? 'Đang hoàn thành...' : 'Hoàn thành quá trình'}
                                 </Button>
                             </>
                         ) : null}
 
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isOperationInProgress}>
-                            <X className="w-4 h-4 mr-2" /> {isEditable ? 'Hủy' : 'Đóng'}
-                        </Button>
                         {isEditable && (
                             <Button onClick={handleSave} disabled={isSaving}>
                                 <Save className="w-4 h-4 mr-2" /> {isSaving ? 'Đang lưu...' : 'Lưu'}

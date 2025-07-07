@@ -414,9 +414,9 @@ const OvulationTriggerInjectionCard: React.FC<OvulationTriggerInjectionCardProps
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="space-y-2 col-span-2">
-                            <Label>Trạng thái quá trình</Label>
-                            <p className="font-medium text-[color:var(--text-accent)]">
+                        <div className="col-span-2 flex items-center gap-2">
+                            <Label>Trạng thái quá trình:</Label>
+                             <p className="font-medium text-sm text-[color:#6C9BCF]">
                                 {renderStatusInVietnamese(ovulationTriggerData.status)}
                             </p>
                         </div>
@@ -473,7 +473,7 @@ const OvulationTriggerInjectionCard: React.FC<OvulationTriggerInjectionCardProps
                             </div>
                         </div>
                     </div>
-                    <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-4">
+                <DialogFooter className="sticky bottom-[-18px] bg-white z-10 border-t pt-4">
                         {isOperationInProgress && <Loader2 className="h-5 w-5 animate-spin mr-2" />}
                         {saveErrorOvulationTrigger && <p className="text-red-500 text-sm mr-2">{saveErrorOvulationTrigger}</p>}
                         {saveSuccessOvulationTrigger && <p className="text-green-500 text-sm mr-2">Lưu thành công!</p>}
@@ -486,21 +486,17 @@ const OvulationTriggerInjectionCard: React.FC<OvulationTriggerInjectionCardProps
                                     disabled={isOperationInProgress}
                                     className="text-orange-600 hover:text-orange-800"
                                 >
-                                    <Ban className="w-4 h-4 mr-2" /> {isCancelling ? 'Đang hủy...' : 'Hủy quá trình'}
+                                      {isCancelling ? 'Đang hủy...' : 'Hủy quá trình'}
                                 </Button>
                                 <Button
                                     onClick={handleCompleteOvulationTrigger}
                                     disabled={isOperationInProgress}
-                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                    className="bg-[#6C9BCF] hover:bg-[#4F7AA3] text-white"
                                 >
-                                    <CheckCircle className="w-4 h-4 mr-2" /> {isCompleting ? 'Đang hoàn thành...' : 'Hoàn thành quá trình'}
+                                      {isCompleting ? 'Đang hoàn thành...' : 'Hoàn thành quá trình'}
                                 </Button>
                             </>
                         )}
-
-                        <Button variant="outline" onClick={() => setIsOvulationTriggerDialogOpen(false)} disabled={isOperationInProgress}>
-                            <X className="w-4 h-4 mr-2" /> {isEditable ? 'Hủy' : 'Đóng'}
-                        </Button>
                         {isEditable && (
                             <Button onClick={handleSaveOvulationTrigger} disabled={isSavingOvulationTrigger}>
                                 <Save className="w-4 h-4 mr-2" /> {isSavingOvulationTrigger ? 'Đang lưu...' : 'Lưu'}

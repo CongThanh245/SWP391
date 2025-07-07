@@ -234,11 +234,13 @@
 }
 
 .emptyState {
+  justify-items: center;
   text-align: center;
   padding: var(--spacing-lg);
 }
 
 .emptyState p {
+  padding-top: 1rem;
   font-size: var(--font-size-sm);
 }
 

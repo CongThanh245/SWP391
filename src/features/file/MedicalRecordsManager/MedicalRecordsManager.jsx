@@ -10,8 +10,9 @@ import {
   Folder,
 } from "lucide-react";
 import styles from "./MedicalRecordsManager.module.css";
-import { uploadFiles, getPatientFiles } from "@api/file";
+import { uploadFiles, getPatientFiles, deletePatientFile } from "@api/fileApi";
 import { useToast } from "@hooks/use-toast";
+import ConfirmationDialog from "@components/common/ConfirmationDialog/ConfirmationDialog";
 
 const ATTACHMENT_TYPES = [
   { value: "PRESCRIPTION", displayName: "Đơn thuốc" },
@@ -26,12 +27,14 @@ const ATTACHMENT_TYPES = [
 ];
 
 const MedicalRecordsManager = () => {
-  const [uploadedFiles, setUploadedFiles] = useState([]); // State lưu danh sách các tệp đã tải lên server
-  const [selectedFiles, setSelectedFiles] = useState([]); // State lưu các tệp người dùng đã chọn nhưng chưa tải lên
-  const [dragActive, setDragActive] = useState(false); // State để theo dõi trạng thái kéo-thả (drag-and-drop)
-  const [loading, setLoading] = useState(false); // State để quản lý trạng thái đang tải (loading)
-  const [activeTab, setActiveTab] = useState("upload"); // Quản lý tab
-  const fileInputRef = useRef(null); // Tham chiếu đến input tệp ẩn để kích hoạt chọn tệp
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [dragActive, setDragActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("upload");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState(null);
+  const fileInputRef = useRef(null);
   const { toast } = useToast();
 
   const getPatientId = () => {
@@ -43,7 +46,12 @@ const MedicalRecordsManager = () => {
     const fetchFiles = async () => {
       const patientId = getPatientId();
       if (!patientId) {
-        alert("Không tìm thấy thông tin bệnh nhân. Vui lòng đăng nhập lại.");
+        toast({
+          title: "Lỗi",
+          description:
+            "Không tìm thấy thông tin bệnh nhân. Vui lòng đăng nhập lại.",
+          variant: "destructive",
+        });
         return;
       }
       try {
@@ -60,7 +68,11 @@ const MedicalRecordsManager = () => {
         setUploadedFiles(mappedFiles);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách file:", error);
-        alert("Không thể tải danh sách file.");
+        toast({
+          title: "Lỗi",
+          description: " solemne load danh sách file.",
+          variant: "destructive",
+        });
       }
     };
     fetchFiles();
@@ -72,48 +84,50 @@ const MedicalRecordsManager = () => {
     if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
     } else if (e.type === "dragleave") {
-      setDragActive(false); 
-    }
-  };
-  // Xử lý sự kiện thả tệp vào vùng kéo-thả
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false); // Đặt lại trạng thái kéo-thả
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileSelect(e.dataTransfer.files); // Dòng chính: Kích hoạt logic chọn tệp
-    }
-  };
-  // Xử lý sự kiện chọn tệp từ input
-  const handleFileInput = (e) => {
-    if (e.target.files) {
-      handleFileSelect(e.target.files); // Dòng chính: Kích hoạt logic chọn tệp
+      setDragActive(false);
     }
   };
 
-  // Xử lý danh sách tệp được chọn (từ kéo-thả hoặc input)
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files);
+    }
+  };
+
+  const handleFileInput = (e) => {
+    if (e.target.files) {
+      handleFileSelect(e.target.files);
+    }
+  };
+
   const handleFileSelect = (fileList) => {
     const maxSize = 10 * 1024 * 1024; // 10MB
     const newFiles = Array.from(fileList)
       .filter((file) => {
         if (file.size > maxSize) {
-          alert(`File ${file.name} vượt quá giới hạn 10MB.`);
+          toast({
+            title: "Lỗi",
+            description: `File ${file.name} vượt quá giới hạn 10MB.`,
+            variant: "destructive",
+          });
           return false;
         }
         return true;
       })
       .map((file) => ({
-        id: `temp-${Date.now()}-${Math.random()}`, // ID tạm thời
+        id: `temp-${Date.now()}-${Math.random()}`,
         name: file.name,
         size: file.size,
-        file, // Đối tượng tệp gốc
+        file,
         type: file.type,
-        attachmentType: "OTHER", // Loại tài liệu mặc định
+        attachmentType: "OTHER",
       }));
-    setSelectedFiles((prev) => [...prev, ...newFiles]); // Cập nhật state với danh sách tệp mới
+    setSelectedFiles((prev) => [...prev, ...newFiles]);
   };
 
-  // Cập nhật loại tài liệu cho tệp đã chọn
   const handleAttachmentTypeChange = (fileId, newType) => {
     setSelectedFiles((prev) =>
       prev.map((file) =>
@@ -122,19 +136,31 @@ const MedicalRecordsManager = () => {
     );
   };
 
-  // Xử lý việc gửi (tải lên) tệp
   const handleSubmit = async () => {
     const patientId = getPatientId();
     if (!patientId) {
-      alert("Không tìm thấy thông tin bệnh nhân. Vui lòng đăng nhập lại.");
+      toast({
+        title: "Lỗi",
+        description:
+          "Không tìm thấy thông tin bệnh nhân. Vui lòng đăng nhập lại.",
+        variant: "destructive",
+      });
       return;
     }
     if (selectedFiles.length === 0) {
-      alert("Vui lòng chọn ít nhất một file để tải lên.");
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn ít nhất một file để tải lên.",
+        variant: "destructive",
+      });
       return;
     }
     if (selectedFiles.some((file) => !file.attachmentType)) {
-      alert("Vui lòng chọn loại tài liệu cho tất cả các file.");
+      toast({
+        title: "Lỗi",
+        description: "Vui lòng chọn loại tài liệu cho tất cả các file.",
+        variant: "destructive",
+      });
       return;
     }
     setLoading(true);
@@ -155,39 +181,75 @@ const MedicalRecordsManager = () => {
         url: file.url,
       }));
       setUploadedFiles(mappedFiles);
-      // Đặt lại form sau khi tải lên thành công
       setSelectedFiles([]);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
       toast({
-        title: "Tải lên file thành công",
-        description: "file đã được tải lên.",
+        title: "Thành công",
+        description: "File đã được tải lên.",
       });
-      setActiveTab("files"); // Chuyển sang tab danh sách sau khi tải lên
+      setActiveTab("files");
     } catch (error) {
       console.error("Lỗi khi tải lên file:", error);
       toast({
-        title: "Không thể tải lên file",
-        description: "có lỗi xảy ra khi tải lên file. Vui lòng thử lại.",
+        title: "Lỗi",
+        description: "Có lỗi xảy ra khi tải lên file. Vui lòng thử lại.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  // Xóa tệp khỏi danh sách đã chọn (trước khi tải lên)
   const removeSelectedFile = (id) => {
     setSelectedFiles(selectedFiles.filter((file) => file.id !== id));
   };
 
-  // Xóa tệp đã tải lên (chỉ cập nhật giao diện, chưa có API)
-  const deleteUploadedFile = (id) => {
-    if (confirm("Bạn có chắc chắn muốn xóa file này không?")) {
-      setUploadedFiles(uploadedFiles.filter((file) => file.id !== id));
+  const deleteUploadedFile = async (id) => {
+    const patientId = getPatientId();
+    if (!patientId) {
+      toast({
+        title: "Lỗi",
+        description:
+          "Không tìm thấy thông tin bệnh nhân. Vui lòng đăng nhập lại.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setFileToDelete(id);
+    setDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!fileToDelete) return;
+    setLoading(true);
+    try {
+      await deletePatientFile(getPatientId(), fileToDelete);
+      setUploadedFiles(uploadedFiles.filter((file) => file.id !== fileToDelete));
+      toast({
+        title: "Thành công",
+        description: "File đã được xóa.",
+      });
+    } catch (error) {
+      console.error("Lỗi khi xóa file:", error);
+      toast({
+        title: "Lỗi",
+        description: "Không thể xóa file. Vui lòng thử lại.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      setDialogOpen(false);
+      setFileToDelete(null);
     }
   };
-  // Định dạng kích thước tệp để hiển thị
+
+  const handleCancelDelete = () => {
+    setDialogOpen(false);
+    setFileToDelete(null);
+  };
+
   const formatFileSize = (bytes) => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -196,7 +258,6 @@ const MedicalRecordsManager = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  // Lấy tên hiển thị của loại tài liệu
   const getTypeDisplayName = (type) => {
     const typeObj = ATTACHMENT_TYPES.find((t) => t.value === type);
     return typeObj ? typeObj.displayName : "Tài liệu khác";
@@ -204,8 +265,16 @@ const MedicalRecordsManager = () => {
 
   return (
     <div className={styles.container}>
+      <ConfirmationDialog
+        open={dialogOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Xác nhận xóa"
+        content="Bạn có chắc chắn muốn xóa file này không? Hành động này không thể hoàn tác."
+        confirmText="Xóa"
+        cancelText="Hủy"
+      />
       <main className={styles.main}>
-        {/* Tabs */}
         <div className={styles.tabContainer}>
           <button
             className={`${styles.tab} ${
@@ -227,7 +296,6 @@ const MedicalRecordsManager = () => {
           </button>
         </div>
 
-        {/* Tab Content */}
         <div className={styles.tabContent}>
           {activeTab === "upload" && (
             <div className={styles.uploadSection}>
@@ -247,7 +315,7 @@ const MedicalRecordsManager = () => {
                   accept=".pdf"
                   onChange={handleFileInput}
                   className={styles.fileInput}
-                  style={{ display: "none" }} // Ẩn input hoàn toàn
+                  style={{ display: "none" }}
                 />
                 <div className={styles.dropZoneContent}>
                   <Upload className={styles.uploadIcon} size={24} />
@@ -370,7 +438,7 @@ const MedicalRecordsManager = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <Eye style={{ margin: " 0 10px" }} size={16} />
+                            <Eye style={{ margin: "0 10px" }} size={16} />
                           </a>
                           <button onClick={() => deleteUploadedFile(file.id)}>
                             <Trash2 size={16} />
