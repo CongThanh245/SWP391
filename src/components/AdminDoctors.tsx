@@ -42,6 +42,11 @@ interface PaginatedDoctorsInfo {
 const Doctors = () => {
   // Removed: const { toast } = useToast(); // This line is removed
 
+  const [finalImportStatus, setFinalImportStatus] = useState<'success' | 'failed' | null>(null);
+  const [finalImportMessage, setFinalImportMessage] = useState<string>('');
+  const [showImportDialog, setShowImportDialog] = useState(false);
+
+
   const [doctorsData, setDoctorsData] = useState<UIDoctorData[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -195,10 +200,16 @@ const Doctors = () => {
     setLoading(false);
 
     if (result.success) {
-      alert("Import Successful! " + result.message); // Using alert for success
+      setFinalImportStatus('success');
+      setFinalImportMessage(`Successfully imported ${data.length} records.`);
       fetchData();
+      return { success: true, message: `Successfully imported ${data.length} records.` };
+
     } else {
-      alert("Import Failed: " + result.message); // Using alert for failure
+      setFinalImportStatus('failed');
+      setFinalImportMessage(result.message || "Import Failed: An unknown error occurred.");
+      return { success: false, message: result.message || "Import Failed: An unknown error occurred." };
+
     }
   };
 
