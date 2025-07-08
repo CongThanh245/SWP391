@@ -13,18 +13,16 @@ import { useToast } from "@hooks/use-toast";
 // Validation Schema với Yup
 const validationSchema = Yup.object({
   name: Yup.string()
-    .min(2, "Họ tên phải có ít nhất 2 ký tự")
     .max(50, "Họ tên không được vượt quá 50 ký tự")
     .matches(/^[a-zA-ZÀ-ỹ\s]+$/, "Họ tên chỉ được chứa chữ cái và khoảng trắng")
     .required("Họ tên là bắt buộc"),
   phone: Yup.string()
     .matches(
       /^(0|\+84)[3|5|7|8|9][0-9]{8}$/,
-      "Số điện thoại không hợp lệ (VD: 0901234567 hoặc +84901234567)"
+      "Nhập số điện thoại hợp lệ (VD: 0901234567 hoặc +84901234567)"
     )
     .required("Số điện thoại là bắt buộc"),
   address: Yup.string()
-    .min(10, "Địa chỉ phải có ít nhất 10 ký tự")
     .max(200, "Địa chỉ không được vượt quá 200 ký tự")
     .required("Địa chỉ là bắt buộc"),
   dateOfBirth: Yup.date()
@@ -54,11 +52,10 @@ const validationSchema = Yup.object({
   spousePhone: Yup.string()
     .matches(
       /^(0|\+84)[3|5|7|8|9][0-9]{8}$/,
-      "Số điện thoại người đi kèm không hợp lệ (VD: 0901234567 hoặc +84901234567)"
+      "Nhập số điện thoại hợp lệ (VD: 0901234567 hoặc +84901234567)"
     )
     .nullable(),
   spouseAddress: Yup.string()
-    .min(10, "Địa chỉ người đi kèm phải có ít nhất 10 ký tự")
     .max(200, "Địa chỉ người đi kèm không được vượt quá 200 ký tự")
     .nullable(),
   spouseEmergencyContact: Yup.string()

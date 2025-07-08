@@ -1,4 +1,3 @@
-/* AppointmentListReceptionist.module.css */
 .appointmentPage {
   padding: var(--spacing-xl);
   background: var(--primary-background);
@@ -48,11 +47,10 @@
 .tableHeader {
   display: grid;
   grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr;
-  /* Adjusted for notes and actions */
   gap: var(--spacing-md);
-  padding: var(--spacing-lg);
   background: var(--secondary-background);
   border-bottom: 1px solid var(--card-border);
+  padding: var(--spacing-lg);
 }
 
 .headerCell {
@@ -68,14 +66,12 @@
 .appointmentRow {
   display: grid;
   grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr;
-  /* Match tableHeader */
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   border-bottom: 1px solid var(--card-border);
   transition: all 0.3s ease;
   position: relative;
   align-items: center;
-  /* Ensure vertical alignment */
 }
 
 .appointmentRow:last-child {
@@ -204,9 +200,7 @@
   gap: var(--spacing-xs);
   align-items: center;
   justify-content: flex-start;
-  /* Prevent stretching */
   min-width: 80px;
-  /* Ensure enough space for buttons */
 }
 
 .actionBtn {
@@ -358,20 +352,276 @@
   box-shadow: 0 6px 12px var(--shadow-accent);
 }
 
-/* Responsive */
-@media (max-width: var(--breakpoint-lg)) {
+/* Prevent body scroll when modal is open */
+body.modalOpen {
+  overflow: hidden;
+}
 
+/* Details Modal Styles */
+.detailsModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(77, 60, 45, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(1px);
+}
+
+.detailsModalContent {
+  background: var(--light-background);
+  border-radius: var(--card-border-radius);
+  box-shadow: 0 25px 50px -12px var(--shadow-accent);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--card-border);
+  overflow: hidden;
+}
+
+.detailsModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--card-border);
+  background: var(--secondary-background);
+  flex-shrink: 0;
+}
+
+.detailsModalTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--deep-taupe);
+  margin: 0;
+}
+
+.detailsCloseButton {
+  color: var(--deep-taupe);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.detailsCloseButton:hover {
+  color: var(--light-background);
+  background: var(--deep-taupe);
+  border-color: var(--deep-taupe);
+  transform: scale(1.05);
+}
+
+.detailsModalBody {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--light-background);
+  flex: 1;
+  overflow-y: auto;
+}
+
+
+.detailsInfo p {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  padding: var(--spacing-sm) 0;
+}
+
+.detailsInfo p:last-child {
+  margin-bottom: 0;
+}
+
+.detailsInfo strong {
+  color: var(--deep-taupe);
+  font-weight: 700;
+  display: inline-block;
+  min-width: 120px;
+}
+
+.detailsModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--card-border);
+  background: var(--secondary-background);
+  flex-shrink: 0;
+}
+
+.detailsConfirmButton {
+  background: var(--deep-taupe);
+  color: var(--light-background);
+  border: 2px solid var(--deep-taupe);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-2);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px var(--shadow-accent);
+}
+
+.detailsConfirmButton:hover {
+  background: var(--dark-accent);
+  border-color: var(--dark-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px var(--shadow-accent);
+}
+
+/* Attachments Section */
+.attachmentsSection {
+  margin-top: var(--spacing-xs);
+}
+
+.attachmentsTitle {
+  font-weight: 600;
+  color: var(--deep-taupe);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-base);
+}
+
+.attachmentsList {
+  max-height: 192px;
+  overflow-y: auto;
+  padding-right: var(--spacing-sm);
+}
+
+.attachmentItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm);
+  background: var(--secondary-background);
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  margin-bottom: var(--spacing-sm);
+}
+
+.attachmentItem:last-child {
+  margin-bottom: 0;
+}
+
+.attachmentInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.attachmentIcon {
+  color: var(--primary-600);
+  flex-shrink: 0;
+}
+
+.fileIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.attachmentName {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.attachmentDetails {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.attachmentLink {
+  font-size: var(--font-size-sm);
+  color: var(--primary-600);
+  text-decoration: none;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.attachmentLink:hover {
+  color: var(--primary-700);
+  text-decoration: underline;
+}
+
+.noAttachments {
+  font-size: var(--font-size-sm);
+  color: var(--gray-500);
+  font-style: italic;
+  text-align: center;
+  padding: var(--spacing-md);
+}
+
+/* Responsive for details modal */
+@media (max-width: var(--breakpoint-sm)) {
+  .detailsModalContent {
+    width: 95%;
+    margin: var(--spacing-md);
+  }
+
+  .detailsModalHeader,
+  .detailsModalBody,
+  .detailsModalActions {
+    padding: var(--spacing-md);
+  }
+
+  .detailsModalTitle {
+    font-size: var(--font-size-base);
+  }
+
+  .detailsInfo p {
+    font-size: var(--font-size-sm);
+  }
+
+  .detailsConfirmButton {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+
+  .attachmentsTitle {
+    font-size: var(--font-size-base);
+  }
+
+  .attachmentItem {
+    padding: var(--spacing-sm);
+  }
+
+  .attachmentName,
+  .attachmentLink {
+    font-size: var(--font-size-xs);
+  }
+
+  .attachmentDetails {
+    font-size: 12px;
+  }
+
+  .fileIcon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Responsive for table */
+@media (max-width: var(--breakpoint-lg)) {
   .tableHeader,
   .appointmentRow {
     grid-template-columns: 2fr 1.5fr 2fr 1fr 1.5fr 1fr;
-    /* Keep all columns */
   }
 }
 
 @media (max-width: var(--breakpoint-md)) {
   .tableHeader {
     grid-template-columns: 1.5fr 1fr 1.5fr 0.8fr 1.2fr 0.8fr;
-    /* Adjust proportions */
     font-size: var(--font-size-xs);
     padding: var(--spacing-md);
   }
@@ -402,8 +652,6 @@
 
 @media (max-width: var(--breakpoint-sm)) {
   .tableHeader {
-    display: grid;
-    /* Keep header visible */
     grid-template-columns: 1fr 1fr 1fr 0.8fr 1fr 0.8fr;
   }
 
@@ -425,182 +673,5 @@
   .actionBtn {
     width: 24px;
     height: 24px;
-  }
-}
-
-/* Thêm các CSS class này vào file AppointmentListReceptionist.module.css của bạn */
-
-/* Prevent body scroll when modal is open */
-body.modalOpen {
-  overflow: hidden;
-}
-
-/* Details Modal Styles */
-.detailsModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(77, 60, 45, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(1px);
-}
-
-.detailsModalContent {
-  background: var(--light-background);
-  border-radius: var(--card-border-radius);
-  box-shadow: 0 25px 50px -12px var(--shadow-accent);
-  max-width: 500px;
-  width: 90%;
-  overflow: hidden;
-  border: 2px solid var(--card-border);
-}
-
-.detailsModalHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
-  border-bottom: 2px solid var(--card-border);
-  background: linear-gradient(135deg, var(--secondary-background) 0%, #ddd4d0 100%);
-}
-
-.detailsModalTitle {
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  color: var(--deep-taupe);
-  margin: 0;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.detailsCloseButton {
-  color: var(--deep-taupe);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid var(--card-border);
-  cursor: pointer;
-  padding: var(--spacing-xs);
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-}
-
-.detailsCloseButton:hover {
-  color: var(--light-background);
-  background: var(--deep-taupe);
-  border-color: var(--deep-taupe);
-  transform: scale(1.05);
-}
-
-.detailsModalBody {
-  padding: var(--spacing-xl);
-  background: var(--light-background);
-}
-
-.detailsInfo {
-  margin-bottom: var(--spacing-lg);
-}
-
-.detailsInfo p {
-  margin-bottom: var(--spacing-md);
-  font-size: var(--font-size-base);
-  color: var(--text-primary);
-  line-height: 1.6;
-  padding: var(--spacing-sm) 0;
-}
-
-.detailsInfo p:last-child {
-  margin-bottom: 0;
-}
-
-.detailsInfo strong {
-  color: var(--deep-taupe);
-  font-weight: 700;
-  display: inline-block;
-  min-width: 120px;
-}
-
-.detailsModalActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
-  border-top: 2px solid var(--card-border);
-  background: linear-gradient(135deg, #f8f5f2 0%, var(--secondary-background) 100%);
-}
-
-.detailsCancelButton {
-  background: var(--light-background);
-  color: var(--text-secondary);
-  border: 2px solid var(--card-border);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--border-radius-2);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.detailsCancelButton:hover {
-  background: var(--text-secondary);
-  color: var(--light-background);
-  border-color: var(--text-secondary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.detailsConfirmButton {
-  background: var(--deep-taupe);
-  color: var(--light-background);
-  border: 2px solid var(--deep-taupe);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--border-radius-2);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px var(--shadow-accent);
-}
-
-.detailsConfirmButton:hover {
-  background: var(--dark-accent);
-  border-color: var(--dark-accent);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px var(--shadow-accent);
-}
-
-/* Responsive cho details modal */
-@media (max-width: var(--breakpoint-sm)) {
-  .detailsModalContent {
-    width: 95%;
-    margin: var(--spacing-md);
-  }
-
-  .detailsModalHeader,
-  .detailsModalBody,
-  .detailsModalActions {
-    padding: var(--spacing-md);
-  }
-
-  .detailsModalTitle {
-    font-size: var(--font-size-base);
-  }
-
-  .detailsInfo p {
-    font-size: var(--font-size-sm);
-  }
-
-  .detailsCancelButton,
-  .detailsConfirmButton {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-xs);
   }
 }

@@ -146,9 +146,6 @@ const AppointmentSchedulePage = () => {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.title}>Lịch hẹn của tôi</h1>
-        <p className={styles.subtitle}>
-          Quản lý và theo dõi tất cả các cuộc hẹn của bạn
-        </p>
       </header>
 
       <div className={styles.tabsContainer}>

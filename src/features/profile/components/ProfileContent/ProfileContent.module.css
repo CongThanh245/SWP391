@@ -92,18 +92,21 @@
   border-color: var(--card-hover-border);
 }
 
-/* Modal Actions */
 .modalActions {
-  display: flex;
-  gap: var(--spacing-lg);
-  justify-content: flex-end;
-  margin-top: var(--spacing-2xl);
-  padding-top: var(--spacing-xl);
-  border-top: 1px solid var(--card-border);
+    position: sticky;
+    bottom: 0;
+    background: var(--card-background, #fff); /* hoặc màu nền của modal */
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: flex-end;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--card-border);
+    z-index: 1; /* đảm bảo nằm trên nội dung cuộn */
 }
 
 .btnBase {
-  padding: 10px 10px;
+  padding: 6px 6px;
   border: none;
   border-radius: var(--border-radius-1);
   font-size: 15px;
@@ -112,7 +115,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 180px;
-  height: 52px;
+  height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
