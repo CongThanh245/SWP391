@@ -17,7 +17,7 @@ interface CSVImportDialogProps {
   title: string;
   templateFields: string[];
   sampleData: CSVRowData[];
-  onImport: (data: CSVRowData[]) => void;
+  onImport: (data: CSVRowData[]) => Promise<{ success: boolean; message?: string }>;
   trigger: React.ReactNode;
 }
 
@@ -38,6 +38,8 @@ export const CSVImportDialog = ({ title, templateFields, sampleData, onImport, t
   const [fieldMapping, setFieldMapping] = useState<FieldMapping>({});
   const [importStatus, setImportStatus] = useState<ImportStatus>('idle');
   const [parseErrors, setParseErrors] = useState<CSVParseError[]>([]);
+  const [importMessageFromParent, setImportMessageFromParent] = useState<string>(''); // Thêm state để nhận message từ parent
+
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -127,8 +129,8 @@ export const CSVImportDialog = ({ title, templateFields, sampleData, onImport, t
 
 
   const downloadTemplate = (): void => {
-    const csvContent = templateFields.join(",") + "\n" + 
-      sampleData.map(row => 
+    const csvContent = templateFields.join(",") + "\n" +
+      sampleData.map(row =>
         templateFields.map(field => {
           const value = row[field];
           // Handle values that contain commas by wrapping in quotes
@@ -138,7 +140,7 @@ export const CSVImportDialog = ({ title, templateFields, sampleData, onImport, t
           return value || "";
         }).join(",")
       ).join("\n");
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -160,39 +162,46 @@ export const CSVImportDialog = ({ title, templateFields, sampleData, onImport, t
   const transformData = (): CSVRowData[] => {
     return csvData.map(row => {
       const transformedRow: CSVRowData = {};
-      
+
       Object.entries(fieldMapping).forEach(([templateField, csvHeader]) => {
         if (csvHeader && row[csvHeader] !== undefined && row[csvHeader] !== null) {
           let value = row[csvHeader];
-          
+
           // Clean up string values
           if (typeof value === 'string') {
             value = value.toString().trim();
           }
-          
+
           transformedRow[templateField] = value;
         }
       });
-      
+
       return transformedRow;
     }).filter(row => Object.keys(row).length > 0); // Filter out empty rows
   };
 
- const handleImport = (): void => {
+  const handleImport = async (): Promise<void> => {
     try {
       setImportStatus('loading');
       const transformedData = transformData();
-      
+
       if (transformedData.length === 0) {
         throw new Error('No valid data to import. Please check your field mappings.');
       }
-      
-      onImport(transformedData);
-      setImportStatus('success');
+
+      const importResult = await onImport(transformedData);
+      if (importResult.success) {
+        setImportStatus('success');
+        setImportMessageFromParent(importResult.message || `Successfully imported ${transformedData.length} records.`);
+      } else {
+        setImportStatus('error'); // Đổi thành 'error' nếu thất bại
+        setImportMessageFromParent(importResult.message || "Import Failed: An unknown error occurred.");
+      }
       setStep(4);
     } catch (error) {
       console.error('Import failed:', error);
       setImportStatus('error');
+      setImportMessageFromParent(`An unexpected client-side error occurred: ${(error as Error).message}`);
       setStep(4);
     }
   };
@@ -327,7 +336,9 @@ export const CSVImportDialog = ({ title, templateFields, sampleData, onImport, t
 
             <div className="flex gap-2">
               <Button onClick={() => setStep(2)} variant="outline">Back</Button>
-              <Button onClick={handleImport}>Import {csvData.length} Records</Button>
+              <Button onClick={handleImport}
+                disabled={importStatus === 'loading'}
+              >{importStatus === 'loading' ? 'Importing...' : `Import ${csvData.length} Records`}</Button>
             </div>
           </div>
         )}
@@ -339,7 +350,7 @@ export const CSVImportDialog = ({ title, templateFields, sampleData, onImport, t
                 <CheckCircle className="w-16 h-16 mx-auto text-green-500" />
                 <h3 className="text-xl font-medium">Import Successful!</h3>
                 <p className="text-muted-foreground">
-                  Successfully imported {csvData.length} records
+                  {importMessageFromParent || `Successfully imported ${csvData.length} records`}
                 </p>
               </div>
             ) : (
@@ -347,7 +358,7 @@ export const CSVImportDialog = ({ title, templateFields, sampleData, onImport, t
                 <AlertCircle className="w-16 h-16 mx-auto text-red-500" />
                 <h3 className="text-xl font-medium">Import Failed</h3>
                 <p className="text-muted-foreground">
-                  There was an error importing your data. Please try again.
+                  {importMessageFromParent || 'There was an error importing your data. Please try again.'}
                 </p>
               </div>
             )}

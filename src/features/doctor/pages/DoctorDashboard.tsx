@@ -102,7 +102,7 @@ const DoctorDashboard: React.FC<DoctorDashBoardProps> = ({
         return <PatientsContent onPatientSelect={handlePatientSelect} />;
       default:
         return stats ? (
-          <DashboardContent stats={stats} />
+          <DashboardContent />
         ) : (
           <div className="p-4 text-gray-500">Đang tải thống kê...</div>
         );

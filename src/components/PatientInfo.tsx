@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card } from '@components/ui/card';
-
+import { formatDate } from '@utils/format';
 interface PatientData {
   name: string;
   patientId: string;
@@ -42,8 +42,8 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
             <p className="font-medium">{patient.gender}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-[color:var(--text-secondary)]">Năm sinh:</p>
-            <p className="font-medium">{patient.birthYear}</p>
+            <p className="text-sm text-[color:var(--text-secondary)]">Ngày tháng năm sinh:</p>
+            <p className="font-medium">{formatDate(patient.birthYear)}</p>
           </div>
           <div className="space-y-1">
             <p className="text-sm text-[color:var(--text-secondary)]">Thành phố:</p>
@@ -78,8 +78,8 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
             <p className="font-medium">{patient.spouseGender}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-[color:var(--text-secondary)]">Năm sinh:</p>
-            <p className="font-medium">{patient.spouseDateOfBirth}</p>
+            <p className="text-sm text-[color:var(--text-secondary)]">Ngày tháng năm sinh:</p>
+            <p className="font-medium">{formatDate(patient.spouseDateOfBirth)}</p>
           </div>
           <div className="space-y-1">
             <p className="text-sm text-[color:var(--text-secondary)]">Thành phố:</p>
