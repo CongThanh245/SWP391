@@ -57,3 +57,38 @@ export const getDoctorDetails = async (doctorId) => {
     throw new Error(message);
   }
 }
+
+export const uploadDoctorAvatar = async (doctorId: string, file: File): Promise<string> => {
+  try{
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post(`/admin/doctor-avatar/${doctorId}`, formData,
+      {
+        headers: {
+          'Content-Type' : 'multipart/form-data',
+        }
+      }
+    );
+    return response.data;
+  }catch(error: unknown){
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Failed to upload doctor avatar'
+        : 'An unknown error occurred while uploading doctor avatar';
+
+    throw new Error(message);
+  }
+};
+
+export const deleteDoctor  = async (doctorId: string): Promise<void>=>{
+  try {
+    await apiClient.delete(`/admin/${doctorId}`); 
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Failed to delete doctor'
+        : 'An unknown error occurred while deleting doctor';
+
+    throw new Error(message);
+  }
+}

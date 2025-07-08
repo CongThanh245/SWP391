@@ -3,6 +3,7 @@ import { SidebarProvider } from '@components/ui/sidebar';
 import { AdminSidebar } from '@components/admin-sidebar';
 import Dashboard from '@components/Dashboard';
 import Doctors from '@components/AdminDoctors';
+import Patients from '@components/AdminPatient';
 /*import Patients from '@/pages/Patients';
 import Appointments from '@/pages/Appointments';
 import Schedule from '@/pages/Schedule';
@@ -15,9 +16,9 @@ const AdminDashboard: React.FC = () => {
     switch (activeTab) {
       case 'doctors':
         return <Doctors />;
-      /*case 'patients':
+      case 'patients':
         return <Patients />;
-      case 'appointments':
+      /*case 'appointments':
         return <Appointments />;
       case 'schedule':
         return <Schedule />;

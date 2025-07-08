@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
 import { Button } from "@components/ui/button";
 import { Badge } from "@components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
-import { ArrowLeft, Phone, Mail, MapPin, Calendar, Users, Star, Clock } from "lucide-react";
-import {getDoctorDetails} from '@api/adminApi'
-import React, { useEffect, useState } from 'react';
+import { ArrowLeft, Phone, Mail, MapPin, Calendar, Users, Upload  } from "lucide-react";
+import { getDoctorDetails, uploadDoctorAvatar } from '@api/adminApi'
+import React, { useEffect, useState, useRef } from 'react';
 interface DoctorDetailsProps {
   doctorId: string;
   onClose: () => void;
@@ -53,6 +53,9 @@ const DoctorDetails: React.FC<DoctorDetailsProps> = ({ doctorId, onClose }) => {
   const [doctorData, setDoctorData] = useState<FullDoctorDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef(null);
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   // const doctorData = {
   //   id: "WNH-GM-001",
   //   name: "Dr. Petra Winsbury",
@@ -84,19 +87,42 @@ const DoctorDetails: React.FC<DoctorDetailsProps> = ({ doctorId, onClose }) => {
   useEffect(() => {
     const fetchDoctorDetails = async () => {
       const data = await getDoctorDetails(doctorId); // Hàm của bạn trả về response.data
-        if (data) {
-          setDoctorData(data);
-          setLoading(false);
-        } else {
-          setError("Không tìm thấy thông tin chi tiết cho bác sĩ này.");
-          setDoctorData(null);
-        }
+      if (data) {
+        setDoctorData(data);
+        setLoading(false);
+      } else {
+        setError("Không tìm thấy thông tin chi tiết cho bác sĩ này.");
+        setDoctorData(null);
+      }
     }
     if (doctorId) {
       fetchDoctorDetails();
     }
   }, [doctorId]);
-  
+
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setLoadingUpload(true);
+    setUploadError(null);
+    try {
+      const successMessage = await uploadDoctorAvatar(doctorData.id, file);
+      const updatedDoctorData = await getDoctorDetails(doctorId);
+      setDoctorData(updatedDoctorData);
+    } catch (error) {
+      setUploadError(error.message || 'Không thể tải ảnh lên. Vui lòng thử lại.');
+
+    } finally {
+      setLoadingUpload(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+  const triggerFileInput = () => {
+    fileInputRef.current?.click(); // Use optional chaining for safety
+  };
+
   const appointmentStats = {
     total: doctorData?.totalPatients ? doctorData.todayAppointments + 20 : 50, // Example calculation
     newPatients: doctorData?.totalPatients ? doctorData.todayAppointments / 2 : 22,
@@ -234,12 +260,41 @@ const DoctorDetails: React.FC<DoctorDetailsProps> = ({ doctorId, onClose }) => {
             <Card className="bg-white/90 border-[#D9CAC2]">
               <CardContent className="p-6">
                 <div className="text-center mb-6">
-                  <Avatar className="w-32 h-32 mx-auto mb-4 border-4 border-[#D9CAC2]">
-                    <AvatarImage src="/placeholder.svg" />
-                    <AvatarFallback className="text-2xl bg-[#D9CAC2] text-[#4D3C2D]">
-                      {doctorData.doctorName.split(' ').map(n => n[0]).join('').toUpperCase() || 'DR'}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative w-32 h-32 mx-auto mb-4 border-4 border-[#D9CAC2] rounded-full overflow-hidden group">
+                    <Avatar className="w-full h-full">
+                      {/* Display the doctor's profile image or fallback */}
+                      <AvatarImage
+                        src={doctorData.imageProfile || "/placeholder.svg"} // Use doctor.imageProfile from state
+                        alt={`Avatar of ${doctorData.doctorName}`}
+                      />
+                      <AvatarFallback className="text-2xl bg-[#D9CAC2] text-[#4D3C2D]">
+                        {doctorData.doctorName.split(' ').map(n => n[0]).join('').toUpperCase() || 'DR'}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    {/* Overlay with camera icon */}
+                    <div
+                      className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                      onClick={triggerFileInput}
+                    >
+                      {loadingUpload ? (
+                        <span className="text-white text-sm">Đang tải...</span>
+                      ) : (
+                        <Upload className="w-8 h-8 text-white" />
+                      )}
+                      {/* Hidden file input */}
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        className="hidden"
+                        accept="image/*" // Only allow image files
+                      />
+                    </div>
+                  </div>
+
+                  {/* Upload error message */}
+                  {uploadError && <p className="text-red-500 text-sm mt-2">{uploadError}</p>}
                   <h2 className="text-2xl font-bold mb-2 text-[#4D3C2D]">{doctorData.doctorName}</h2>
                   <p className="text-[#4D3C2D]/60 mb-2">{doctorData.doctorId}</p>
                   {getStatusBadge(doctorData.available)}
@@ -259,7 +314,7 @@ const DoctorDetails: React.FC<DoctorDetailsProps> = ({ doctorId, onClose }) => {
                   <div className="bg-[#EAE4E1]/50 rounded-lg p-4">
                     <h3 className="font-medium mb-2 text-[#4D3C2D]">About</h3>
                     <p className="text-sm text-[#4D3C2D]/70">
-                       Dr. {doctorData.doctorName} có {doctorData.yearOfExperience} năm kinh nghiệm.
+                      Dr. {doctorData.doctorName} có {doctorData.yearOfExperience} năm kinh nghiệm.
                     </p>
                   </div>
 

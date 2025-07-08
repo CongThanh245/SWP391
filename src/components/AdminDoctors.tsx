@@ -6,6 +6,7 @@ import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { Badge } from "@components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
+import { useToast } from '@hooks/use-toast';
 import {
   Select,
   SelectContent,
@@ -23,12 +24,23 @@ import {
 import { AddDoctorDialog } from "@components/AddDoctorDialog";
 import { CSVImportDialog } from "@components/CSVImportDialog";
 import { DoctorService } from '@services/doctorService';
-// Removed: import { useToast } from "@components/ui/use-toast"; // This is removed
 import React, { useState, useEffect, useCallback } from 'react';
 import { UIDoctorData } from '@services/doctorService';
-import { getDoctorStats } from '@api/adminApi';
+import { getDoctorStats, deleteDoctor } from '@api/adminApi';
 import { useNavigate } from "react-router-dom";
 import DoctorAdminDetails from '@components/DoctorAdminDetails'
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@components/ui/alert-dialog";
 
 // Interface for pagination information
 interface PaginatedDoctorsInfo {
@@ -71,8 +83,8 @@ const Doctors = () => {
 
   const [showDoctorDetails, setShowDoctorDetails] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
-
-
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { toasts, toast } = useToast();
   const getInitials = useCallback((name: string) => {
     if (!name || typeof name !== 'string') {
       return 'DR';
@@ -151,7 +163,6 @@ const Doctors = () => {
     selectedSpecialization,
     selectedStatus,
     getInitials,
-    // Removed toast from dependencies
   ]);
 
   useEffect(() => {
@@ -177,6 +188,27 @@ const Doctors = () => {
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
     setCurrentPage(0);
+  };
+
+ const handleDeleteDoctor = async (doctorId: string) => {
+    setIsDeleting(true);
+    try {
+      await deleteDoctor(doctorId);
+      toast({ 
+        title: "Thành công",
+        description: `Đã hoàn thành xóa bác sĩ: ${doctorId}`,
+       
+      });
+    } catch (error) {
+       toast({
+        title: 'Lỗi',
+        description: `Không thể lưu xóa bác sĩ: ${doctorId}`,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
+      fetchData();
+    }
   };
 
   const csvTemplateFields = [
@@ -237,6 +269,7 @@ const Doctors = () => {
   const handleCloseDoctorDetails = () => {
     setShowDoctorDetails(false);
     setSelectedDoctorId(null);
+    fetchData();
   };
 
   const handleNextPage = () => {
@@ -253,254 +286,282 @@ const Doctors = () => {
 
   return (
     <>
-    {showDoctorDetails && selectedDoctorId ? (
+      {showDoctorDetails && selectedDoctorId ? (
         <DoctorAdminDetails doctorId={selectedDoctorId} onClose={handleCloseDoctorDetails} />
       ) : (
-    <div className="flex flex-col h-screen bg-[#EAE4E1]">
-      <Header title="Doctors" subtitle="Manage and view all doctor information" />
+        <div className="flex flex-col h-screen bg-[#EAE4E1]">
+          <Header title="Doctors" subtitle="Manage and view all doctor information" />
 
-      <div className="flex-1 overflow-auto p-6">
-        {/* Enhanced Header Section */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-[#4D3C2D] mb-2">Medical Team</h1>
-              <p className="text-[#4D3C2D]/70">Manage your hospital's medical professionals</p>
-            </div>
-            <div className="flex gap-3">
-              <CSVImportDialog
-                title="Doctors"
-                templateFields={csvTemplateFields}
-                sampleData={csvSampleData}
-                onImport={handleCSVImport}
-                trigger={
-                  <Button variant="outline" className="border-[#4D3C2D] text-[#4D3C2D] hover:bg-[#4D3C2D] hover:text-white">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Import Doctors
-                  </Button>
-                }
-              />
-              <AddDoctorDialog />
-            </div>
-          </div>
-
-          {/* Enhanced Stats Cards with better visual hierarchy */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-3xl font-bold text-[#4D3C2D] mb-1">{stats.totalDoctors}</div>
-                    <div className="text-sm font-medium text-[#4D3C2D]/70">Total Doctors</div>
-                  </div>
-                  <div className="w-12 h-12 bg-[#D9CAC2]/20 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-[#D9CAC2] rounded-full"></div>
-                  </div>
+          <div className="flex-1 overflow-auto p-6">
+            {/* Enhanced Header Section */}
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h1 className="text-3xl font-bold text-[#4D3C2D] mb-2">Medical Team</h1>
+                  <p className="text-[#4D3C2D]/70">Manage your hospital's medical professionals</p>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-3xl font-bold text-green-600 mb-1">{stats.availableDoctors}</div>
-                    <div className="text-sm font-medium text-[#4D3C2D]/70">Available Now</div>
-                  </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-green-500 rounded-full"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-3xl font-bold text-red-600 mb-1">{stats.unavailableDoctors}</div>
-                    <div className="text-sm font-medium text-[#4D3C2D]/70">Unavailable</div>
-                  </div>
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-red-500 rounded-full"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-3xl font-bold text-[#4D3C2D] mb-1">{stats.todayAppointments}</div>
-                    <div className="text-sm font-medium text-[#4D3C2D]/70">Today's Appointments</div>
-                  </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Filter and Search Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#4D3C2D]/60 w-4 h-4" />
-            <Input
-              placeholder="Search name, ID, department..."
-              className="pl-10 bg-white/80 border-[#D9CAC2] focus:border-[#4D3C2D]"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-          </div>
-          <div className="flex gap-2">
-            <Select value={selectedSpecialization} onValueChange={handleSpecializationChange}>
-              <SelectTrigger className="w-[180px] bg-white/80 border-[#D9CAC2]">
-                <Filter className="w-4 h-4 mr-2 text-[#4D3C2D]" />
-                <SelectValue placeholder="Treatment" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Treatment Type</SelectItem>
-                <SelectItem value="IUI_SPECIALIST">IUI Specialist</SelectItem>
-                <SelectItem value="IVF_SPECIALIST">IVF Specialist</SelectItem>
-                <SelectItem value="GENERAL">General</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={selectedStatus} onValueChange={handleStatusChange}>
-              <SelectTrigger className="w-[180px] bg-white/80 border-[#D9CAC2]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="available">Available</SelectItem>
-                <SelectItem value="unavailable">Unavailable</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Doctors Grid Display */}
-        {loading ? (
-          <div className="text-center py-8 text-[#4D3C2D]/70">Loading doctors and stats...</div>
-        ) : doctorsData.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">No doctors found matching your criteria.</div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {doctorsData.map((doctor) => (
-              <Card key={doctor.id} className="bg-white/95 border-[#D9CAC2] hover:shadow-xl transition-all duration-300 hover:bg-white hover:scale-[1.02]">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="w-14 h-14 border-2 border-[#D9CAC2]">
-                        <AvatarImage src={doctor.imageProfile} />
-                        <AvatarFallback className="bg-[#D9CAC2] text-[#4D3C2D] font-semibold text-lg">
-                          {doctor.avatar}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold text-[#4D3C2D] text-lg">{doctor.name}</h3>
-                        <p className="text-sm text-[#4D3C2D]/60 font-medium">{doctor.id}</p>
-                      </div>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-[#4D3C2D] hover:bg-[#D9CAC2]/20">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border-[#D9CAC2]">
-                        <DropdownMenuItem onClick={() => handleViewDetails(doctor.id)} className="text-[#4D3C2D]">
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-[#4D3C2D]">
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-semibold text-[#4D3C2D]">{doctor.department}</p>
-                      <p className="text-sm text-[#4D3C2D]/60">{doctor.specialist}</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-3 bg-[#EAE4E1]/50 rounded-lg">
-                        <div className="text-lg font-bold text-[#4D3C2D]">{doctor.totalPatients}</div>
-                        <div className="text-xs text-[#4D3C2D]/70">Total Patients</div>
-                      </div>
-                      <div className="text-center p-3 bg-[#EAE4E1]/50 rounded-lg">
-                        <div className="text-lg font-bold text-[#4D3C2D]">{doctor.todayAppointments}</div>
-                        <div className="text-xs text-[#4D3C2D]/70">Today's Appts</div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center pt-2">
-                      {getStatusBadge(doctor.status)}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleViewDetails(doctor.id)}
-                        className="border-[#4D3C2D] text-[#4D3C2D] hover:bg-[#4D3C2D] hover:text-white"
-                      >
-                        View Profile
+                <div className="flex gap-3">
+                  <CSVImportDialog
+                    title="Doctors"
+                    templateFields={csvTemplateFields}
+                    sampleData={csvSampleData}
+                    onImport={handleCSVImport}
+                    trigger={
+                      <Button variant="outline" className="border-[#4D3C2D] text-[#4D3C2D] hover:bg-[#4D3C2D] hover:text-white">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Import Doctors
                       </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                    }
+                  />
+                  <AddDoctorDialog />
+                </div>
+              </div>
 
-        {/* Pagination Controls */}
-        <div className="flex items-center justify-between mt-8 p-4">
-          <div className="text-sm text-[#4D3C2D]/70">
-            Showing {doctorsData.length} of {paginationInfo.totalElements} doctors
+              {/* Enhanced Stats Cards with better visual hierarchy */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-3xl font-bold text-[#4D3C2D] mb-1">{stats.totalDoctors}</div>
+                        <div className="text-sm font-medium text-[#4D3C2D]/70">Total Doctors</div>
+                      </div>
+                      <div className="w-12 h-12 bg-[#D9CAC2]/20 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-[#D9CAC2] rounded-full"></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-3xl font-bold text-green-600 mb-1">{stats.availableDoctors}</div>
+                        <div className="text-sm font-medium text-[#4D3C2D]/70">Available Now</div>
+                      </div>
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-green-500 rounded-full"></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-3xl font-bold text-red-600 mb-1">{stats.unavailableDoctors}</div>
+                        <div className="text-sm font-medium text-[#4D3C2D]/70">Unavailable</div>
+                      </div>
+                      <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-red-500 rounded-full"></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-3xl font-bold text-[#4D3C2D] mb-1">{stats.todayAppointments}</div>
+                        <div className="text-sm font-medium text-[#4D3C2D]/70">Today's Appointments</div>
+                      </div>
+                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Filter and Search Bar */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#4D3C2D]/60 w-4 h-4" />
+                <Input
+                  placeholder="Search name, ID, department..."
+                  className="pl-10 bg-white/80 border-[#D9CAC2] focus:border-[#4D3C2D]"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Select value={selectedSpecialization} onValueChange={handleSpecializationChange}>
+                  <SelectTrigger className="w-[180px] bg-white/80 border-[#D9CAC2]">
+                    <Filter className="w-4 h-4 mr-2 text-[#4D3C2D]" />
+                    <SelectValue placeholder="Treatment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Treatment Type</SelectItem>
+                    <SelectItem value="IUI_SPECIALIST">IUI Specialist</SelectItem>
+                    <SelectItem value="IVF_SPECIALIST">IVF Specialist</SelectItem>
+                    <SelectItem value="GENERAL">General</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={selectedStatus} onValueChange={handleStatusChange}>
+                  <SelectTrigger className="w-[180px] bg-white/80 border-[#D9CAC2]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="available">Available</SelectItem>
+                    <SelectItem value="unavailable">Unavailable</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Doctors Grid Display */}
+            {loading ? (
+              <div className="text-center py-8 text-[#4D3C2D]/70">Loading doctors and stats...</div>
+            ) : doctorsData.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No doctors found matching your criteria.</div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {doctorsData.map((doctor) => (
+                  <Card key={doctor.id} className="bg-white/95 border-[#D9CAC2] hover:shadow-xl transition-all duration-300 hover:bg-white hover:scale-[1.02]">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <Avatar className="w-14 h-14 border-2 border-[#D9CAC2]">
+                            <AvatarImage src={doctor.imageProfile} />
+                            <AvatarFallback className="bg-[#D9CAC2] text-[#4D3C2D] font-semibold text-lg">
+                              {doctor.avatar}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h3 className="font-semibold text-[#4D3C2D] text-lg">{doctor.name}</h3>
+                            <p className="text-sm text-[#4D3C2D]/60 font-medium">{doctor.id}</p>
+                          </div>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="text-[#4D3C2D] hover:bg-[#D9CAC2]/20">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-white border-[#D9CAC2]">
+                            <DropdownMenuItem onClick={() => handleViewDetails(doctor.id)} className="text-[#4D3C2D]">
+                              <Eye className="w-4 h-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-[#4D3C2D]">
+                              <Edit className="w-4 h-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                {/* Đây là nút kích hoạt AlertDialog, nó trông giống một DropdownMenuItem */}
+                                <DropdownMenuItem
+                                  onSelect={(e) => e.preventDefault()} // Ngăn chặn Dropdown đóng ngay lập tức
+                                  className="text-red-600 focus:bg-red-50 focus:text-red-700 cursor-pointer"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-white border-[#D9CAC2] rounded-lg p-6">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="text-[#4D3C2D]">Xác nhận xóa bác sĩ</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-gray-600">
+                                    Bạn có chắc chắn muốn xóa bác sĩ **{doctor.name}**? Hành động này không thể hoàn tác.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="pt-4 flex justify-end gap-2">
+                                  <AlertDialogCancel className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                                    Hủy bỏ
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteDoctor(doctor.id)}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                                    disabled={isDeleting} // Vô hiệu hóa nút khi đang xóa
+                                  >
+                                    {isDeleting ? 'Đang xóa...' : 'Xóa'}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-sm font-semibold text-[#4D3C2D]">{doctor.department}</p>
+                          <p className="text-sm text-[#4D3C2D]/60">{doctor.specialist}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="text-center p-3 bg-[#EAE4E1]/50 rounded-lg">
+                            <div className="text-lg font-bold text-[#4D3C2D]">{doctor.totalPatients}</div>
+                            <div className="text-xs text-[#4D3C2D]/70">Total Patients</div>
+                          </div>
+                          <div className="text-center p-3 bg-[#EAE4E1]/50 rounded-lg">
+                            <div className="text-lg font-bold text-[#4D3C2D]">{doctor.todayAppointments}</div>
+                            <div className="text-xs text-[#4D3C2D]/70">Today's Appts</div>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center pt-2">
+                          {getStatusBadge(doctor.status)}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleViewDetails(doctor.id)}
+                            className="border-[#4D3C2D] text-[#4D3C2D] hover:bg-[#4D3C2D] hover:text-white"
+                          >
+                            View Profile
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between mt-8 p-4">
+              <div className="text-sm text-[#4D3C2D]/70">
+                Showing {doctorsData.length} of {paginationInfo.totalElements} doctors
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#D9CAC2] text-[#4D3C2D]"
+                  onClick={handlePrevPage}
+                  disabled={paginationInfo.first || loading}
+                >
+                  Previous
+                </Button>
+                {/* MODIFIED: Display current page and total pages */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-[#4D3C2D] text-white border-[#4D3C2D]"
+                  disabled
+                >
+                  Page {paginationInfo.page + 1} of {paginationInfo.totalPages}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#D9CAC2] text-[#4D3C2D]"
+                  onClick={handleNextPage}
+                  disabled={paginationInfo.last || loading}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-[#D9CAC2] text-[#4D3C2D]"
-              onClick={handlePrevPage}
-              disabled={paginationInfo.first || loading}
-            >
-              Previous
-            </Button>
-            {/* MODIFIED: Display current page and total pages */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-[#4D3C2D] text-white border-[#4D3C2D]"
-              disabled
-            >
-              Page {paginationInfo.page + 1} of {paginationInfo.totalPages}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-[#D9CAC2] text-[#4D3C2D]"
-              onClick={handleNextPage}
-              disabled={paginationInfo.last || loading}
-            >
-              Next
-            </Button>
-          </div>
+
         </div>
-      </div>
-      
-    </div>
-    )}
+      )}
     </>
   );
 };
