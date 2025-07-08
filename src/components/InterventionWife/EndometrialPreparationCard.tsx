@@ -400,6 +400,21 @@ const EndometrialPreparationCard: React.FC<EndometrialPreparationCardProps> = ({
 
   const renderValue = (value) => value || "N/A";
 
+  const renderDrugResponse = (value: string | undefined | null): string => {
+    if (!value) {
+      return "Không xác định"; // Hoặc một chuỗi mặc định khác
+    }
+    switch (value) {
+      case "EFFECTIVE":
+        return "Hiệu quả";
+      case "INEFFECTIVE":
+        return "Không hiệu quả";
+      case "UNCLEAR":
+        return "Chưa rõ";
+      default:
+        return value;
+    }
+  };
   const isEditable = endometrialPreparationData.status === "IN_PROGRESS";
   const isOperationInProgress =
     isSavingEndometrialPreparation || isCompleting || isCancelling;
@@ -472,7 +487,7 @@ const EndometrialPreparationCard: React.FC<EndometrialPreparationCardProps> = ({
                 <div>
                   <Label>Đáp ứng thuốc</Label>
                   <p className="font-medium">
-                    {renderValue(endometrialPreparationData.drugResponse)}
+                    {renderDrugResponse(endometrialPreparationData.drugResponse)}
                   </p>
                 </div>
                 <div>

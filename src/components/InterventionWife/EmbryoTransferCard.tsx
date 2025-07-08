@@ -405,12 +405,10 @@ const EmbryoTransferCard: React.FC<EmbryoTransferCardProps> = ({ patientId }) =>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Chọn đáp ứng" />
                                 </SelectTrigger>
-                                <SelectContent>
+                               <SelectContent>
                                     <SelectItem value="EFFECTIVE">Hiệu quả</SelectItem>
-                                    <SelectItem value="NOT_EFFECTIVE">Không hiệu quả</SelectItem>
-                                    <SelectItem value="GOOD">Tốt</SelectItem>
-                                    <SelectItem value="AVERAGE">Trung bình</SelectItem>
-                                    <SelectItem value="POOR">Kém</SelectItem>
+                                    <SelectItem value="INEFFECTIVE">Không hiệu quả</SelectItem>
+                                    <SelectItem value="UNCLEAR">Chưa kết luận</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

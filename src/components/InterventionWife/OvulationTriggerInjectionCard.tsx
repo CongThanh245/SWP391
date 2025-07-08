@@ -279,6 +279,21 @@ const OvulationTriggerInjectionCard: React.FC<OvulationTriggerInjectionCardProps
     }, [patientId]);
 
     const renderValue = (value) => value || 'N/A';
+    const renderDrugResponse = (value: string | undefined | null): string => {
+    if (!value) {
+      return "Không xác định"; // Hoặc một chuỗi mặc định khác
+    }
+    switch (value) {
+      case "EFFECTIVE":
+        return "Hiệu quả";
+      case "INEFFECTIVE":
+        return "Không hiệu quả";
+      case "UNCLEAR":
+        return "Chưa rõ";
+      default:
+        return value;
+    }
+  };
 
     const isEditable = ovulationTriggerData.status === 'IN_PROGRESS';
     const isOperationInProgress = isSavingOvulationTrigger || isCompleting || isCancelling;
@@ -331,7 +346,7 @@ const OvulationTriggerInjectionCard: React.FC<OvulationTriggerInjectionCardProps
                                 </div>
                                 <div>
                                     <Label>Đáp ứng thuốc</Label>
-                                    <p className="font-medium">{renderValue(ovulationTriggerData.drugResponse)}</p>
+                                    <p className="font-medium">{renderDrugResponse(ovulationTriggerData.drugResponse)}</p>
                                 </div>
                                 <div>
                                     <Label>Trạng thái</Label>
@@ -407,10 +422,8 @@ const OvulationTriggerInjectionCard: React.FC<OvulationTriggerInjectionCardProps
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="EFFECTIVE">Hiệu quả</SelectItem>
-                                    <SelectItem value="NOT_EFFECTIVE">Không hiệu quả</SelectItem>
-                                    <SelectItem value="GOOD">Tốt</SelectItem>
-                                    <SelectItem value="AVERAGE">Trung bình</SelectItem>
-                                    <SelectItem value="POOR">Kém</SelectItem>
+                                    <SelectItem value="INEFFECTIVE">Không hiệu quả</SelectItem>
+                                    <SelectItem value="UNCLEAR">Chưa kết luận</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

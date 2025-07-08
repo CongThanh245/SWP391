@@ -147,14 +147,6 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
                                 </SelectContent>
                             </Select>
                         </div>
-
-                        <Button
-                            variant="outline"
-                            onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-                            className="border-[#D9CAC2] text-[#4D3C2D] hover:bg-[#D9CAC2]"
-                        >
-                            Hôm nay
-                        </Button>
                     </div>
                 </CardContent>
             </Card>

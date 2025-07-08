@@ -283,6 +283,21 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
     }, [patientId]);
 
     const renderValue = (value) => value || 'N/A';
+    const renderDrugResponse = (value: string | undefined | null): string => {
+    if (!value) {
+      return "Không xác định"; // Hoặc một chuỗi mặc định khác
+    }
+    switch (value) {
+      case "EFFECTIVE":
+        return "Hiệu quả";
+      case "INEFFECTIVE":
+        return "Không hiệu quả";
+      case "UNCLEAR":
+        return "Chưa rõ";
+      default:
+        return value;
+    }
+  };
 
     // Determine if the form should be editable
     const isEditable = ovarianStimulationData.status === 'IN_PROGRESS';
@@ -337,7 +352,7 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                                 </div>
                                 <div>
                                     <Label>Đáp ứng thuốc</Label>
-                                    <p className="font-medium">{renderValue(ovarianStimulationData.drugResponse)}</p>
+                                    <p className="font-medium">{renderDrugResponse(ovarianStimulationData.drugResponse)}</p>
                                 </div>
                                 <div>
                                     <Label>Trạng thái</Label>
@@ -411,12 +426,10 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                                 <SelectTrigger>
                                     <SelectValue placeholder="Chọn đáp ứng" />
                                 </SelectTrigger>
-                                <SelectContent>
+                               <SelectContent>
                                     <SelectItem value="EFFECTIVE">Hiệu quả</SelectItem>
-                                    <SelectItem value="NOT_EFFECTIVE">Không hiệu quả</SelectItem>
-                                    <SelectItem value="GOOD">Tốt</SelectItem>
-                                    <SelectItem value="AVERAGE">Trung bình</SelectItem>
-                                    <SelectItem value="POOR">Kém</SelectItem>
+                                    <SelectItem value="INEFFECTIVE">Không hiệu quả</SelectItem>
+                                    <SelectItem value="UNCLEAR">Chưa kết luận</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
