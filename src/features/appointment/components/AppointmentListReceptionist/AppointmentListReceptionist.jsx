@@ -8,6 +8,7 @@ import {
   cancelAppointment,
 } from "@api/appointmentApi";
 import { useToast } from "@hooks/use-toast";
+import { getAppointmentFiles } from "@api/fileApi";
 
 const statusConfig = {
   pending: "Chờ xác nhận",
@@ -22,7 +23,7 @@ const AppointmentListReceptionist = ({
   activeTab = "all",
   refetchAppointments,
 }) => {
-  const { toasts, toast } = useToast(); // Get toast function
+  const { toasts, toast } = useToast();
   const [showNoteModal, setShowNoteModal] = useState({
     open: false,
     content: "",
@@ -39,6 +40,33 @@ const AppointmentListReceptionist = ({
     open: false,
     appointment: null,
   });
+  const [attachments, setAttachments] = useState([]);
+  const [isLoadingAttachments, setIsLoadingAttachments] = useState(false);
+  const [attachmentError, setAttachmentError] = useState(null);
+
+  // Fetch attachments when details modal is opened
+  useEffect(() => {
+    if (detailsModal.open && detailsModal.appointment?.id) {
+      const fetchAttachments = async () => {
+        setIsLoadingAttachments(true);
+        setAttachmentError(null);
+        try {
+          const data = await getAppointmentFiles(detailsModal.appointment.id);
+          setAttachments(data || []);
+        } catch (error) {
+          setAttachmentError("Không thể tải file đính kèm. Vui lòng thử lại.");
+          console.error("Error fetching attachments:", error);
+        } finally {
+          setIsLoadingAttachments(false);
+        }
+      };
+      fetchAttachments();
+    } else {
+      // Reset attachments when modal is closed
+      setAttachments([]);
+      setAttachmentError(null);
+    }
+  }, [detailsModal.open, detailsModal.appointment?.id]);
 
   const handleActionClick = (id, action, appointment = null) => {
     if (action === "confirm") {
@@ -102,7 +130,6 @@ const AppointmentListReceptionist = ({
           title: "Thành công",
           description: "Lịch hẹn đã được đánh dấu là hoàn thành!",
         });
-        console.log(toasts);
       } else if (action === "cancel") {
         await cancelAppointment(appointmentId);
         toast({
@@ -110,7 +137,6 @@ const AppointmentListReceptionist = ({
           description: "Hủy lịch hẹn thành công!",
           variant: "default",
         });
-        console.log(toast);
       }
       refetchAppointments();
     } catch (error) {
@@ -310,9 +336,7 @@ const AppointmentListReceptionist = ({
               <h3 className={styles.detailsModalTitle}>Chi tiết lịch hẹn</h3>
               <button
                 className={styles.detailsCloseButton}
-                onClick={() =>
-                  setDetailsModal({ open: false, appointment: null })
-                }
+                onClick={() => setDetailsModal({ open: false, appointment: null })}
               >
                 <X size={20} />
               </button>
@@ -340,6 +364,82 @@ const AppointmentListReceptionist = ({
                   {detailsModal.appointment.notes || "Không có"}
                 </p>
               </div>
+
+              {/* Attachments Section with Scroll */}
+              <div className={styles.attachmentsSection}>
+                <h4 className={styles.attachmentsTitle}>File đính kèm</h4>
+                {isLoadingAttachments ? (
+                  <p className={styles.loadingText}>Đang tải file đính kèm...</p>
+                ) : attachmentError ? (
+                  <p className={styles.errorText}>{attachmentError}</p>
+                ) : attachments.length > 0 ? (
+                  <div className={styles.attachmentsList}>
+                    {attachments.map((attachment) => (
+                      <div
+                        key={attachment.attachmentId}
+                        className={styles.attachmentItem}
+                      >
+                        <div className={styles.attachmentInfo}>
+                          <span className={styles.attachmentIcon}>
+                            {attachment.fileType === "PDF" ? (
+                              <svg
+                                className={styles.fileIcon}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className={styles.fileIcon}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
+                              </svg>
+                            )}
+                          </span>
+                          <div>
+                            <p className={styles.attachmentName}>
+                              {attachment.fileName}
+                            </p>
+                            <p className={styles.attachmentDetails}>
+                              {attachment.attachmentType} •{" "}
+                              {attachment.fileSize === 0
+                                ? "N/A"
+                                : `${attachment.fileSize} KB`}
+                            </p>
+                          </div>
+                        </div>
+                        <a
+                          href={attachment.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.attachmentLink}
+                        >
+                          Tải xuống
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className={styles.noAttachments}>Không có file đính kèm</p>
+                )}
+              </div>
             </div>
 
             <div className={styles.detailsModalActions}>
@@ -364,7 +464,7 @@ const AppointmentListReceptionist = ({
         content={confirmDialog.content}
         confirmText={confirmDialog.confirmText}
         cancelText="Hủy bỏ"
-        zIndex={1100} // đảm bảo nằm trên modal chi tiết
+        zIndex={1100}
       />
     </div>
   );

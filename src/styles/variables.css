@@ -6,6 +6,9 @@
   --font-size-lg: 20px;
   --font-size-xl: 28px;
   --font-size-xxl: 36px;
+  --font-size-xs: 12px;
+  
+
 
   /* Màu nền chính */
   --primary-background: #f9f6f6; /* Off-white/cream */
@@ -72,7 +75,7 @@
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
-  --spacing-lg: 24px;
+  --spacing-lg: 20px;
   --spacing-xl: 32px;
   --spacing-xxl: 48px;
 

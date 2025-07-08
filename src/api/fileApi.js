@@ -67,3 +67,18 @@ export const downloadFile = async (patientId) => {
     throw error;
   }
 };
+
+export const getAppointmentFiles = async (appointmentId) => {
+  if (!appointmentId) {
+    throw new Error("appointmentId is required");
+  }
+  try {
+    const response = await apiClient.get(`/appointment/files/get-files`, {
+      params: { appointmentId },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching appointment files:", error.message);
+    throw error;
+  }
+}
