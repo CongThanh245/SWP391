@@ -43,3 +43,17 @@ export const getAdminDashboard = async () => {
     throw new Error(message);
   }
 }
+
+export const getDoctorDetails = async (doctorId) => {
+    try {
+    const response = await apiClient.get(`/admin/doctor/doctor_id_ferticare?doctor_id_ferticare=${doctorId}`);
+    return response.data;
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Failed to fetch doctor details '
+        : 'An unknown error occurred while fetching admin doctor details';
+
+    throw new Error(message);
+  }
+}

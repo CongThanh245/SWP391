@@ -35,6 +35,7 @@ const AdminDashboard: React.FC = () => {
         <main className="flex-1 overflow-hidden">
           {renderContent()}
         </main>
+        
       </div>
     </SidebarProvider>
   );

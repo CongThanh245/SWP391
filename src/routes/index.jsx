@@ -13,7 +13,7 @@ import AppointmentManagement from "@features/appointment/pages/AppointmentManage
 import PreTestResult from "@features/test-result/pages/PreTestResult.jsx";
 import PatientList from "@features/patient/pages/PatientList/PatientList.jsx";
 import DoctorList from "@features/doctor/pages/DoctorList/DoctorList.jsx";
-import React, { useState } from "react";
+import React from "react";
 import DoctorDashboard from "@features/doctor/pages/DoctorDashboard";
 import ReceptionistHomePage from "@features/dashboard/pages/ReceptionistHomePage/ReceptionistHomePage.jsx";
 import DoctorsPage from "@features/doctor/components/DoctorPage/DoctorPage.jsx";
@@ -28,6 +28,7 @@ import MedicineViewPage from "@features/medicine/pages/MedicineViewPage.jsx";
 import MedicalRecordsManager from "@features/file/MedicalRecordsManager/MedicalRecordsManager.jsx";
 import PrescriptionsPage from "@features/medicine/pages/PrescriptionPage.jsx";
 import PatientResultsPage from "@features/test-result/pages/PatientResultPage.jsx";
+
 
 const AppRoutes = () => {
   return (

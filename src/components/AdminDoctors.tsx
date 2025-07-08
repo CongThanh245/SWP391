@@ -27,7 +27,8 @@ import { DoctorService } from '@services/doctorService';
 import React, { useState, useEffect, useCallback } from 'react';
 import { UIDoctorData } from '@services/doctorService';
 import { getDoctorStats } from '@api/adminApi';
-
+import { useNavigate } from "react-router-dom";
+import DoctorAdminDetails from '@components/DoctorAdminDetails'
 
 // Interface for pagination information
 interface PaginatedDoctorsInfo {
@@ -40,8 +41,7 @@ interface PaginatedDoctorsInfo {
 }
 
 const Doctors = () => {
-  // Removed: const { toast } = useToast(); // This line is removed
-
+  const navigate = useNavigate();
   const [finalImportStatus, setFinalImportStatus] = useState<'success' | 'failed' | null>(null);
   const [finalImportMessage, setFinalImportMessage] = useState<string>('');
   const [showImportDialog, setShowImportDialog] = useState(false);
@@ -68,6 +68,10 @@ const Doctors = () => {
     first: true,
     last: true,
   });
+
+  const [showDoctorDetails, setShowDoctorDetails] = useState(false);
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null);
+
 
   const getInitials = useCallback((name: string) => {
     if (!name || typeof name !== 'string') {
@@ -227,8 +231,12 @@ const Doctors = () => {
   };
 
   const handleViewDetails = (doctorId: string) => {
-    console.log("Viewing details for:", doctorId);
-    // Implement navigation or modal display for doctor details here
+    setSelectedDoctorId(doctorId);
+    setShowDoctorDetails(true);
+  };
+  const handleCloseDoctorDetails = () => {
+    setShowDoctorDetails(false);
+    setSelectedDoctorId(null);
   };
 
   const handleNextPage = () => {
@@ -244,6 +252,10 @@ const Doctors = () => {
   };
 
   return (
+    <>
+    {showDoctorDetails && selectedDoctorId ? (
+        <DoctorAdminDetails doctorId={selectedDoctorId} onClose={handleCloseDoctorDetails} />
+      ) : (
     <div className="flex flex-col h-screen bg-[#EAE4E1]">
       <Header title="Doctors" subtitle="Manage and view all doctor information" />
 
@@ -486,7 +498,10 @@ const Doctors = () => {
           </div>
         </div>
       </div>
+      
     </div>
+    )}
+    </>
   );
 };
 
