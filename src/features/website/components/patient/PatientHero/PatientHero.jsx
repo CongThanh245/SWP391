@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./PatientHero.module.css";
 import BookingForm from "@features/appointment/components/BookingForm/BookingForm";
 import { Link } from "react-router-dom";
@@ -9,6 +9,7 @@ import {
   ToastDescription,
   ToastClose,
 } from "@components/ui/toast";
+import { User, FileText, Calendar, CloudUpload } from "lucide-react";
 
 const PatientHero = () => {
   const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
@@ -32,110 +33,68 @@ const PatientHero = () => {
   return (
     <section className={styles.container}>
       <div className={styles.backgroundDecoration}></div>
+      <div className={styles.pulseRing}></div>
+      <div className={styles.particleContainer}>
+        <div className={styles.particle}></div>
+        <div className={styles.particle}></div>
+        <div className={styles.particle}></div>
+      </div>
 
       <div className={styles.content}>
-        {/* Left Section */}
-        <div className={styles.leftSection}>
-          <div className={styles.badge}>
-            Trung tâm điều trị hiếm muộn hàng đầu
-          </div>
-
-          <h1 className={styles.title}>
+        <div className={styles.centerSection}>
+          <h1 className={`${styles.title} ${styles.fadeInUp}`}>
             Chào mừng bạn đến với
             <br />
             FertiCare
           </h1>
-
-          <p className={styles.subtitle}>
+          <p className={`${styles.subtitle} ${styles.fadeInUp}`}>
             Chúng tôi mang đến những giải pháp điều trị hiếm muộn tiên tiến
             nhất, với đội ngũ bác sĩ giàu kinh nghiệm và công nghệ y tế hiện
             đại.
           </p>
-
           <button
-            className={styles.primaryButton}
+            className={`${styles.primaryButton} ${styles.glowEffect}`}
             onClick={handleBookAppointment}
           >
-            Đặt lịch hẹn ngay
+            <span className={styles.buttonText}>Đặt lịch hẹn ngay</span>
+            <span className={styles.ripple}></span>
           </button>
         </div>
 
-        {/* Right Section */}
-        <div className={styles.rightSection}>
-          {/* Card for View Schedule */}
-          <Link
-            to="/health-records/appointments"
-            className={styles.featureCard}
-          >
-            <svg
-              className={styles.icon}
-              xmlns="http://www.w3.org/2000/svg"
-              width="35"
-              height="35"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#4D3C2D"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M8 2v4" />
-              <path d="M16 2v4" />
-              <rect width="18" height="18" x="3" y="4" rx="2" />
-              <path d="M3 10h18" />
-              <path d="M8 14h.01" />
-              <path d="M12 14h.01" />
-              <path d="M16 14h.01" />
-              <path d="M8 18h.01" />
-              <path d="M12 18h.01" />
-              <path d="M16 18h.01" />
-            </svg>
-            <h3 className={styles.cardTitle}>Xem lịch khám</h3>
-            <p className={styles.cardDescription}>
-              Kiểm tra và quản lý lịch hẹn khám bệnh của bạn một cách dễ dàng
-            </p>
-            <span className={styles.cardLink}>Xem ngay</span>
+        <div className={styles.actionSection}>
+          <Link to="/health-records/profile" className={styles.actionButton}>
+            <User className={styles.icon} size={20} />
+            Hồ sơ cá nhân
           </Link>
-
-          {/* Card for Medical Record */}
           <Link
             to="/health-records/medical-records"
-            className={styles.featureCard}
+            className={styles.actionButton}
           >
-            <svg
-              className={styles.icon}
-              xmlns="http://www.w3.org/2000/svg"
-              width="35"
-              height="35"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#4D3C2D"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-              <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-              <path d="M10 9H8" />
-              <path d="M16 13H8" />
-              <path d="M16 17H8" />
-            </svg>
-            <h3 className={styles.cardTitle}>Hồ sơ bệnh án</h3>
-            <p className={styles.cardDescription}>
-              Truy cập hồ sơ y tế và theo dõi quá trình điều trị của bạn
-            </p>
-            <span className={styles.cardLink}>Xem ngay</span>
+            <FileText className={styles.icon} size={20} />
+            Kết quả khám bệnh
+          </Link>
+          <Link
+            to="/health-records/appointments"
+            className={styles.actionButton}
+          >
+            <Calendar className={styles.icon} size={20} />
+            Lịch hẹn của tôi
+          </Link>
+          <Link
+            to="/health-records/attachments"
+            className={styles.actionButton}
+          >
+            <CloudUpload className={styles.icon} size={20} />
+            Tài liệu tải lên
           </Link>
         </div>
       </div>
 
-      {/* Booking Modal */}
       <BookingForm
         isOpen={isBookingFormOpen}
         onClose={handleCloseBookingForm}
-        onSuccess={handleBookingSuccess} // ← truyền callback
+        onSuccess={handleBookingSuccess}
       />
-      {/* Render tất cả toast */}
       {toasts.map((t) => (
         <Toast key={t.id} {...t}>
           {t.title && <ToastTitle>{t.title}</ToastTitle>}

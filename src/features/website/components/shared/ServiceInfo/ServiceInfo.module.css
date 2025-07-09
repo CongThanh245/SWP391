@@ -1,0 +1,217 @@
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+/* Service Section */
+.serviceSection {
+  margin-bottom: var(--spacing-xl);
+  background: var(--card-background);
+  border-radius: 10px;
+  padding: var(--spacing-lg);
+  border: 1px solid var(--card-border);
+}
+
+/* Service Header */
+.serviceHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.serviceIcon {
+  width: 50px;
+  height: 50px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-right: var(--spacing-md);
+  color: white;
+}
+
+.serviceTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--deep-taupe);
+  margin-bottom: var(--spacing-sm);
+}
+
+.serviceShortDesc {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Tabs */
+.tabsNav {
+  display: flex;
+  background: var(--secondary-background);
+  border-radius: 10px;
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tabButton {
+  flex: 1;
+  padding: var(--spacing-md);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.tabButton:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tabActive {
+  background-color: white;
+  color: var(--deep-taupe);
+  font-weight: 600;
+}
+
+.tabContent {
+  background: white;
+  border-radius: 10px;
+  padding: var(--spacing-lg);
+}
+
+/* Content */
+.contentTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--deep-taupe);
+  margin-bottom: var(--spacing-md);
+}
+
+.contentSubtitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--deep-taupe);
+  margin: var(--spacing-md) 0;
+}
+
+.contentText {
+  font-size: var(--font-size-base);
+  line-height: 1.8;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.contentList {
+  list-style: disc;
+  padding-left: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.listItem {
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Process Steps */
+.processStep {
+  display: flex;
+  background: white;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.stepNumber {
+  width: 30px;
+  height: 30px;
+  background: var(--accent-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  margin-right: var(--spacing-md);
+}
+
+.stepTitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--deep-taupe);
+  margin-bottom: var(--spacing-sm);
+}
+
+.stepDescription {
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.stepDuration {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--accent-color);
+  color: white;
+  border-radius: 20px;
+  font-size: var(--font-size-sm);
+}
+
+/* Preparation & Notes */
+.preparationGrid, .notesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.preparationCard, .noteCard {
+  background: white;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: var(--spacing-md);
+}
+
+.preparationTitle, .noteTitle {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--deep-taupe);
+  margin-bottom: var(--spacing-md);
+}
+
+.preparationList, .notesList {
+  list-style: disc;
+  padding-left: var(--spacing-lg);
+}
+
+.preparationItem, .noteItem {
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .serviceHeader {
+    flex-direction: column;
+    text-align: center;
+  }
+  .serviceIcon {
+    margin-bottom: var(--spacing-md);
+  }
+  .tabsNav {
+    flex-direction: column;
+  }
+  .processStep {
+    flex-direction: column;
+  }
+  .stepNumber {
+    margin-bottom: var(--spacing-md);
+  }
+}
