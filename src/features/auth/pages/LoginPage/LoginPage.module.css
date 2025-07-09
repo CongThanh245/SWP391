@@ -11,10 +11,12 @@
   --shadow-accent: rgba(0, 0, 0, 0.1);
   --shadow-dark: rgba(0, 0, 0, 0.05);
   --gradient-circle: radial-gradient(circle, rgba(128, 45, 70, 0.1) 0%, rgba(128, 45, 70, 0) 70%);
+  --font-primary: 'Montserrat', sans-serif;
 }
 
 /* Container chính */
 .loginContainer {
+  font-family: var(--font-primary);
   position: relative;
   min-height: 100vh;
   padding: 2rem;
@@ -100,7 +102,7 @@
   max-width: 450px;
   border-radius: 16px;
   padding: 3rem;
-  box-shadow: 
+  box-shadow:
     0 8px 30px var(--shadow-accent),
     0 3px 10px var(--shadow-dark);
   backdrop-filter: blur(15px);
@@ -130,15 +132,18 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--secondary-background); /* Semi-transparent overlay */
+  background: var(--secondary-background);
+  /* Semi-transparent overlay */
   z-index: 2;
   border-radius: 16px;
 }
 
-.formWrapper > *:not(.backgroundImage) {
+.formWrapper>*:not(.backgroundImage) {
   position: relative;
-  z-index: 3; /* Content above image and overlay */
+  z-index: 3;
+  /* Content above image and overlay */
 }
+
 /* Additional Options */
 .additionalOptions {
   width: 100%;
@@ -257,17 +262,17 @@
     text-align: left;
     align-self: flex-start;
   }
-  
+
   .backToHome a {
     display: inline-flex;
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
-  
+
   .loginContainer {
     padding: 1rem;
   }
-  
+
   .formWrapper {
     padding: 2rem;
     max-width: 100%;
@@ -344,5 +349,6 @@
 
 /* Debug CSS - Thêm tạm để test */
 .formGroup :global(.MuiTextField-root .MuiOutlinedInput-root) {
-  /* background-color: rgba(255, 0, 0, 0.05) !important; */ /* Uncomment để test */
+  /* background-color: rgba(255, 0, 0, 0.05) !important; */
+  /* Uncomment để test */
 }

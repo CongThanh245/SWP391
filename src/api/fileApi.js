@@ -53,3 +53,17 @@ export const deletePatientFile = async (patientId, attachmentId) => {
     throw error;
   }
 };
+
+
+export const downloadFile = async (patientId) => {
+  try {
+    const response = await apiClient.get(`export-pdf`, {
+      params: { patientId },
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error downloading file:", error.message);
+    throw error;
+  }
+};

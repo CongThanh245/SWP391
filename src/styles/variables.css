@@ -28,7 +28,7 @@
   --button-secondary-bg: transparent;
   --button-secondary-text: #9e8e7b; /* Soft taupe */
   --button-secondary-border: #bdbdbd; /* Light gray */
-  --button-hover-bg: #4a3639; /* Darker taupe cho hover */
+  --button-hover-bg: #6b2e2e; /* Darker taupe cho hover */
 
   /* Màu hover và shadow */
   --hover-accent: rgba(97, 71, 76, 0.2); /* Deep taupe với opacity */
