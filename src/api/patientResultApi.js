@@ -10,7 +10,7 @@ const drugResponseTranslations = {
 
 const statusTranslations = {
   IN_PROGRESS: "Đang tiến hành",
-  COMPLETED: "Hoàn thành",
+  COMPLETED: "Đã hoàn thành",
   CANCELLED: "Đã hủy",
 };
 

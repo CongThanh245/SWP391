@@ -38,24 +38,21 @@ const Footer = () => {
           <h3 className="footer-heading">Liên kết nhanh</h3>
           <ul className="footer-links">
             <li><a href="/">Trang chủ</a></li>
-            <li><a href="/facility">Giới thiệu cơ sở y tế</a></li>
-            <li><a href="/doctors">Đội ngũ bác sĩ</a></li>
+            <li><a href="/about-us">Giới thiệu cơ sở y tế</a></li>
+            <li><a href="/our-doctors">Đội ngũ bác sĩ</a></li>
             <li><a href="/services">Dịch vụ điều trị</a></li>
-            <li><a href="/blog">Blog</a></li>
             <li><a href="/health-records">Hồ sơ sức khỏe</a></li>
-            <li><a href="/contact">Liên hệ</a></li>
           </ul>
         </div>
 
         <div className="footer-section services">
           <h3 className="footer-heading">Dịch vụ</h3>
           <ul className="footer-links">
-            <li><a href="/services/iui">Điều trị IUI</a></li>
-            <li><a href="/services/ivf">Điều trị IVF</a></li>
-            <li><a href="/services/consultation">Tư vấn hiếm muộn</a></li>
-            <li><a href="/services/tracking">Theo dõi chu kỳ</a></li>
-            <li><a href="/services/medication">Quản lý đơn thuốc</a></li>
-            <li><a href="/services/prices">Bảng giá dịch vụ</a></li>
+            <li><a href="/health-records/profile">Hồ sơ cá nhân</a></li>
+            <li><a href="/health-records/medical-records">Kết quả điều trị</a></li>
+            <li><a href="/health-records/appointmens">Lịch khám</a></li>
+            <li><a href="/health-records/prescriptions">Đơn thuốc</a></li>
+            <li><a href="/health-records/attachments">Hồ sơ đính kèm</a></li>
           </ul>
         </div>
 
@@ -73,13 +70,6 @@ const Footer = () => {
             <div className="contact-item">
               <Mail size={18} />
               <span>info@FertiCare.vn</span>
-            </div>
-          </div>
-          <div className="footer-subscribe">
-            <h4>Đăng ký nhận tin</h4>
-            <div className="subscribe-form">
-              <input type="email" placeholder="Email của bạn" />
-              <button type="submit">Đăng ký</button>
             </div>
           </div>
         </div>

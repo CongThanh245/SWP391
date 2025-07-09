@@ -61,7 +61,7 @@ const ProfilePage = () => {
     { key: 'profile', label: 'Hồ sơ cá nhân', icon: User, path: '/health-records/profile' },
     { key: 'medical-records', label: 'Kết quả điều trị', icon: FileText, path: '/health-records/medical-records' },
     { key: 'appointments', label: 'Lịch khám', icon: Calendar, path: '/health-records/appointments' },
-    { key: 'health-monitoring', label: 'Đơn thuốc', icon: Activity, path: '/health-records/health-monitoring' },
+    { key: 'prescriptions', label: 'Đơn thuốc', icon: Activity, path: '/health-records/prescriptions' },
     { key: 'attachments', label: 'Hồ sơ đính kèm', icon: CloudUpload, path: '/health-records/attachments' },
   ];
 

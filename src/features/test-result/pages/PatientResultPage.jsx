@@ -89,7 +89,7 @@ const PatientResultsPage = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>Kết Quả Khám Bệnh</h1>
-        <div className={styles.subtitle}>Chi tiết quá trình điều trị</div>
+        <div className={styles.subtitle}>Tải về tại đây để xem chi tiết quá trình điều trị</div>
         <button className={styles.downloadButton} onClick={handleDownload}>
          Xem chi tiết kết quả
         </button>

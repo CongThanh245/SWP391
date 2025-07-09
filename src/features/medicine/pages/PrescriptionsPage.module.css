@@ -1,7 +1,6 @@
 .prescriptionsContainer {
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--spacing-md);
   background: var(--primary-background);
   min-height: 100vh;
   font-family: var(--font-family);
@@ -9,19 +8,17 @@
 
 /* Header */
 .header {
-  text-align: center;
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: var(--card-background);
-  border-radius: var(--border-radius-2);
-  box-shadow: var(--shadow-dark-gray);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;  
 }
 
 .pageTitle {
-  font-size: var(--font-size-lg);
-  color: var(--text-primary);
-  font-weight: 600;
-  margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
 }
 
 .subtitle {

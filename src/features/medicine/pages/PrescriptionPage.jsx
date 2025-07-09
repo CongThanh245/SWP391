@@ -135,7 +135,7 @@ const PrescriptionsPage = () => {
   return (
     <div className={styles.prescriptionsContainer}>
       <div className={styles.header}>
-        <h1 className={styles.pageTitle}>Đơn Thuốc Của Tôi</h1>
+        <h1 className={styles.pageTitle}>Đơn thuốc của tôi</h1>
       </div>
 
       {/* Filter Tabs */}
@@ -159,7 +159,7 @@ const PrescriptionsPage = () => {
               }`}
               onClick={() => setActiveTab(key)}
             >
-              {config.title} ({count})
+              {config.title}
             </button>
           );
         })}
@@ -182,7 +182,12 @@ const PrescriptionsPage = () => {
                   <span className={styles.treatmentIcon}>
                     {typeConfig.icon}
                   </span>
-                  <h3 className={styles.treatmentTitle}>{typeConfig.title}</h3>
+                  <h3 className={styles.treatmentTitle}>
+                    <strong style={{ paddingRight: "5px" }}>
+                      Thuốc cho phác đồ:
+                    </strong>{" "}
+                    {typeConfig.title}
+                  </h3>
                 </div>
                 <div className={styles.prescriptionMeta}>
                   <div className={styles.metaItem}>

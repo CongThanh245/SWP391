@@ -47,9 +47,8 @@ const AppRoutes = () => {
           <Route path="profile" element={<ProfileContent />} />
           <Route path="medical-records" element={<PatientResultsPage />} />
           <Route path="appointments" element={<AppointmentSchedulePage />} />
-          <Route path="health-monitoring" element={<PrescriptionsPage />} />
-          <Route path="notifications" element={<AppointmentsContent />} />
-          <Route path="attachments" element={<MedicalRecordsManager></MedicalRecordsManager>} />
+          <Route path="prescriptions" element={<PrescriptionsPage />} />
+          <Route path="attachments" element={<MedicalRecordsManager/>} />
         </Route>
       </Route>
 
