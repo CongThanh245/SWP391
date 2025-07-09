@@ -531,7 +531,7 @@ body.modalOpen {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-md);
-  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
   border-top: 2px solid var(--card-border);
   background: linear-gradient(135deg, #f8f5f2 0%, var(--secondary-background) 100%);
 }

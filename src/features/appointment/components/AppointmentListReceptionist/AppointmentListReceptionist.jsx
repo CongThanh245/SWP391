@@ -343,14 +343,6 @@ const AppointmentListReceptionist = ({
             </div>
 
             <div className={styles.detailsModalActions}>
-              <button
-                className={styles.detailsCancelButton}
-                onClick={() =>
-                  setDetailsModal({ open: false, appointment: null })
-                }
-              >
-                Hủy
-              </button>
               {detailsModal.appointment.status === "pending" && (
                 <button
                   className={styles.detailsConfirmButton}

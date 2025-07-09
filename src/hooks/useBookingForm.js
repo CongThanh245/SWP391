@@ -212,7 +212,7 @@ const useBookingForm = (onClose) => {
         appointmentDate: formData.date,
         appointmentTime: formData.timeSlot,
         note: formData.notes || "",
-        fileIds: formData.files,
+        attachmentId: formData.files,
       };
       
       console.log("Creating appointment:", payload);
