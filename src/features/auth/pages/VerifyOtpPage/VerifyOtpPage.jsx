@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import OTPInput from 'react-otp-input';
-import {  useNavigate } from 'react-router-dom';
-import { verifyOtp } from '../../../../api/authApi';  // import hàm API bạn đã viết
+import { verifyOtp } from '../../../../api/authApi';
+import styles from './VerifyOtpPage.module.css'; 
 
 function VerifyOtpPage() {
-    const [token, setToken] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+  const [token, setToken] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-
-    const handleChange = (value) => {
+  const handleChange = (value) => {
     setToken(value);
     setError('');
   };
@@ -36,42 +36,33 @@ function VerifyOtpPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: 'auto', padding: 20 }}>
-      <h2>Nhập mã kích hoạt tài khoản</h2>
-      <OTPInput
-        value={token}
-        onChange={handleChange}
-        numInputs={6}
-        isInputNum
-        separator={<span style={{ margin: '0 8px' }}>-</span>}
-        renderInput={(props) => (
-          <input
-            {...props}
-            style={{
-              width: '3rem',
-              height: '3rem',
-              fontSize: '1.5rem',
-              borderRadius: 4,
-              border: '1px solid #ccc',
-            }}
-          />
-        )}
-      />
-
-      {error && <p style={{ color: 'red', marginTop: 10 }}>{error}</p>}
-
+    <div className={styles.verifyOtpContainer}>
+      <h2>
+        Vui lòng nhập mã OTP gồm 6 chữ số mà chúng tôi đã gửi đến email của bạn. <br />
+        Kiểm tra hộp thư đến hoặc thư mục spam nếu không thấy email.
+      </h2>
+      <div className={styles.otpInputContainer}>
+        <OTPInput
+          value={token}
+          onChange={handleChange}
+          numInputs={6}
+          isInputNum
+          separator={<span className={styles.otpSeparator}>-</span>}
+          renderInput={(props) => <input {...props} className={styles.otpInput} aria-label="Mã OTP" />}
+        />
+      </div>
+      {error && <p className={styles.errorMessage} role="alert">{error}</p>}
       <button
+        className={styles.verifyButton}
         onClick={handleVerify}
         disabled={loading || token.length !== 6}
-        style={{
-          marginTop: 20,
-          padding: '10px 20px',
-          fontSize: '1rem',
-          cursor: loading || token.length !== 6 ? 'not-allowed' : 'pointer',
-        }}
+        aria-label={loading ? 'Đang xác thực mã OTP' : 'Xác thực mã OTP'}
       >
         {loading ? 'Đang xác thực...' : 'Xác thực'}
       </button>
+      <Link to="/register" className={styles.registerLink} aria-label="Quay lại trang đăng ký">
+        Quay lại đăng ký
+      </Link>
     </div>
   );
 }

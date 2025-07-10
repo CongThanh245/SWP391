@@ -3,7 +3,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { TextField } from "@mui/material";
 import styles from "./LoginForm.module.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Thêm Link
 import { useToast } from "@hooks/use-toast";
 
 const LoginForm = ({
@@ -50,7 +50,6 @@ const LoginForm = ({
         const errorMessage = errorData.validationErrors
           ? errorData.validationErrors.join(", ")
           : "Email hoặc mật khẩu không đúng";
-        // Gán lỗi vào trường username hoặc password
         setFieldError("username", errorMessage);
         setFieldError("password", errorMessage);
         throw new Error(errorMessage);
@@ -65,14 +64,12 @@ const LoginForm = ({
         localStorage.setItem("isFreshLogin", "true");
       }
 
-      // Hiển thị toast thành công
       toast({
         title: "Thành công",
         description: "Đăng nhập thành công!",
         variant: "default",
       });
 
-      // Navigate to the appropriate dashboard
       const storedRole =
         localStorage.getItem("role")?.toLowerCase() || "patient";
       const redirectPath = roleRedirectMap[storedRole] || "/";
@@ -82,8 +79,6 @@ const LoginForm = ({
       }, 1000);
     } catch (error) {
       console.error("Lỗi đăng nhập:", error.message);
-
-      // Clear mật khẩu khi đăng nhập thất bại
       setFieldValue("password", "");
     } finally {
       setLoading(false);
@@ -105,8 +100,8 @@ const LoginForm = ({
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
-          validateOnBlur={false} // Prevent validation on blur
-          validateOnChange={false} // Prevent validation on change
+          validateOnBlur={false}
+          validateOnChange={false}
         >
           {({ values, errors, touched, handleChange, handleBlur }) => (
             <Form className={styles.loginForm}>
@@ -139,6 +134,13 @@ const LoginForm = ({
                   disabled={loading}
                   variant="outlined"
                 />
+              </div>
+
+              {/* Thêm liên kết Quên mật khẩu */}
+              <div className={styles.forgotPassword}>
+                <Link to="/forgot-password" className={styles.forgotPasswordLink}>
+                  Quên mật khẩu?
+                </Link>
               </div>
 
               <button
