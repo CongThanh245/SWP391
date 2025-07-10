@@ -108,14 +108,7 @@ const PrescriptionsPage = () => {
   if (error) {
     return (
       <div className={styles.errorContainer}>
-        <h2>Lỗi tải dữ liệu</h2>
         <p>{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className={styles.retryButton}
-        >
-          Thử lại
-        </button>
       </div>
     );
   }
