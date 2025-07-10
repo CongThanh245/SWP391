@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import DoctorCard from "@features/doctor/components/DoctorCard/DoctorCard";
 import styles from "./DoctorPage.module.css";
 import { useDoctors } from "@hooks/useDoctors";
@@ -10,8 +9,9 @@ const DoctorsPage = () => {
   const debouncedSearchTerm = useDebounce(inputValue, 500);
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [page, setPage] = useState(0);
-  const size = 10;
-  const [allSpecializations, setAllSpecializations] = useState([]);
+  const size = 5;
+  const allSpecializations = ["IUI_SPECIALIST", "IVF_SPECIALIST"];
+  const contentSectionRef = useRef(null);
 
   const { doctors, pagination, loading, error } = useDoctors({
     search: debouncedSearchTerm || undefined,
@@ -20,26 +20,12 @@ const DoctorsPage = () => {
     size,
   });
 
-  const updateSpecializations = () => {
-    if (!doctors || selectedFilter !== "all" || debouncedSearchTerm) return;
-
-    const specializations = doctors
-      .map((doctor) => doctor.specialization)
-      .filter(Boolean);
-    const uniqueSpecializations = [...new Set(specializations)];
-
-    if (
-      allSpecializations.length === 0 ||
-      JSON.stringify(allSpecializations) !==
-        JSON.stringify(uniqueSpecializations)
-    ) {
-      setAllSpecializations(uniqueSpecializations);
-    }
-  };
-
+  // Cuộn đến contentSection khi page thay đổi
   useEffect(() => {
-    updateSpecializations();
-  }, [doctors, selectedFilter, debouncedSearchTerm, allSpecializations]);
+    if (contentSectionRef.current) {
+      contentSectionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [page]);
 
   return (
     <div className={styles.container}>
@@ -103,64 +89,67 @@ const DoctorsPage = () => {
         </div>
       </div>
 
-      {/* Results count */}
-      <div className={styles.resultsInfo}>
-        <p>
-          Hiện có {doctors.length} bác sĩ
-          {debouncedSearchTerm && ` cho "${debouncedSearchTerm}"`}
-        </p>
-      </div>
-
-      <div className={styles.contentSection}>
-        {(() => {
-          if (loading) {
-            return (
-              <div className={styles.loadingContainer}>
-                <div className={styles.spinner}></div>
-                <p>Đang tải thông tin bác sĩ...</p>
-              </div>
-            );
-          } else if (doctors.length > 0) {
-            return (
-              <div className={styles.doctorsGrid}>
-                {doctors.map((doctor) => (
-                    <DoctorCard doctor={doctor} />
-                ))}
-              </div>
-            );
-          } else {
-            return (
-              <div className={styles.noResults}>
-                <div className={styles.noResultsIcon}>👨‍⚕️</div>
-                <h3>Không tìm thấy bác sĩ</h3>
-                <p>
-                  {debouncedSearchTerm
-                    ? `Không tìm thấy bác sĩ nào với tên "${debouncedSearchTerm}"`
-                    : "Không có bác sĩ nào trong chuyên khoa này"}
-                </p>
-              </div>
-            );
-          }
-        })()}
+      {/* Doctors Section */}
+      <div className={styles.contentSection} ref={contentSectionRef}>
+        {loading ? (
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner}></div>
+            <p>Đang tải thông tin bác sĩ...</p>
+          </div>
+        ) : error ? (
+          <div className={styles.errorContainer}>
+            <p>Lỗi: {error}</p>
+          </div>
+        ) : doctors.length > 0 ? (
+          <div className={styles.doctorsGrid}>
+            {doctors.map((doctor) => (
+              <DoctorCard key={doctor.id} doctor={doctor} />
+            ))}
+          </div>
+        ) : (
+          <div className={styles.noResults}>
+            <div className={styles.noResultsIcon}>👨‍⚕️</div>
+            <h3>Không tìm thấy bác sĩ</h3>
+            <p>
+              {debouncedSearchTerm
+                ? `Không tìm thấy bác sĩ nào với tên "${debouncedSearchTerm}"`
+                : "Không có bác sĩ nào trong chuyên khoa này"}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Pagination */}
-      {pagination?.totalPages > 1 && (
+      {pagination && pagination.totalPages > 1 && (
         <div className={styles.pagination}>
           <button
             disabled={page === 0}
             onClick={() => setPage(page - 1)}
-            className={styles.pageButton}
+            className={`${styles.pageButton} ${
+              page === 0 ? styles.disabled : ""
+            }`}
           >
             Trước
           </button>
-          <span>
-            Trang {page + 1} / {pagination?.totalPages || 1}
-          </span>
+          <div className={styles.pageNumbers}>
+            {Array.from({ length: pagination.totalPages }, (_, index) => (
+              <button
+                key={index}
+                className={`${styles.pageNumber} ${
+                  page === index ? styles.active : ""
+                }`}
+                onClick={() => setPage(index)}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
           <button
-            disabled={page === (pagination?.totalPages || 1) - 1}
+            disabled={page === pagination.totalPages - 1}
             onClick={() => setPage(page + 1)}
-            className={styles.pageButton}
+            className={`${styles.pageButton} ${
+              page === pagination.totalPages - 1 ? styles.disabled : ""
+            }`}
           >
             Sau
           </button>
