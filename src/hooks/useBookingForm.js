@@ -213,6 +213,29 @@ const useBookingForm = (onClose) => {
     setErrors((prev) => ({ ...prev, files: "" }));
     setErrorMessage("");
   };
+  const translateError = (code, message) => {
+    const errorMap = {
+      400: {
+        "Appointments must be booked at least 24 hours in advance":
+          "Lịch hẹn phải được đặt trước ít nhất 24 giờ.",
+      },
+      100: {
+        "You already have 3 appointments on this date. Please delete unnecessary appointments.":
+          "Bạn đã có 3 lịch hẹn vào ngày này. Vui lòng hủy các lịch hẹn không cần thiết.",
+        "You already have another appointment at this time.":
+          "Bạn đã có lịch hẹn khác vào thời điểm này.",
+        default: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+      },
+      409: {
+        default: "Khung giờ đã được đặt.",
+      },
+    };
+
+    if (errorMap[code] && errorMap[code][message]) {
+      return errorMap[code][message];
+    }
+    return errorMap[code]?.default || "Đã xảy ra lỗi. Vui lòng thử lại.";
+  };
 
   // Handle submit
   const handleSubmit = async (e) => {
@@ -239,21 +262,21 @@ const useBookingForm = (onClose) => {
     } catch (err) {
       console.error("Create appointment error:", err);
 
-      let errorMsg = "Đặt lịch thất bại: ";
-      if (err.response?.status === 409) {
-        errorMsg += "Khung giờ đã được đặt.";
-      } else if (err.response?.data?.message?.includes("maximum")) {
-        errorMsg += "Bạn đã đạt giới hạn số lịch hẹn.";
-      } else {
-        errorMsg += err.response?.data?.message || "Lỗi không xác định.";
-      }
+      const errorCode = err.response?.data?.businessErrorCode;
+      const errorMessageFromBackend =
+        err.response?.data?.error || err.response?.data?.message;
 
-      setErrorMessage(errorMsg);
+      // Dịch lỗi sang tiếng Việt
+      const translatedMessage = translateError(
+        errorCode,
+        errorMessageFromBackend
+      );
+
+      setErrorMessage(translatedMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
-
   // Handle input change
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
