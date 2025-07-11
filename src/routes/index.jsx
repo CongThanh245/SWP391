@@ -27,6 +27,7 @@ import MedicalRecordsManager from "@features/file/MedicalRecordsManager/MedicalR
 import PrescriptionsPage from "@features/medicine/pages/PrescriptionPage.jsx";
 import PatientResultsPage from "@features/test-result/pages/PatientResultPage.jsx";
 import NotFoundPage from "@features/website/NotFoundPage.jsx";
+import ForgotPasswordPage from "@features/auth/pages/ForgotPasswordPage.jsx";
 
 
 const AppRoutes = () => {

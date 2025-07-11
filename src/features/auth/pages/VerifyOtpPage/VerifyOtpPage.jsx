@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import OTPInput from 'react-otp-input';
-import { useNavigate } from 'react-router-dom';
 import { verifyOtp } from '../../../../api/authApi';
 import styles from './VerifyOtpPage.module.css'; 
 
@@ -37,7 +37,10 @@ function VerifyOtpPage() {
 
   return (
     <div className={styles.verifyOtpContainer}>
-      <h2>Nhập mã kích hoạt tài khoản</h2>
+      <h2>
+        Vui lòng nhập mã OTP gồm 6 chữ số mà chúng tôi đã gửi đến email của bạn. <br />
+        Kiểm tra hộp thư đến hoặc thư mục spam nếu không thấy email.
+      </h2>
       <div className={styles.otpInputContainer}>
         <OTPInput
           value={token}
@@ -45,17 +48,21 @@ function VerifyOtpPage() {
           numInputs={6}
           isInputNum
           separator={<span className={styles.otpSeparator}>-</span>}
-          renderInput={(props) => <input {...props} className={styles.otpInput} />}
+          renderInput={(props) => <input {...props} className={styles.otpInput} aria-label="Mã OTP" />}
         />
       </div>
-      {error && <p className={styles.errorMessage}>{error}</p>}
+      {error && <p className={styles.errorMessage} role="alert">{error}</p>}
       <button
         className={styles.verifyButton}
         onClick={handleVerify}
         disabled={loading || token.length !== 6}
+        aria-label={loading ? 'Đang xác thực mã OTP' : 'Xác thực mã OTP'}
       >
         {loading ? 'Đang xác thực...' : 'Xác thực'}
       </button>
+      <Link to="/register" className={styles.registerLink} aria-label="Quay lại trang đăng ký">
+        Quay lại đăng ký
+      </Link>
     </div>
   );
 }
