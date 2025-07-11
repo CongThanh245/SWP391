@@ -92,3 +92,19 @@ export const deleteDoctor  = async (doctorId: string): Promise<void>=>{
     throw new Error(message);
   }
 }
+
+export const getPatients = async (
+  params: Record<string, string>
+) => {
+  try {
+    const response = await apiClient.get('/admin/patients', { params });
+    return response.data;
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Failed to fetch patients'
+        : 'An unknown error occurred while fetching doctors';
+
+    throw new Error(message);
+  }
+};
