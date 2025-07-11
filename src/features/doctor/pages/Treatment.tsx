@@ -28,6 +28,7 @@ import {
 } from "@components/ui/toast";
 import { useTreatmentProgress } from '@components/TreatmentProgress';
 import { getMedicationList } from '@api/doctorInterventionApi';
+import FileList from '@components/FileList';
 
 interface TreatmentProps {
   onBackToDashboard?: () => void;
@@ -236,21 +237,21 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
 
 
   useEffect(() => {
-          const fetchMedications = async () => {
-              setIsLoadingMedicationList(true);
-              setErrorMedicationList(null);
-              try {
-                  const data = await getMedicationList();
-                  setMedicationList(data);
-              } catch (error) {
-                  console.error("Failed to fetch medication list:", error);
-                  setErrorMedicationList("Không thể tải danh sách thuốc. Vui lòng thử lại.");
-              } finally {
-                  setIsLoadingMedicationList(false);
-              }
-          };
-          fetchMedications();
-      }, []);
+    const fetchMedications = async () => {
+      setIsLoadingMedicationList(true);
+      setErrorMedicationList(null);
+      try {
+        const data = await getMedicationList();
+        setMedicationList(data);
+      } catch (error) {
+        console.error("Failed to fetch medication list:", error);
+        setErrorMedicationList("Không thể tải danh sách thuốc. Vui lòng thử lại.");
+      } finally {
+        setIsLoadingMedicationList(false);
+      }
+    };
+    fetchMedications();
+  }, []);
   // Fetch wife vital data
   useEffect(() => {
     const fetchWifeVitalData = async () => {
@@ -593,7 +594,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     await saveProtocols();
   };
 
-  
+
 
 
   const renderSpecialtySubTabs = () => (
@@ -734,11 +735,15 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
             onReasonChange={setFollowUpReason}
             patientId={patientId}
           />
+
+          <div className="mt-6"> {/* Add some spacing */}
+            <FileList patientId={patientId} />
+          </div>
         </TabsContent>
       </Tabs>
 
 
-       <div className="flex justify-end pt-6">
+      <div className="flex justify-end pt-6">
         <Button
           onClick={handleSaveRecord}
           className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
