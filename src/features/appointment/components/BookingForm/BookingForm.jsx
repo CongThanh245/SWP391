@@ -22,11 +22,10 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
     loadingSlots,
   } = useBookingForm(onClose);
 
-  // Khi booking thành công:
   useEffect(() => {
     if (showSuccess) {
-      handleClose(); // Đóng modal
-      onSuccess?.(); // Báo lên parent để show toast
+      handleClose(); 
+      onSuccess?.();
     }
   }, [showSuccess]);
 

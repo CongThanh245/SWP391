@@ -60,7 +60,6 @@ const AppRoutes = () => {
       <Route path="/verify-otp" element={<VerifyOtpPage />} />
       <Route path="/receptionist-dashboard" element={<ReceptionistDashboard />}>
         <Route index element={<ReceptionistHomePage />} />
-        {/* Trang chủ sẽ được xử lý trong ReceptionistDashboard */}
         <Route path="appointment" element={<AppointmentManagement />} />
         <Route path="test-results" element={<PreTestResult />} />
         <Route path="patients" element={<PatientList />} />
