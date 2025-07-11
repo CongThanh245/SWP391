@@ -398,7 +398,6 @@ const Doctors = () => {
                     <SelectItem value="all">All Treatment Type</SelectItem>
                     <SelectItem value="IUI_SPECIALIST">IUI Specialist</SelectItem>
                     <SelectItem value="IVF_SPECIALIST">IVF Specialist</SelectItem>
-                    <SelectItem value="GENERAL">General</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={selectedStatus} onValueChange={handleStatusChange}>

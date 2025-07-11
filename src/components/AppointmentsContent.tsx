@@ -86,12 +86,8 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
         switch (status) {
             case 'confirmed':
                 return <Badge className="bg-green-100 text-green-800">Đã xác nhận</Badge>;
-            case 'pending':
-                return <Badge variant="secondary">Chưa xác nhận</Badge>;
             case 'completed':
                 return <Badge className="bg-blue-100 text-blue-800">Đã khám xong</Badge>;
-            case 'cancelled':
-                return <Badge className="bg-brown-100 text-brown-800">Đã hủy</Badge>;
             default:
                 return <Badge variant="outline">{status}</Badge>;
         }
@@ -125,8 +121,8 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="week">Tất cả</SelectItem>
                                     <SelectItem value="day">Ngày</SelectItem>
-                                    <SelectItem value="week">Tuần</SelectItem>
                                     <SelectItem value="month">Tháng</SelectItem>
                                 </SelectContent>
                             </Select>
@@ -141,9 +137,7 @@ export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPati
                                 <SelectContent>
                                     <SelectItem value="all">Tất cả</SelectItem>
                                     <SelectItem value="confirmed">Đã xác nhận</SelectItem>
-                                    <SelectItem value="pending">Chưa xác nhận</SelectItem>
-                                    <SelectItem value="completed">Đã khám xong</SelectItem>
-                                    <SelectItem value="cancelled">Đã hủy</SelectItem>
+                                    <SelectItem value="completed">Đã khám xong</SelectItem>                    
                                 </SelectContent>
                             </Select>
                         </div>

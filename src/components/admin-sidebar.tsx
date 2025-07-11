@@ -9,6 +9,7 @@ import {
   Stethoscope,
   CalendarDays,
   Heart,
+  LogOut,
 } from "lucide-react";
 
 import {
@@ -23,7 +24,9 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@components/ui/sidebar";
-
+import { Button } from '@components/ui/button';
+import { logout } from '@utils/authUtils';
+import { useNavigate } from 'react-router-dom';
 interface AdminSidebarProps {
   activeTab: 'dashboard' | 'doctors' | 'patients';
   onTabChange: (tab: AdminSidebarProps['activeTab']) => void;
@@ -40,6 +43,7 @@ const managementItems = [
 ];
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange }) => {
+  const navigate = useNavigate();
   return (
     <Sidebar className="w-64 border-r theme-primary-bg">
       <SidebarHeader className="p-6 border-b border-[#3a2a1f]">
@@ -97,6 +101,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChan
       </SidebarContent>
 
       <SidebarFooter className="p-6 bg-[#4D3C2D] border-t border-[#3a2a1f] text-[#EAE4E1] text-xs">
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-[#EAE4E1] hover:text-white hover:bg-[#3a2a1f]"
+          onClick={() => logout(navigate)}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Log out
+        </Button>
         © 2024 WellNest Hospital
       </SidebarFooter>
     </Sidebar>
