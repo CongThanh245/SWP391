@@ -1,7 +1,6 @@
 import apiClient from "./axiosConfig";
 
 // Translation mappings for statuses
-// Translation mappings for statuses
 const drugResponseTranslations = {
   EFFECTIVE: "Hiệu quả",
   INEFFECTIVE: "Không hiệu quả",
@@ -14,27 +13,29 @@ const statusTranslations = {
   CANCELLED: "Đã hủy",
 };
 
+// New: Error message translations for business errors
+const errorTranslations = {
+  appointmentNotReached: "Bạn chưa đến ngày khám, vui lòng chờ đến ngày khám để thực hiện thao tác này.",
+  default: "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại hoặc liên hệ hỗ trợ."
+};
+
 // Function to translate status fields in an object
 const translateStatuses = (obj) => {
   if (!obj) return obj;
 
-  // Create a new object to avoid mutating the original
   const translatedObj = { ...obj };
 
-  // Translate drugResponse if it exists
   if (translatedObj.drugResponse) {
     translatedObj.drugResponse =
       drugResponseTranslations[translatedObj.drugResponse] ||
       translatedObj.drugResponse;
   }
 
-  // Translate status if it exists
   if (translatedObj.status) {
     translatedObj.status =
       statusTranslations[translatedObj.status] || translatedObj.status;
   }
 
-  // Translate evaluationOutcome if it exists
   if (translatedObj.evaluationOutcome) {
     translatedObj.evaluationOutcome =
       drugResponseTranslations[translatedObj.evaluationOutcome] ||
@@ -50,7 +51,6 @@ const translateNestedData = (data) => {
     return data.map((item) => translateNestedData(item));
   } else if (data && typeof data === "object") {
     const translated = translateStatuses(data);
-    // Recursively translate nested objects
     for (const key in translated) {
       if (Object.prototype.hasOwnProperty.call(translated, key)) {
         translated[key] = translateNestedData(translated[key]);
@@ -61,14 +61,30 @@ const translateNestedData = (data) => {
   return data;
 };
 
+// New: Function to handle and translate API errors
+const handleApiError = (error) => {
+  const errorResponse = error.response?.data || {};
+  const { businessErrorCode, businessExceptionDescription, error: errorDetail } = errorResponse;
+
+  // Default error message
+  let userMessage = errorTranslations.default;
+
+  // Check for specific "lastAppointment is null" error
+  if (businessErrorCode === 100 && errorDetail?.includes("null")) {
+    userMessage = errorTranslations.appointmentNotReached;
+  }
+
+  // Return the user-friendly message to be displayed
+  return userMessage;
+};
+
 // Hàm lấy toàn bộ kết quả bệnh nhân và chia theo giai đoạn
 export const getAllPatientResults = async (patientId) => {
   if (!patientId) {
-    throw new Error("Patient ID is required");
+    throw new Error("Mã bệnh nhân là bắt buộc");
   }
 
   try {
-    // Gọi 5 API song song để tối ưu hiệu suất
     const [
       medicalRecordResponse,
       ovulationTriggerResponse,
@@ -105,7 +121,6 @@ export const getAllPatientResults = async (patientId) => {
       ),
     ]);
 
-    // Translate statuses in each response
     const translatedMedicalRecord = translateNestedData(
       medicalRecordResponse.data
     );
@@ -122,7 +137,6 @@ export const getAllPatientResults = async (patientId) => {
       embryoTransferResponse.data
     );
 
-    // Tổ chức dữ liệu theo 3 giai đoạn
     const results = {
       preIntervention: {
         vitalSigns: {
@@ -141,7 +155,7 @@ export const getAllPatientResults = async (patientId) => {
           translatedMedicalRecord.oocyteRetrievalProcedureResponse,
         spermProcessing: translatedMedicalRecord.spermProcessingResponse,
         ovulationTrigger: translatedOvulationTrigger,
-        ovarianStimulation: translatedOvarianStimulation, // Fixed typo here
+        ovarianStimulation: translatedOvarianStimulation,
         endometrialPreparation: translatedEndometrialPreparation,
         embryoTransfer: translatedEmbryoTransfer,
         interventionStageNotes:
@@ -155,25 +169,18 @@ export const getAllPatientResults = async (patientId) => {
 
     return results;
   } catch (error) {
-    console.error(
-      "Error fetching patient results:",
-      error.response?.data || error.message
-    );
-    throw new Error(
-      "Failed to fetch patient results: " +
-        (error.response?.data?.error || error.message)
-    );
+    const userMessage = handleApiError(error);
+    throw new Error(userMessage); // Throw user-friendly error for the UI to catch
   }
 };
 
 // Hàm lấy tất cả đơn thuốc từ 4 API can thiệp
 export const getAllPrescriptions = async (patientId) => {
   if (!patientId) {
-    throw new Error("Patient ID is required");
+    throw new Error("Mã bệnh nhân là bắt buộc");
   }
 
   try {
-    // Gọi 4 API liên quan đến đơn thuốc
     const [
       ovulationTriggerResponse,
       ovarianStimulationResponse,
@@ -206,7 +213,6 @@ export const getAllPrescriptions = async (patientId) => {
       ),
     ]);
 
-    // Tập hợp tất cả đơn thuốc
     const prescriptions = [
       {
         type: "ovulationTrigger",
@@ -226,18 +232,11 @@ export const getAllPrescriptions = async (patientId) => {
       },
     ];
 
-    // Lọc bỏ các đơn thuốc rỗng (nếu có)
     return prescriptions.filter(
       (p) => p.prescription && p.prescription.items?.length > 0
     );
   } catch (error) {
-    console.error(
-      "Error fetching prescriptions:",
-      error.response?.data || error.message
-    );
-    throw new Error(
-      "Failed to fetch prescriptions: " +
-        (error.response?.data?.error || error.message)
-    );
+    const userMessage = handleApiError(error);
+    throw new Error(userMessage); 
   }
 };
