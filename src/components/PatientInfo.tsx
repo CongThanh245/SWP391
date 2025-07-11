@@ -20,6 +20,7 @@ interface PatientData {
 interface PatientInfoProps {
   patient: PatientData;
 }
+const genderMap = { MALE: 'Nam', FEMALE: 'Nữ', OTHER: 'Khác', PREFER_NOT_TO_SAY: 'Chưa tiết lộ' };
 
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   return (
@@ -39,7 +40,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
           </div>
           <div className="space-y-1">
             <p className="text-sm text-[color:var(--text-secondary)]">Giới tính:</p>
-            <p className="font-medium">{patient.gender}</p>
+            <p className="font-medium">{genderMap[patient.gender]}</p>
           </div>
           <div className="space-y-1">
             <p className="text-sm text-[color:var(--text-secondary)]">Ngày tháng năm sinh:</p>
@@ -75,7 +76,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
           </div>
           <div className="space-y-1">
             <p className="text-sm text-[color:var(--text-secondary)]">Giới tính:</p>
-            <p className="font-medium">{patient.spouseGender}</p>
+            <p className="font-medium">{genderMap[patient.gender]}</p>
           </div>
           <div className="space-y-1">
             <p className="text-sm text-[color:var(--text-secondary)]">Ngày tháng năm sinh:</p>
