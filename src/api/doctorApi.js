@@ -237,6 +237,16 @@ export const getPostInterventionStageStatus = async (patientId) => {
   }
 }
 
+export const completeTreatment = async (patientId) => {
+  try {
+    const response = await apiClient.patch(`/doctors/treatment-profile/treatment/finish-treatment?patientId=${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching detailed test result for protocolId ${patientId}:`, error);
+    throw error;
+  }
+}
+
 
 
 export const saveFollowUpRecommendation = async (followUpData) => {

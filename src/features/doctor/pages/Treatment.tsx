@@ -736,9 +736,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
             patientId={patientId}
           />
 
-          <div className="mt-6"> {/* Add some spacing */}
-            <FileList patientId={patientId} />
-          </div>
+          
         </TabsContent>
       </Tabs>
 

@@ -97,7 +97,7 @@ const FileList: React.FC<FileListProps> = ({ patientId }) => {
     <Card className="p-6 bg-white border border-[color:var(--card-border)] shadow-sm">
       <CardHeader>
         <CardTitle className="text-xl font-semibold text-[color:var(--text-accent)] flex items-center gap-2">
-          Hồ sơ đã lưu của bệnh nhân 📁
+          Hồ sơ đính kèm của bệnh nhân 📁
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

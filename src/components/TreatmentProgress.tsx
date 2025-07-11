@@ -7,7 +7,8 @@ import {
     getInterventionStageStatus,
     completeInterventionStage,
     getPostInterventionStageStatus,  
-    completePostInterventionStage 
+    completePostInterventionStage,
+    completeTreatment,
 } from '@api/doctorApi' // Make sure these are correctly imported from your API file
 import { Check } from 'lucide-react';
 
@@ -158,6 +159,7 @@ export const useTreatmentProgress = ({
                 await completeInterventionStage(id); // NEW: Call API for 'intervention'
             } else if (stageKey === 'postIntervention') {
                 await completePostInterventionStage(id); // NEW: Call API for 'postIntervention'
+                await completeTreatment(id);
             }
             // Add more else if conditions for other specific stages if needed
 

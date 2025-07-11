@@ -52,7 +52,10 @@ const Dashboard = () => {
       "SAT": { "ivfCount": 0, "iuiCount": 0 },
       "SUN": { "ivfCount": 0, "iuiCount": 0 }
     },
-    treatmentSuccessRates: {} // This is empty in your API
+    treatmentSuccessRates: {
+      "IUI": { protocolName: "IUI", successful: 0, total: 1 },
+      "IVF": { protocolName: "IVF", successful: 0, total: 0 } // Added IVF example
+    }
   };
 
 
@@ -110,8 +113,7 @@ const Dashboard = () => {
   // Treatment methods success rates for the week
   const treatmentSuccessData = [
     { name: "IVF", successful: 45, total: 67, rate: 67.2 },
-    { name: "IUI", successful: 28, total: 52, rate: 53.8 },
-    { name: "Natural Cycle", successful: 12, total: 28, rate: 42.9 },
+    { name: "IUI", successful: dataToUse.treatmentSuccessRates.IUI.successful, total: dataToUse.treatmentSuccessRates.IUI.total, rate: (dataToUse.treatmentSuccessRates.IUI.successful/dataToUse.treatmentSuccessRates.IUI.total)*100},
   ];
 
   // Patient overview by treatment type over the week
@@ -264,7 +266,6 @@ const Dashboard = () => {
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="border-[#D9CAC2] text-[#4D3C2D]">Week</Button>
-                  <Button variant="outline" size="sm" className="border-[#D9CAC2] text-[#4D3C2D]">Month</Button>
                 </div>
               </div>
             </CardHeader>
