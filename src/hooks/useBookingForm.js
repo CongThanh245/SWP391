@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react"; // Thêm useEffect
+// src/hooks/useBookingForm.js
+import { useState, useEffect } from "react";
 import { createAppointment } from "@api/appointmentApi";
-import { useDoctors } from "./useDoctors"; 
-import  useTimeSlots  from "./useTimeSlots";
-import  usePatient  from "./usePatient";
-import  {translateError}  from "../utils/errorUtils";
+import { useDoctorList } from "@hooks/useDoctorList";
+import useTimeSlots from "./useTimeSlots";
+import usePatient from "./usePatient";
+import { translateError } from "../utils/errorUtils";
 import usePatientFiles from "./usePatientFiles";
 
 const useBookingForm = (onClose) => {
@@ -21,14 +22,14 @@ const useBookingForm = (onClose) => {
   const today = new Date().toISOString().split("T")[0];
 
   const { patientId, error: patientError } = usePatient();
-  const { doctors, error: doctorsError } = useDoctors();
-  const { timeSlots, loadingSlots, error: slotsError } = useTimeSlots(
-    formData.doctorId,
-    formData.date
-  );
+  const { doctors, error: doctorsError } = useDoctorList();
+  const {
+    timeSlots,
+    loadingSlots,
+    error: slotsError,
+  } = useTimeSlots(formData.doctorId, formData.date);
   const { uploadedFiles, fileErrorMessage } = usePatientFiles(patientId);
 
-  // Quản lý lỗi trong useEffect
   useEffect(() => {
     if (patientError) {
       setErrorMessage(patientError);
@@ -97,17 +98,23 @@ const useBookingForm = (onClose) => {
         attachmentId: formData.files,
       };
 
-      console.log("Creating appointment:", payload);
+      console.log("Payload before sending:", payload);
       await createAppointment(payload);
 
       setShowSuccess(true);
       setTimeout(handleClose, 100);
     } catch (err) {
-      console.error("Create appointment error:", err);
+      console.error("Create appointment error:", err.response?.data);
       const errorCode = err.response?.data?.businessErrorCode;
       const errorMessageFromBackend =
         err.response?.data?.error || err.response?.data?.message;
-      const translatedMessage = translateError(errorCode, errorMessageFromBackend);
+      console.log("Error code:", errorCode); // Log errorCode
+      console.log("Error message:", errorMessageFromBackend); // Log errorMessageFromBackend
+      const translatedMessage = translateError(
+        errorCode,
+        errorMessageFromBackend
+      );
+      console.log("Translated message:", translatedMessage); // Log translated message
       setErrorMessage(translatedMessage);
     } finally {
       setIsSubmitting(false);

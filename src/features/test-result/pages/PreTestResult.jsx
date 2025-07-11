@@ -15,6 +15,7 @@ import {
   updateEvaluationCriteria,
 } from "@api/patientApi";
 import styles from "./PreTestResult.module.css";
+import { Link } from "react-router-dom";
 
 const PreTestResult = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,7 +58,7 @@ const PreTestResult = () => {
       );
       setIsModalOpen(true);
     } catch (err) {
-      setError("Bệnh nhân chưa được bác sĩ chỉ định");
+      setError("Bệnh nhân chưa tới ngày khám");
     }
   };
 
@@ -127,7 +128,16 @@ const PreTestResult = () => {
   };
 
   if (isLoading) return <div className={styles.loading}>Đang tải...</div>;
-  if (error) return <div className={styles.error}>{error}</div>;
+  if (error)
+    return (
+      <div>
+        <Link
+          to="/receptionist-dashboard/test-results"
+          className={styles.backLink}
+        > Quay lại </Link>
+        <div className={styles.error}>{error}</div>
+      </div>
+    );
 
   return (
     <div className={styles.patientListPage}>
