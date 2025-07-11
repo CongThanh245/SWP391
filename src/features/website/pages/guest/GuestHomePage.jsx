@@ -7,11 +7,13 @@ import FAQ from '@features/website/components/shared/FAQ/FAQ';
 import TestimonialSection from '@features/website/components/guest/TestimonialSection/TestimonialSection';
 import FeaturesSection from '@features/website/components/patient/FeatureSection/FeatureSection';
 import PatientHero from '@features/website/components/patient/PatientHero/PatientHero';
-import AnimatedSection from '@components/common/AnimatedSection'; // Import wrapper
+import AnimatedSection from '@components/common/AnimatedSection';
+import OnboardingModal from '@components/common/OnBoardingModal/OnBoardingModal.jsx';
 
 const GuestHomePage = () => {
   const [isPatient, setIsPatient] = useState(false);
   const [user, setUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { toasts, toast } = useToast();
 
   useEffect(() => {
@@ -23,16 +25,17 @@ const GuestHomePage = () => {
     if (isPatientAuthenticated) {
       const userData = localStorage.getItem('user');
       setUser(userData ? JSON.parse(userData) : null);
-    }
 
-    const isFreshLogin = localStorage.getItem('isFreshLogin');
-    if (isFreshLogin === 'true') {
-      toast({
-        title: 'Đăng nhập thành công',
-        description: 'Chào mừng bạn đã quay trở lại.',
-        variant: 'success',
-      });
-      localStorage.removeItem('isFreshLogin');
+      // Kiểm tra xem người dùng đã xem modal chưa
+      const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+      if (!hasSeenOnboarding || hasSeenOnboarding === 'false') {
+        setIsModalOpen(true);
+        toast({
+          title: 'Đăng nhập thành công',
+          description: 'Chào mừng bạn đã quay trở lại.',
+          variant: 'success',
+        });
+      }
     }
   }, [toast]);
 
@@ -43,6 +46,14 @@ const GuestHomePage = () => {
           <AnimatedSection animationType="fade" minHeight="500px">
             <PatientHero userName={user ? user.patientName : 'bạn'} />
           </AnimatedSection>
+          <OnboardingModal
+            isOpen={isModalOpen}
+            onRequestClose={() => {
+              setIsModalOpen(false);
+              localStorage.setItem('hasSeenOnboarding', 'true');
+            }}
+            userName={user ? user.patientName : 'bạn'}
+          />
         </>
       ) : (
         <AnimatedSection animationType="fade" minHeight="600px">

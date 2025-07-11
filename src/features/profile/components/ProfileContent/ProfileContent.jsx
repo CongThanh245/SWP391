@@ -41,6 +41,12 @@ const validationSchema = Yup.object({
       "Vui lòng chọn giới tính"
     )
     .required("Giới tính là bắt buộc"),
+  emergencyContact: Yup.string()
+    .matches(
+      /^(0|\+84)[3|5|7|8|9][0-9]{8}$/,
+      "Nhập số điện thoại liên hệ khẩn cấp hợp lệ (VD: 0901234567 hoặc +84901234567)"
+    )
+    .required("Số liên hệ khẩn cấp là bắt buộc"),
   spouseName: Yup.string()
     .min(2, "Tên người đi kèm phải có ít nhất 2 ký tự")
     .max(50, "Tên người đi kèm không được vượt quá 50 ký tự")
@@ -105,9 +111,9 @@ const ProfileContent = () => {
     marriageDate: userData?.marriageDate || "Chưa cập nhật",
     address: userData?.address || "Chưa cập nhật",
     phone: userData?.phone || "Chưa cập nhật",
-    gender: userData?.gender || "Chưa cập nhật",
+    gender: genderMap[userData?.gender] || "Chưa cập nhật",
     email: userData?.email || "Chưa cập nhật",
-    maritalStatus: userData?.maritalStatus || "Chưa cập nhật",
+    maritalStatus: maritalStatusMap[userData?.maritalStatus] || "Chưa cập nhật",
     emergencyContact: userData?.emergencyContact || "Chưa cập nhật",
     image: userData?.image || null,
     spouseName: userData?.spouseName || "Chưa cập nhật",
@@ -115,7 +121,7 @@ const ProfileContent = () => {
     spousePhone: userData?.spousePhone || "Chưa cập nhật",
     spouseEmergencyContact: userData?.spouseEmergencyContact || "Chưa cập nhật",
     spouseBirthDate: userData?.spouseBirthDate || "Chưa cập nhật",
-    spouseGender: userData?.spouseGender || "Chưa cập nhật",
+    spouseGender: genderMap[userData?.spouseGender] || "Chưa cập nhật",
   };
 
   const getInitialValues = () => ({
@@ -124,6 +130,7 @@ const ProfileContent = () => {
     address: rawUserData?.patientAddress || "",
     dateOfBirth: rawUserData?.dateOfBirth || "",
     gender: rawUserData?.gender || "",
+    emergencyContact: rawUserData?.emergencyContact || "", // Added emergencyContact
     spouseName: rawUserData?.spousePatientName || "",
     spousePhone: rawUserData?.spousePatientPhone || "",
     spouseAddress: rawUserData?.spousePatientAddress || "",
@@ -149,6 +156,7 @@ const ProfileContent = () => {
       patientAddress: values.address.trim(),
       dateOfBirth: formatDateForAPI(values.dateOfBirth),
       gender: values.gender,
+      emergencyContact: values.emergencyContact.trim(), // Added emergencyContact
       spousePatientName: values.spouseName ? values.spouseName.trim() : null,
       spousePatientPhone: values.spousePhone ? values.spousePhone.trim() : null,
       spousePatientAddress: values.spouseAddress ? values.spouseAddress.trim() : null,
@@ -159,7 +167,7 @@ const ProfileContent = () => {
 
     try {
       const updated = await updatePatient(payload);
-      // localStorage.setItem("user", JSON.stringify(updated));
+      localStorage.setItem("user", JSON.stringify(updated));
       setIsModalOpen(false);
       toast({
         title: "Cập nhật thành công",
@@ -303,6 +311,27 @@ const ProfileContent = () => {
                     />
                     <ErrorMessage
                       name="address"
+                      component="div"
+                      className={styles.errorMessage}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.detailItem}>
+                  <label className={styles.detailLabel}>Liên hệ khẩn cấp:</label>
+                  <div>
+                    <Field
+                      type="tel"
+                      name="emergencyContact"
+                      className={`${styles.formInput} ${
+                        errors.emergencyContact && touched.emergencyContact
+                          ? styles.inputError
+                          : ""
+                      }`}
+                      placeholder="Nhập số liên hệ khẩn cấp"
+                    />
+                    <ErrorMessage
+                      name="emergencyContact"
                       component="div"
                       className={styles.errorMessage}
                     />
