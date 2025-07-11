@@ -1,0 +1,156 @@
+:root {
+  --deep-taupe: #61474C;
+  --soft-taupe: #9e8e7b;
+  --dark-accent: #4a3639;
+  --text-primary: #333333;
+  --text-secondary: #4A2C2A;
+  --shadow-accent: rgba(97, 71, 76, 0.25);
+}
+
+:local(.onboardingModal) {
+  outline: none;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--shadow-accent);
+  padding: 24px;
+  max-width: 672px;
+  margin: 0 auto;
+}
+
+:local(.onboardingOverlay) {
+  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+:local(.onboardingModal) .skipButton {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  background: rgba(97, 71, 76, 0.5);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+:local(.onboardingModal) .skipButton:hover {
+  background: var(--deep-taupe);
+}
+
+:local(.onboardingModal) img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  max-width: 624px;
+}
+
+:local(.onboardingModal) h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--deep-taupe);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+:local(.onboardingModal) p {
+  font-size: 16px;
+  color: #4b5563;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+:local(.onboardingModal) .buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+:local(.onboardingModal) .navButton {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+:local(.onboardingModal) .previousButton {
+  background: var(--soft-taupe);
+  color: #ffffff;
+}
+
+:local(.onboardingModal) .previousButton:hover {
+  background: var(--deep-taupe);
+}
+
+:local(.onboardingModal) .previousButton:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+:local(.onboardingModal) .nextButton {
+  background: var(--deep-taupe);
+  color: #ffffff;
+}
+
+:local(.onboardingModal) .nextButton:hover {
+  background: var(--dark-accent);
+}
+
+:local(.onboardingModal) .progressDots {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+:local(.onboardingModal) .progressDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+:local(.onboardingModal) .progressDot.active {
+  background: var(--deep-taupe);
+}
+
+@media (max-width: 640px) {
+  :local(.onboardingModal) {
+    width: 90%;
+    padding: 16px;
+  }
+
+  :local(.onboardingModal) img {
+    height: 240px;
+    max-width: 100%;
+  }
+
+  :local(.onboardingModal) h2 {
+    font-size: 20px;
+  }
+
+  :local(.onboardingModal) p {
+    font-size: 14px;
+  }
+
+  :local(.onboardingModal) .skipButton {
+    top: 4px;
+    right: 4px;
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+}

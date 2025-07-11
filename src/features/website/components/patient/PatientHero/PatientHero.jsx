@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import Modal from "react-modal";
 import styles from "./PatientHero.module.css";
 import BookingForm from "@features/appointment/components/BookingForm/BookingForm";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@hooks/use-toast";
 import {
   Toast,
@@ -13,10 +14,18 @@ import { User, FileText, Calendar, CloudUpload } from "lucide-react";
 
 const PatientHero = () => {
   const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
+  const [isProfileIncompleteModalOpen, setIsProfileIncompleteModalOpen] = useState(false);
   const { toasts, toast } = useToast();
+  const navigate = useNavigate();
 
   const handleBookAppointment = () => {
-    setIsBookingFormOpen(true);
+    const userData = localStorage.getItem("user");
+    const user = userData ? JSON.parse(userData) : null;
+    if (user && user.profileCompleted) {
+      setIsBookingFormOpen(true);
+    } else {
+      setIsProfileIncompleteModalOpen(true);
+    }
   };
 
   const handleCloseBookingForm = () => {
@@ -28,6 +37,15 @@ const PatientHero = () => {
       title: "🎉 Đặt lịch thành công",
       description: "Chúng tôi sẽ liên hệ với bạn sớm nhất.",
     });
+  };
+
+  const handleCloseProfileModal = () => {
+    setIsProfileIncompleteModalOpen(false);
+  };
+
+  const handleCompleteProfile = () => {
+    setIsProfileIncompleteModalOpen(false);
+    navigate("/health-records/profile");
   };
 
   return (
@@ -95,6 +113,38 @@ const PatientHero = () => {
         onClose={handleCloseBookingForm}
         onSuccess={handleBookingSuccess}
       />
+
+      <Modal
+        isOpen={isProfileIncompleteModalOpen}
+        onRequestClose={handleCloseProfileModal}
+        className={styles.profileIncompleteModal}
+        overlayClassName={styles.profileIncompleteOverlay}
+        ariaHideApp={false}
+      >
+        <div className={styles.profileModalContent}>
+          <h2 className={styles.profileModalTitle}>
+            Vui lòng hoàn thành hồ sơ
+          </h2>
+          <p className={styles.profileModalDescription}>
+            Để đặt lịch hẹn, bạn cần hoàn thành thông tin hồ sơ cá nhân trước.
+          </p>
+          <div className={styles.profileModalButtonContainer}>
+            <button
+              onClick={handleCloseProfileModal}
+              className={styles.profileModalCloseButton}
+            >
+              Đóng
+            </button>
+            <button
+              onClick={handleCompleteProfile}
+              className={styles.profileModalActionButton}
+            >
+              Hoàn thành hồ sơ
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       {toasts.map((t) => (
         <Toast key={t.id} {...t}>
           {t.title && <ToastTitle>{t.title}</ToastTitle>}
