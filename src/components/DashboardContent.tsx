@@ -11,7 +11,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from 'recharts';
-import { getDoctorTreatmentStats } from '@api/statsApi'; // Đường dẫn đã đúng theo query
+import { getDoctorTreatmentStats } from '@api/statsApi';
 
 // Giao diện DoctorStats từ API
 export interface DoctorStats {
@@ -68,8 +68,8 @@ export const DashboardContent: React.FC<DashboardContentProps> = () => {
 
   // Chuẩn bị dữ liệu cho biểu đồ Tỉ lệ thành công theo phác đồ
   const successRateByProtocolData = Object.keys(stats.successRateByProtocol).map((key) => ({
-    protocol: key,
-    rate: Math.round(stats.successRateByProtocol[key] * 100), // Chuyển thành phần trăm
+    protocol: key, // e.g., IUI, IVF
+    rate: stats.successRateByProtocol[key], // Sử dụng trực tiếp giá trị từ API
   }));
 
   // Chuẩn bị dữ liệu cho biểu đồ phân bổ điều trị
@@ -127,10 +127,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = () => {
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{Math.round(stats.successRateThisMonth * 100)}%</div>
+            <div className="text-2xl font-bold text-green-600">{stats.successRateThisMonth}%</div>
             <p className="text-xs text-gray-500 mt-1">
               <span className={stats.successRateChangeFromLastMonth >= 0 ? "text-green-600" : "text-red-600"}>
-                {stats.successRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.successRateChangeFromLastMonth * 100)}%` : `${Math.round(stats.successRateChangeFromLastMonth * 100)}%`}
+                {stats.successRateChangeFromLastMonth >= 0 ? `+${stats.successRateChangeFromLastMonth}%` : `${stats.successRateChangeFromLastMonth}%`}
               </span>{' '}
               so với tháng trước
             </p>
@@ -146,7 +146,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = () => {
             <div className="text-2xl font-bold text-green-600">{stats.completedTreatments}</div>
             <p className="text-xs text-gray-500 mt-1">
               <span className={stats.completedRateChangeFromLastMonth >= 0 ? "text-green-600" : "text-red-600"}>
-                {stats.completedRateChangeFromLastMonth >= 0 ? `+${Math.round(stats.completedRateChangeFromLastMonth)}%` : `${Math.round(stats.completedRateChangeFromLastMonth)}%`}
+                {stats.completedRateChangeFromLastMonth >= 0 ? `+${stats.completedRateChangeFromLastMonth}%` : `${stats.completedRateChangeFromLastMonth}%`}
               </span>{' '}
               so với tháng trước
             </p>
@@ -168,13 +168,13 @@ export const DashboardContent: React.FC<DashboardContentProps> = () => {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
                 data={successRateByProtocolData}
-                layout="vertical"
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#D9CAC2" />
-                <XAxis type="number" unit="%" stroke="#4D3C2D" />
-                <YAxis dataKey="protocol" type="category" stroke="#4D3C2D" />
+                <XAxis dataKey="protocol" stroke="#4D3C2D" /> 
+                <YAxis unit="%" stroke="#4D3C2D" />
                 <Tooltip formatter={(value) => `${value}%`} />
+                Ascending
                 <Bar dataKey="rate" fill="#4D3C2D" />
               </BarChart>
             </ResponsiveContainer>
@@ -198,13 +198,13 @@ export const DashboardContent: React.FC<DashboardContentProps> = () => {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, value }) => `${name} (${value})`}
                   >
                     {treatmentDistributionData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip formatter={(value) => `${value}`} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>

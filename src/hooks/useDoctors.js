@@ -1,6 +1,6 @@
 // src/hooks/useDoctors.js
 import { useState, useEffect } from "react";
-import { getAdminDoctors, getDoctors } from "@api/doctorApi";
+import { getAdminDoctors, getDoctorDetails, getDoctors } from "@api/doctorApi";
 
 export const useDoctors = (params = {}) => {
   const [doctors, setDoctors] = useState([]);
@@ -82,4 +82,42 @@ export const useAdminDoctors = (params = {}) => {
   }, [JSON.stringify(params)]); 
 
   return { doctors, loading, error };
+};
+
+export const useDoctorDetails = (doctorId) => {
+  const [doctor, setDoctor] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDoctorDetails = async () => {
+      if (!doctorId) return;
+      setLoading(true);
+      try {
+        const data = await getDoctorDetails(doctorId);
+        const mappedDoctor = {
+          id: data.doctorId,
+          name: data.doctorName,
+          specialization: data.specialization,
+          phone: data.phone,
+          yearOfExperience: data.yearOfExperience,
+          degree: data.degree,
+          licenseNumber: data.licenseNumber,
+          gender: data.gender,
+          address: data.doctorAddress,
+          about: data.about,
+          image: data.imageProfile,
+        };
+        setDoctor(mappedDoctor);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctorDetails();
+  }, [doctorId]);
+
+  return { doctor, loading, error };
 };

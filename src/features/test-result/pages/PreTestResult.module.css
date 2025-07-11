@@ -62,7 +62,7 @@
   border-radius: 30px;
   font-size: var(--font-size-lg);
   background: var(--card-background);
-  color: var(--text-primary);
+  color: var(--accent-color);
 }
 
 .searchBox input:focus {
@@ -108,7 +108,7 @@
 
 .patientBasicInfo h4 {
   font-size: var(--font-size-lg);
-  color: var(--text-primary);
+  color: var(--accent-color);
   font-weight: 600;
   margin: 0;
 }
@@ -168,7 +168,7 @@
 .noResults h3 {
   font-size: var(--font-size-xl);
   margin-bottom: var(--spacing-md);
-  color: var(--text-primary);
+  color: var(--accent-color);
 }
 
 .noResults p {
@@ -272,14 +272,17 @@
   background: var(--secondary-background);
   border-bottom: 2px solid var(--card-border);
   font-size: 14px;
-  color: var(--text-primary);
+  color: var(--accent-color);
   text-transform: uppercase;
+  font-weight: 600;
 }
 
 .testResultsList {
   flex: 1;
   overflow-y: auto;
   padding: 16px 32px 32px;
+  color: var(--accent-color);
+  font-weight: 450;
 }
 
 .testResultRow {
@@ -303,7 +306,7 @@
   border: 2px solid var(--card-border);
   border-radius: 12px;
   font-size: 14px;
-  color: var(--text-primary);
+  color: var(--accent-color);
   background: var(--secondary-background);
 }
 
@@ -326,7 +329,7 @@
 }
 
 .saveButton {
-  padding: 12px 14px;
+  padding: 20px 40px;
   background: var(--button-primary-bg);
   color: white;
   border: none;
@@ -334,19 +337,23 @@
   font-size: 12px;
   cursor: pointer;
 }
+.saveButton:hover {
+  background: var(--button-hover-bg);
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 16px rgba(64, 158, 255, 0.15);
+}
 
 /* Back link */
 .backLink {
-  position: absolute;
-  top: var(--spacing-md);
-  left: 300px;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--text-secondary);
-  font-size: var(--font-size-base);
-  text-decoration: none;
-  background: rgba(64, 158, 255, 0.1);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+    text-decoration: none;
+    background: rgba(64, 158, 255, 0.1);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: 30px;
+    justify-self: center;
+    margin-top: 5%;
 }

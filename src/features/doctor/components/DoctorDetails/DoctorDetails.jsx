@@ -1,13 +1,12 @@
-// src/features/doctor/components/DoctorDetails/DoctorDetails.jsx
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useAdminDoctors } from '@hooks/useDoctors';
+import { useDoctorDetails } from '@hooks/useDoctors';
 import Card from '@components/common/Card/Card';
 import styles from './DoctorDetails.module.css';
 
 const DoctorDetails = ({ onClose }) => {
   const { id } = useParams();
-  const { doctors, loading, error } = useAdminDoctors();
+  const { doctor, loading, error } = useDoctorDetails(id);
 
   if (loading) {
     return <div className={styles.loading}>Đang tải...</div>;
@@ -17,8 +16,6 @@ const DoctorDetails = ({ onClose }) => {
     return <div className={styles.error}>Lỗi: {error}</div>;
   }
 
-  const doctor = doctors.find((doc) => doc.id === id);
-
   if (!doctor) {
     return <div className={styles.error}>Không tìm thấy bác sĩ</div>;
   }
@@ -26,7 +23,7 @@ const DoctorDetails = ({ onClose }) => {
   const leftContent = (
     <div className={styles.doctorStats}>
       <div className={styles.experience}>
-        <strong>{doctor.yearOfExperience}</strong> {/* Sửa từ yearsOfExperience */}
+        <strong>{doctor.yearOfExperience}</strong>
         <span>Năm kinh nghiệm</span>
       </div>
     </div>

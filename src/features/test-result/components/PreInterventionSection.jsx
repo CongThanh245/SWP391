@@ -65,7 +65,7 @@ const PreInterventionSection = ({ results }) => {
             <h3>Quy trình điều trị</h3>
           </div>
           <div className={styles.cardContent}>
-            {results.protocol.length > 0 ? (
+            {Array.isArray(results.protocol) && results.protocol.length > 0 ? (
               <table className={styles.protocolsTable}>
                 <thead>
                   <tr>
