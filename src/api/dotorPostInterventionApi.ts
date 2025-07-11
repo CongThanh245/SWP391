@@ -19,8 +19,8 @@ interface Prescription {
 }
 
 type PostInterventionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'PLANNED'; 
-type BetahcgEvaluation = 'PREGNANT' | 'NOT_PREGNANT' | 'SUSPICIOUS' | 'BIOCHEMICAL';
-type EvaluationOutcome = 'EFFECTIVE' | 'NOT_EFFECTIVE' | 'SUSPICIOUS' | 'EARLY_MISCARRIAGE';
+type BetahcgEvaluation = 'PREGNANT' | 'NOT_PREGNANT' | 'SUSPICIOUS' | 'MOLAR_PREGNANCY';
+type EvaluationOutcome = 'EFFECTIVE' | 'INEFFECTIVE' | 'UNCLEAR';
 
 export interface PostInterventionData {
     hasPain: boolean; // hasPain

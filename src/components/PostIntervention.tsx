@@ -20,7 +20,7 @@ import {
     PostInterventionData,
 } from '@api/dotorPostInterventionApi';
 
-import {completePostInterventionStage} from '@api/doctorApi'
+import {completePostInterventionStage, completeTreatment} from '@api/doctorApi'
 
 import PrescriptionItemFormDialog from '@components/InterventionWife/PrescriptionItemFormDialog'; 
 
@@ -61,7 +61,7 @@ const PostInterventionCard: React.FC<PostInterventionCardProps> = ({ patientId, 
         betahcgDate: new Date().toISOString().split('T')[0], // Default to today
         betahcgResult: '',
         betahcgEvaluation: 'NOT_PREGNANT', // Default value
-        evaluationOutcome: 'NOT_EFFECTIVE', // Default value
+        evaluationOutcome: 'INEFFECTIVE', // Default value
         expectedFollowUpDate: '', // Can be null or empty string initially
         additionalNotes: '',
         status: 'PLANNED', // Default status based on image_cca934.png
@@ -208,6 +208,7 @@ const PostInterventionCard: React.FC<PostInterventionCardProps> = ({ patientId, 
         setError(null);
         try {
             await completePostInterventionStage(patientId);
+            await completeTreatment(patientId);
             setData(prev => ({ ...prev, status: 'COMPLETED' }));
             toast({ title: "Thành công", description: "Quá trình hậu can thiệp đã được đánh dấu là HOÀN THÀNH." });
             setIsDialogOpen(false);
@@ -252,7 +253,7 @@ const PostInterventionCard: React.FC<PostInterventionCardProps> = ({ patientId, 
     const isEditable = data.status === 'IN_PROGRESS' || data.status === 'PLANNED'; // Can edit if IN_PROGRESS or PLANNED
     const isOperationInProgress = isLoading || isSaving || isCompleting || isCancelling;
 
-    const renderValue = (value) => value !== undefined && value !== null && value !== '' ? value : 'N/A';
+    const renderValue = (value) => value !== undefined && value !== null && value !== '' ? value : 'Chưa biết';
 
     const renderStatusInVietnamese = (status: PostInterventionData['status']) => {
         switch (status) {
@@ -269,18 +270,17 @@ const PostInterventionCard: React.FC<PostInterventionCardProps> = ({ patientId, 
             case 'PREGNANT': return 'Có thai';
             case 'NOT_PREGNANT': return 'Không có thai';
             case 'SUSPICIOUS': return 'Nghi ngờ';
-            case 'BIOCHEMICAL': return 'Thai hóa sinh';
-            default: return 'N/A';
+            case 'MOLAR_PREGNANCY': return 'Thai hóa sinh';
+            default: return 'Nghi ngờ';
         }
     };
 
     const renderEvaluationOutcome = (outcome: PostInterventionData['evaluationOutcome']) => {
         switch (outcome) {
             case 'EFFECTIVE': return 'Đậu thai';
-            case 'NOT_EFFECTIVE': return 'Không đậu'; // Changed from 'not-pregnant' to 'Không đậu' for clarity
-            case 'SUSPICIOUS': return 'Nghi ngờ';
-            case 'EARLY_MISCARRIAGE': return 'Sẩy thai sớm';
-            default: return 'N/A';
+            case 'INEFFECTIVE': return 'Không đậu'; // Changed from 'not-pregnant' to 'Không đậu' for clarity
+            case 'UNCLEAR': return 'Nghi ngờ';
+            default: return 'UNCLEAR';
         }
     };
 
@@ -524,9 +524,8 @@ const PostInterventionCard: React.FC<PostInterventionCardProps> = ({ patientId, 
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="EFFECTIVE">Đậu thai</SelectItem>
-                                    <SelectItem value="NOT_EFFECTIVE">Không đậu</SelectItem>
-                                    <SelectItem value="SUSPICIOUS">Nghi ngờ</SelectItem>
-                                    <SelectItem value="EARLY_MISCARRIAGE">Sẩy thai sớm</SelectItem>
+                                    <SelectItem value="INEFFECTIVE">Không đậu</SelectItem>
+                                    <SelectItem value="UNCLEAR">Nghi ngờ</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

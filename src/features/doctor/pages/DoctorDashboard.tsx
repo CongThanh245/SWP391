@@ -1,4 +1,4 @@
-import { Sidebar } from "lucide-react";
+
 import React, { useEffect, useState } from "react";
 import { AppointmentsContent } from "@components/AppointmentsContent";
 import { PatientsContent } from "@components/PatientsContent";
