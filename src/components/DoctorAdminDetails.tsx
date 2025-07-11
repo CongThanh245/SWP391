@@ -19,7 +19,7 @@ interface FullDoctorDetails {
   gender: "MALE" | "FEMALE" | "OTHER" | string;
   degree: string;
   doctorAddress: string;
-  phoneNumber: string;
+  phone: string;
   joinDate: string;
   dateOfBirth: string;
   yearOfExperience: number;
@@ -146,32 +146,7 @@ const DoctorDetails: React.FC<DoctorDetailsProps> = ({ doctorId, onClose }) => {
     { patient: "Administrative Work", type: "Task", time: "03:00 PM" }
   ];
 
-  const feedback = [
-    {
-      name: "Alice Johnson",
-      date: "2028-07-01",
-      avatar: "AJ",
-      comment: "Dr. Winsbury is very thorough and caring. He took the time to explain my condition and treatment options in detail. I felt very comfortable and well taken care of during my visit."
-    },
-    {
-      name: "Robert Brown",
-      date: "2028-06-25",
-      avatar: "RB",
-      comment: "Great experience, highly recommend Dr. Winsbury. He is attentive and professional, ensuring that all my questions were answered. His expertise make him a great doctor."
-    },
-    {
-      name: "Chance Siphron",
-      date: "2028-06-11",
-      avatar: "CS",
-      comment: "Dr. Winsbury is efficient, professional, and skilled. He quickly diagnosed my issue, provided a clear treatment plan, and I'm happy with the positive outcome. I highly recommend him."
-    },
-    {
-      name: "Lincoln Donin",
-      date: "2028-05-27",
-      avatar: "LD",
-      comment: "Dr. Winsbury is an exceptional physician who combines deep knowledge with genuine care, addressing all my concerns and making patients feel understood."
-    }
-  ];
+  
 
 
 
@@ -321,7 +296,7 @@ const DoctorDetails: React.FC<DoctorDetailsProps> = ({ doctorId, onClose }) => {
                   <div className="space-y-3 pt-4">
                     <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg">
                       <Phone className="w-4 h-4 text-[#4D3C2D]" />
-                      <span className="text-sm text-[#4D3C2D]">{doctorData.phoneNumber}</span>
+                      <span className="text-sm text-[#4D3C2D]">{doctorData.phone}</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg">
                       <Mail className="w-4 h-4 text-[#4D3C2D]" />
@@ -450,31 +425,7 @@ const DoctorDetails: React.FC<DoctorDetailsProps> = ({ doctorId, onClose }) => {
               </CardContent>
             </Card>
 
-            {/* Feedback */}
-            <Card className="bg-white/90 border-[#D9CAC2]">
-              <CardHeader>
-                <CardTitle className="text-[#4D3C2D]">Patient Feedback</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {feedback.map((item, index) => (
-                    <div key={index} className="border border-[#D9CAC2] rounded-lg p-4 bg-white/50">
-                      <div className="flex items-center gap-3 mb-3">
-                        <Avatar>
-                          <AvatarImage src="/placeholder.svg" />
-                          <AvatarFallback className="bg-[#D9CAC2] text-[#4D3C2D]">{item.avatar}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium text-[#4D3C2D]">{item.name}</div>
-                          <div className="text-sm text-[#4D3C2D]/60">{item.date}</div>
-                        </div>
-                      </div>
-                      <p className="text-sm text-[#4D3C2D]/70">{item.comment}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            
           </div>
 
           {/* Schedule Sidebar */}

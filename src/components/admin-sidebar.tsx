@@ -28,7 +28,7 @@ import { Button } from '@components/ui/button';
 import { logout } from '@utils/authUtils';
 import { useNavigate } from 'react-router-dom';
 interface AdminSidebarProps {
-  activeTab: 'dashboard' | 'doctors' | 'patients';
+  activeTab: 'dashboard' | 'doctors' | 'patients' | 'receptionist';
   onTabChange: (tab: AdminSidebarProps['activeTab']) => void;
 }
 
@@ -36,6 +36,7 @@ const menuItems: { title: string; key: AdminSidebarProps['activeTab']; icon: Rea
   { title: "Dashboard", key: "dashboard", icon: BarChart3 },
   { title: "Doctors", key: "doctors", icon: UserCheck },
   { title: "Patients", key: "patients", icon: Users },
+   { title: "receptionist", key: "receptionist", icon: UserCheck },
 ];
 
 const managementItems = [

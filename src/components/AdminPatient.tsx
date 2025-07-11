@@ -14,7 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@components/ui/select";
-import { Plus, Search, Filter, MoreHorizontal, Eye, Edit, FileText, Calendar, Phone, Mail, Upload } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Eye, Edit, FileText, Calendar, Phone, Mail, Upload, Trash2 } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -24,7 +24,10 @@ import {
 import { CSVImportDialog } from "@components/CSVImportDialog";
 import React, { useState, useEffect, useCallback } from 'react';
 import { getPatients } from '@api/adminApi'
-import {formatDate} from '@utils/format'
+import { formatDate } from '@utils/format'
+import { EditPatientDialog } from '@components/EditPatientDialog'
+import { PatientDetailsDialog } from '@components/PatientDetailsDialog'
+import { DeletePatientsDialog } from '@components/DeletePatientsDialog'
 interface Patient {
     id: string;
     patientId: string;
@@ -56,7 +59,7 @@ const Patients = () => {
     const [showImportDialog, setShowImportDialog] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+    const [selectedPatients, setSelectedPatients] = useState<string[]>([]);
 
     const [patientsData, setPatientsData] = useState<Patient[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -180,6 +183,32 @@ const Patients = () => {
                 return 'Unknown'; // Fallback for any unexpected values
         }
     };
+    const handleUpdatePatient = (updatedPatient) => {
+        console.log("Patient updated:", updatedPatient);
+    };
+
+    const handleDeletePatients = (patientIds: string[]) => {
+        setPatientsData(prevData =>
+            prevData.filter(patient => !patientIds.includes(patient.id))
+        );
+        setSelectedPatients([]);
+    };
+
+    const handleSelectPatient = (patientId: string) => {
+        setSelectedPatients(prev =>
+            prev.includes(patientId)
+                ? prev.filter(id => id !== patientId)
+                : [...prev, patientId]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedPatients.length === patientsData.length) {
+            setSelectedPatients([]);
+        } else {
+            setSelectedPatients(patientsData.map(patient => patient.id));
+        }
+    };
 
     const csvTemplateFields = ["Name", "Age", "Gender", "Phone", "Email", "Address", "Doctor", "Condition", "Medical History", "Allergies", "Emergency Contact"];
     const csvSampleData = [
@@ -235,12 +264,7 @@ const Patients = () => {
             <div className="flex-1 overflow-auto p-6">
                 <Tabs defaultValue="all" className="space-y-6">
                     <div className="flex justify-between items-center">
-                        <TabsList className="grid w-fit grid-cols-4">
-                            <TabsTrigger value="all">All Patients (85)</TabsTrigger>
-                            <TabsTrigger value="active">Active (45)</TabsTrigger>
-                            <TabsTrigger value="treatment">In Treatment (25)</TabsTrigger>
-                            <TabsTrigger value="completed">Completed (15)</TabsTrigger>
-                        </TabsList>
+                        
                         <div className="flex gap-4">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -263,7 +287,15 @@ const Patients = () => {
                                     <SelectItem value="damian">Dr. Damian Sanchez</SelectItem>
                                 </SelectContent>
                             </Select>
-
+                            {selectedPatients.length > 0 && (
+                                <DeletePatientsDialog
+                                    patientIds={selectedPatients}
+                                    patientNames={selectedPatients.map(id =>
+                                        patientsData.find(p => p.id === id)?.patientName || ''
+                                    )}
+                                    onDelete={handleDeletePatients}
+                                />
+                            )}
                             <Button>
                                 <Plus className="w-4 h-4 mr-2" />
                                 Add Patient
@@ -278,7 +310,12 @@ const Patients = () => {
                                     <TableHeader>
                                         <TableRow className="hover:bg-transparent">
                                             <TableHead className="w-12">
-                                                <input type="checkbox" className="rounded" />
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded"
+                                                    checked={selectedPatients.length === patientsData.length}
+                                                    onChange={handleSelectAll}
+                                                />
                                             </TableHead>
                                             <TableHead>Patient Info</TableHead>
                                             <TableHead>Contact</TableHead>
@@ -293,7 +330,12 @@ const Patients = () => {
                                         {patientsData.map((patient, index) => (
                                             <TableRow key={patient.id} className="hover:bg-muted/50">
                                                 <TableCell>
-                                                    <input type="checkbox" className="rounded" />
+                                                    <input
+                                                        type="checkbox"
+                                                        className="rounded"
+                                                        checked={selectedPatients.includes(patient.id)}
+                                                        onChange={() => handleSelectPatient(patient.id)}
+                                                    />
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex items-center gap-3">
@@ -348,21 +390,26 @@ const Patients = () => {
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end" className="bg-popover">
-                                                            <DropdownMenuItem>
-                                                                <Eye className="w-4 h-4 mr-2" />
-                                                                View Details
+                                                            <DropdownMenuItem asChild>
+                                                                <PatientDetailsDialog patient={patient} />
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem>
-                                                                <FileText className="w-4 h-4 mr-2" />
-                                                                Medical Records
+                                                            <DropdownMenuItem asChild>
+                                                                <EditPatientDialog patient={patient} onUpdate={handleUpdatePatient} />
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem>
-                                                                <Calendar className="w-4 h-4 mr-2" />
-                                                                Schedule Appointment
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem>
-                                                                <Edit className="w-4 h-4 mr-2" />
-                                                                Edit Patient
+                                                        </DropdownMenuContent>
+                                                        <DropdownMenuContent align="end" className="bg-popover">
+                                                            <DropdownMenuItem asChild>
+                                                                <DeletePatientsDialog
+                                                                    patientIds={[patient.id]}
+                                                                    patientNames={[patient.patientName]}
+                                                                    onDelete={handleDeletePatients}
+                                                                    trigger={
+                                                                        <Button variant="ghost" size="sm" className="justify-start w-full">
+                                                                            <Trash2 className="w-4 h-4 mr-2" />
+                                                                            Delete Patient
+                                                                        </Button>
+                                                                    }
+                                                                />
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
@@ -375,6 +422,11 @@ const Patients = () => {
                                 <div className="flex items-center justify-between p-6 border-t border-border bg-muted/20">
                                     <div className="text-sm text-muted-foreground font-medium">
                                         Showing {patientsData.length} out of {totalElements} patients
+                                        {selectedPatients.length > 0 && (
+                                            <span className="ml-2 text-primary">
+                                                ({selectedPatients.length} selected)
+                                            </span>
+                                        )}
                                     </div>
                                     <Pagination>
                                         <PaginationContent>

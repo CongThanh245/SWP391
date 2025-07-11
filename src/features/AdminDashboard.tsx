@@ -4,13 +4,10 @@ import { AdminSidebar } from '@components/admin-sidebar';
 import Dashboard from '@components/Dashboard';
 import Doctors from '@components/AdminDoctors';
 import Patients from '@components/AdminPatient';
-/*import Patients from '@/pages/Patients';
-import Appointments from '@/pages/Appointments';
-import Schedule from '@/pages/Schedule';
-import MedicalRecords from '@/pages/MedicalRecords';*/
+import Receptionists  from '@components/Receptionists'
 
 const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'doctors' | 'patients'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'doctors' | 'patients' | 'receptionist'>('dashboard');
 
   const renderContent = () => {
     switch (activeTab) {
@@ -18,12 +15,8 @@ const AdminDashboard: React.FC = () => {
         return <Doctors />;
       case 'patients':
         return <Patients />;
-      /*case 'appointments':
-        return <Appointments />;
-      case 'schedule':
-        return <Schedule />;
-      case 'records':
-        return <MedicalRecords />;*/
+      case 'receptionist':
+        return <Receptionists />;
       default:
         return <Dashboard />;
     }

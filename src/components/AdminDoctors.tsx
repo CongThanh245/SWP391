@@ -29,6 +29,7 @@ import { UIDoctorData } from '@services/doctorService';
 import { getDoctorStats, deleteDoctor } from '@api/adminApi';
 import { useNavigate } from "react-router-dom";
 import DoctorAdminDetails from '@components/DoctorAdminDetails'
+import {EditDoctorDialog}  from '@components/EditDoctorDialog'
 
 import {
   AlertDialog,
@@ -121,7 +122,7 @@ const Doctors = () => {
           specialist: doctor.specialization || 'General',
           totalPatients: doctor.totalPatients ?? 0,
           todayAppointments: doctor.todayAppointments ?? 0,
-          status: doctor.available && doctor.active ? 'Available' : 'Unavailable',
+          status: doctor.available ? 'Available' : 'Unavailable',
           avatar: getInitials(doctor.doctorName || 'Unknown Doctor'),
           phone: doctor.phone || '',
           email: doctor.doctorEmail || '',
@@ -190,17 +191,17 @@ const Doctors = () => {
     setCurrentPage(0);
   };
 
- const handleDeleteDoctor = async (doctorId: string) => {
+  const handleDeleteDoctor = async (doctorId: string) => {
     setIsDeleting(true);
     try {
       await deleteDoctor(doctorId);
-      toast({ 
+      toast({
         title: "Thành công",
         description: `Đã hoàn thành xóa bác sĩ: ${doctorId}`,
-       
+
       });
     } catch (error) {
-       toast({
+      toast({
         title: 'Lỗi',
         description: `Không thể lưu xóa bác sĩ: ${doctorId}`,
         variant: 'destructive',
@@ -282,6 +283,10 @@ const Doctors = () => {
     if (!paginationInfo.first) {
       setCurrentPage(prev => prev - 1);
     }
+  };
+
+  const handleUpdateDoctor = (updatedDoctor) => {
+    console.log("Doctor updated:", updatedDoctor);
   };
 
   return (
@@ -447,15 +452,13 @@ const Doctors = () => {
                               <Eye className="w-4 h-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-[#4D3C2D]">
-                              <Edit className="w-4 h-4 mr-2" />
-                              Edit
+                            <DropdownMenuItem asChild>
+                              <EditDoctorDialog doctor={doctor} onUpdate={handleUpdateDoctor} />
                             </DropdownMenuItem>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                {/* Đây là nút kích hoạt AlertDialog, nó trông giống một DropdownMenuItem */}
                                 <DropdownMenuItem
-                                  onSelect={(e) => e.preventDefault()} // Ngăn chặn Dropdown đóng ngay lập tức
+                                  onSelect={(e) => e.preventDefault()} 
                                   className="text-red-600 focus:bg-red-50 focus:text-red-700 cursor-pointer"
                                 >
                                   <Trash2 className="w-4 h-4 mr-2" />
