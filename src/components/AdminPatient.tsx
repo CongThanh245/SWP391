@@ -23,104 +23,163 @@ import {
 } from "@components/ui/dropdown-menu";
 import { CSVImportDialog } from "@components/CSVImportDialog";
 import React, { useState, useEffect, useCallback } from 'react';
+import { getPatients } from '@api/adminApi'
+import {formatDate} from '@utils/format'
+interface Patient {
+    id: string;
+    patientId: string;
+    patientName: string;
+    age: number;
+    gender: 'MALE' | 'FEMALE' | 'OTHER';
+    phone: string;
+    email: string;
+    doctorName: string;
+    lastVisit: string;
+    nextAppointment: string;
+    status: 'PLANNED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+}
+
+interface ApiResponse {
+    content: Patient[];
+    number: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    first: boolean;
+    last: boolean;
+}
+
 
 const Patients = () => {
     const [finalImportStatus, setFinalImportStatus] = useState<'success' | 'failed' | null>(null);
     const [finalImportMessage, setFinalImportMessage] = useState<string>('');
     const [showImportDialog, setShowImportDialog] = useState(false);
-     const [loading, setLoading] = useState(true);
-    const patientsData = [
-        {
-            id: "WNH-PT-001",
-            name: "Sarah Johnson",
-            age: 32,
-            gender: "Female",
-            phone: "+1 555-123-4567",
-            email: "sarah.johnson@email.com",
-            address: "123 Main St, Boston, MA",
-            lastVisit: "2024-01-15",
-            nextAppointment: "2024-01-25",
-            doctor: "Dr. Petra Winsbury",
-            status: "Active",
-            condition: "Infertility Treatment",
-            treatmentPlan: "IVF Protocol",
-            medicalHistory: "PCOS, Previous miscarriage",
-            allergies: "Penicillin",
-            emergencyContact: "John Johnson - +1 555-123-4568"
-        },
-        {
-            id: "WNH-PT-002",
-            name: "Maria Garcia",
-            age: 28,
-            gender: "Female",
-            phone: "+1 555-234-5678",
-            email: "maria.garcia@email.com",
-            address: "456 Oak Ave, Cambridge, MA",
-            lastVisit: "2024-01-10",
-            nextAppointment: "2024-01-22",
-            doctor: "Dr. Olivia Martinez",
-            status: "Active",
-            condition: "Fertility Consultation",
-            treatmentPlan: "IUI Preparation",
-            medicalHistory: "Endometriosis",
-            allergies: "None",
-            emergencyContact: "Carlos Garcia - +1 555-234-5679"
-        },
-        {
-            id: "WNH-PT-003",
-            name: "Emily Chen",
-            age: 35,
-            gender: "Female",
-            phone: "+1 555-345-6789",
-            email: "emily.chen@email.com",
-            address: "789 Pine St, Somerville, MA",
-            lastVisit: "2024-01-08",
-            nextAppointment: "2024-01-28",
-            doctor: "Dr. Damian Sanchez",
-            status: "In Treatment",
-            condition: "Recurrent Pregnancy Loss",
-            treatmentPlan: "Comprehensive Testing",
-            medicalHistory: "3 miscarriages, Thyroid disorder",
-            allergies: "Shellfish",
-            emergencyContact: "David Chen - +1 555-345-6790"
-        },
-        {
-            id: "WNH-PT-004",
-            name: "Jessica Brown",
-            age: 30,
-            gender: "Female",
-            phone: "+1 555-456-7890",
-            email: "jessica.brown@email.com",
-            address: "321 Elm St, Newton, MA",
-            lastVisit: "2024-01-12",
-            nextAppointment: "",
-            doctor: "Dr. Chloe Harrington",
-            status: "Completed",
-            condition: "Successful Pregnancy",
-            treatmentPlan: "Post-treatment Follow-up",
-            medicalHistory: "Male factor infertility",
-            allergies: "Latex",
-            emergencyContact: "Michael Brown - +1 555-456-7891"
-        },
-        {
-            id: "WNH-PT-005",
-            name: "Amanda Wilson",
-            age: 33,
-            gender: "Female",
-            phone: "+1 555-567-8901",
-            email: "amanda.wilson@email.com",
-            address: "654 Maple Dr, Brookline, MA",
-            lastVisit: "2024-01-14",
-            nextAppointment: "2024-01-26",
-            doctor: "Dr. Emily Smith",
-            status: "Active",
-            condition: "PCOS Treatment",
-            treatmentPlan: "Ovulation Induction",
-            medicalHistory: "PCOS, Insulin resistance",
-            allergies: "Sulfa drugs",
-            emergencyContact: "Robert Wilson - +1 555-567-8902"
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+
+    const [patientsData, setPatientsData] = useState<Patient[]>([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [pageSize, setPageSize] = useState(5);
+    const [totalElements, setTotalElements] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Function to fetch patients, now accepting page, size, and search
+    const fetchPatients = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        const params = {
+            search: searchQuery,
+            page: String(currentPage), // Convert to string as per Record<string, string>
+            size: String(pageSize),    // Convert to string
+        };
+
+        try {
+            const response: ApiResponse = await getPatients(params);
+            setPatientsData(response.content);
+            setTotalElements(response.totalElements);
+            setTotalPages(response.totalPages);
+            setCurrentPage(response.number); // Ensure currentPage is in sync with API's returned page
+            setPageSize(response.size);      // Ensure pageSize is in sync with API's returned size
+        } catch (err: unknown) {
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : 'An unknown error occurred while fetching patients.';
+            setError(message);
+            console.error("Failed to fetch patients:", err);
+        } finally {
+            setLoading(false);
         }
-    ];
+    }, [currentPage, pageSize, searchQuery]); // Dependencies for useCallback
+
+    // Fetch data whenever currentPage, pageSize, or searchQuery changes
+    useEffect(() => {
+        fetchPatients();
+    }, [fetchPatients]); // Dependency array includes fetchPatients (due to useCallback)
+
+    // Handlers for pagination
+    const handlePreviousPage = () => {
+        if (currentPage > 0) {
+            setCurrentPage(prev => prev - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages - 1) {
+            setCurrentPage(prev => prev + 1);
+        }
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page - 1); // Convert 1-indexed page from UI to 0-indexed for API
+    };
+
+    const renderPaginationLinks = () => {
+        const links = [];
+        const maxPagesToShow = 5;
+        const startPage = Math.max(0, currentPage - Math.floor(maxPagesToShow / 2));
+        const endPage = Math.min(totalPages - 1, startPage + maxPagesToShow - 1);
+
+        if (startPage > 0) {
+            links.push(
+                <PaginationItem key="1">
+                    <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
+                </PaginationItem>
+            );
+            if (startPage > 1) {
+                links.push(<PaginationItem key="ellipsis-start"><PaginationEllipsis /></PaginationItem>);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            links.push(
+                <PaginationItem key={i}>
+                    <PaginationLink onClick={() => handlePageChange(i + 1)} isActive={currentPage === i}>
+                        {i + 1}
+                    </PaginationLink>
+                </PaginationItem>
+            );
+        }
+
+        if (endPage < totalPages - 1) {
+            if (endPage < totalPages - 2) {
+                links.push(<PaginationItem key="ellipsis-end"><PaginationEllipsis /></PaginationItem>);
+            }
+            links.push(
+                <PaginationItem key={totalPages - 1}>
+                    <PaginationLink onClick={() => handlePageChange(totalPages)}>{totalPages}</PaginationLink>
+                </PaginationItem>
+            );
+        }
+        return links;
+    };
+
+
+    if (loading) {
+        return <div>Loading patients...</div>;
+    }
+
+    if (error) {
+        return <div className="text-red-500">Error: {error}</div>;
+    }
+
+    const formatGender = (gender: 'MALE' | 'FEMALE' | 'PREFER_NOT_TO_SAY' | 'OTHER'): string => {
+        switch (gender) {
+            case 'MALE':
+                return 'Male';
+            case 'FEMALE':
+                return 'Female';
+            case 'PREFER_NOT_TO_SAY':
+                return 'Prefer not to say';
+            case 'OTHER':
+                return 'Other';
+            default:
+                return 'Unknown'; // Fallback for any unexpected values
+        }
+    };
 
     const csvTemplateFields = ["Name", "Age", "Gender", "Phone", "Email", "Address", "Doctor", "Condition", "Medical History", "Allergies", "Emergency Contact"];
     const csvSampleData = [
@@ -152,20 +211,20 @@ const Patients = () => {
         }
     ];
 
-    
+
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case "Active":
+            case "ACTIVE":
                 return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Active</Badge>;
-            case "In Treatment":
+            case "IN_PROGRESS":
                 return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">In Treatment</Badge>;
-            case "Completed":
+            case "COMPLETED":
                 return <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100">Completed</Badge>;
-            case "Inactive":
+            case "CANCELLED":
                 return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Inactive</Badge>;
             default:
-                return <Badge variant="secondary">{status}</Badge>;
+                return <Badge variant="secondary">Planned</Badge>;
         }
     };
 
@@ -188,6 +247,8 @@ const Patients = () => {
                                 <Input
                                     placeholder="Search patients..."
                                     className="pl-10 w-80"
+                                    value={searchQuery} // Bind value to searchQuery state
+                                    onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery on change
                                 />
                             </div>
                             <Select>
@@ -202,7 +263,7 @@ const Patients = () => {
                                     <SelectItem value="damian">Dr. Damian Sanchez</SelectItem>
                                 </SelectContent>
                             </Select>
-                            
+
                             <Button>
                                 <Plus className="w-4 h-4 mr-2" />
                                 Add Patient
@@ -222,7 +283,6 @@ const Patients = () => {
                                             <TableHead>Patient Info</TableHead>
                                             <TableHead>Contact</TableHead>
                                             <TableHead>Doctor</TableHead>
-                                            <TableHead>Condition</TableHead>
                                             <TableHead>Last Visit</TableHead>
                                             <TableHead>Next Appointment</TableHead>
                                             <TableHead>Status</TableHead>
@@ -240,13 +300,13 @@ const Patients = () => {
                                                         <Avatar className="w-10 h-10">
                                                             <AvatarImage src="/placeholder.svg" />
                                                             <AvatarFallback className="text-sm font-medium">
-                                                                {patient.name.split(' ').map(n => n[0]).join('')}
+                                                                {patient.patientName.split(' ').map(n => n[0]).join('')}
                                                             </AvatarFallback>
                                                         </Avatar>
                                                         <div>
-                                                            <div className="font-medium">{patient.name}</div>
-                                                            <div className="text-sm text-muted-foreground">{patient.id}</div>
-                                                            <div className="text-sm text-muted-foreground">{patient.age} years, {patient.gender}</div>
+                                                            <div className="font-medium">{patient.patientName}</div>
+                                                            <div className="text-sm text-muted-foreground">{patient.patientId}</div>
+                                                            <div className="text-sm text-muted-foreground">{patient.age} years, {formatGender(patient.gender)}</div>
                                                         </div>
                                                     </div>
                                                 </TableCell>
@@ -263,22 +323,17 @@ const Patients = () => {
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <div className="font-medium text-sm">{patient.doctor}</div>
+                                                    <div className="font-medium text-sm">{patient.doctorName}</div>
                                                 </TableCell>
+
                                                 <TableCell>
-                                                    <div>
-                                                        <div className="font-medium text-sm">{patient.condition}</div>
-                                                        <div className="text-sm text-muted-foreground">{patient.treatmentPlan}</div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="text-sm font-medium">{patient.lastVisit}</div>
+                                                    <div className="text-sm font-medium">{formatDate(patient.lastVisit)}</div>
                                                 </TableCell>
                                                 <TableCell>
                                                     {patient.nextAppointment ? (
                                                         <div className="flex items-center gap-2">
                                                             <Calendar className="w-4 h-4 text-blue-500" />
-                                                            <span className="text-sm font-medium">{patient.nextAppointment}</span>
+                                                            <span className="text-sm font-medium">{formatDate(patient.nextAppointment)}</span>
                                                         </div>
                                                     ) : (
                                                         <span className="text-sm text-muted-foreground italic">Not scheduled</span>
@@ -319,30 +374,22 @@ const Patients = () => {
 
                                 <div className="flex items-center justify-between p-6 border-t border-border bg-muted/20">
                                     <div className="text-sm text-muted-foreground font-medium">
-                                        Showing 5 out of 85 patients
+                                        Showing {patientsData.length} out of {totalElements} patients
                                     </div>
                                     <Pagination>
                                         <PaginationContent>
                                             <PaginationItem>
-                                                <PaginationPrevious href="#" />
+                                                <PaginationPrevious
+                                                    onClick={handlePreviousPage}
+                                                    className={currentPage === 0 ? 'pointer-events-none opacity-50' : ''}
+                                                />
                                             </PaginationItem>
+                                            {renderPaginationLinks()}
                                             <PaginationItem>
-                                                <PaginationLink href="#" isActive>1</PaginationLink>
-                                            </PaginationItem>
-                                            <PaginationItem>
-                                                <PaginationLink href="#">2</PaginationLink>
-                                            </PaginationItem>
-                                            <PaginationItem>
-                                                <PaginationLink href="#">3</PaginationLink>
-                                            </PaginationItem>
-                                            <PaginationItem>
-                                                <PaginationEllipsis />
-                                            </PaginationItem>
-                                            <PaginationItem>
-                                                <PaginationLink href="#">17</PaginationLink>
-                                            </PaginationItem>
-                                            <PaginationItem>
-                                                <PaginationNext href="#" />
+                                                <PaginationNext
+                                                    onClick={handleNextPage}
+                                                    className={currentPage === totalPages - 1 ? 'pointer-events-none opacity-50' : ''}
+                                                />
                                             </PaginationItem>
                                         </PaginationContent>
                                     </Pagination>
