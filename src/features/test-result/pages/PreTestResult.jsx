@@ -131,10 +131,12 @@ const PreTestResult = () => {
   if (error)
     return (
       <div>
-        <Link
-          to="/receptionist-dashboard/test-results"
+        <button
+          onClick={() => window.location.reload()}
           className={styles.backLink}
-        > Quay lại </Link>
+        >
+          Quay lại
+        </button>
         <div className={styles.error}>{error}</div>
       </div>
     );
@@ -143,9 +145,8 @@ const PreTestResult = () => {
     <div className={styles.patientListPage}>
       <div className={styles.pageHeader}>
         <h2>Nhập kết quả xét nghiệm</h2>
-        <p>Quản lý thông tin bệnh nhân</p>
         <div className={styles.stats}>
-          <span>Tổng số: {patients.length}</span>
+          <span>Tổng số bệnh nhân: {patients.length}</span>
         </div>
       </div>
 
@@ -247,7 +248,15 @@ const PreTestResult = () => {
                     <span>Mô tả</span>
                   </div>
 
-                  <div className={styles.headerCell}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "1em",
+                      paddingLeft: "1rem",
+                      alignItems: "center",
+                    }}
+                    className={styles.headerCell}
+                  >
                     <Edit3 size={16} />
                     <span>Ghi chú</span>
                   </div>
@@ -314,7 +323,6 @@ const PreTestResult = () => {
             <div className={styles.modalFooter}>
               <div className={styles.footerActions}>
                 <button className={styles.saveButton} onClick={handleSubmit}>
-                  <Activity size={12} />
                   Lưu kết quả
                 </button>
               </div>
