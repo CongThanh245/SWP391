@@ -1,9 +1,10 @@
 // src/hooks/useDoctors.js
-import { useState, useEffect } from 'react';
-import { getAdminDoctors, getDoctors } from '@api/doctorApi';
+import { useState, useEffect } from "react";
+import { getAdminDoctors, getDoctors } from "@api/doctorApi";
 
 export const useDoctors = (params = {}) => {
   const [doctors, setDoctors] = useState([]);
+  const [pagination, setPagination] = useState(null); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -12,20 +13,27 @@ export const useDoctors = (params = {}) => {
       setLoading(true);
       try {
         const data = await getDoctors(params);
-        // Ánh xạ dữ liệu từ API response sang định dạng components sử dụng
-        const mappedDoctors = data.content.map(doctor => ({
+        // Map API response data to component-friendly format
+        const mappedDoctors = data.content.map((doctor) => ({
           id: doctor.doctorId,
-          name: doctor.doctorName,           // Ánh xạ doctorName → name
+          name: doctor.doctorName,
           specialization: doctor.specialization,
           phone: doctor.phone,
-          yearOfExperience: doctor.yearOfExperience, // Không phải yearsOfExperience
+          yearOfExperience: doctor.yearOfExperience,
           degree: doctor.degree,
           licenseNumber: doctor.licenseNumber,
           gender: doctor.gender,
-          address: doctor.doctorAddress,     // Ánh xạ doctorAddress → address
+          address: doctor.doctorAddress,
           about: doctor.about,
         }));
         setDoctors(mappedDoctors);
+        // Set pagination data
+        setPagination({
+          totalPages: data.totalPages || 1,
+          totalElements: data.totalElements || 0,
+          currentPage: data.number || 0,
+          size: data.size || params.size || 10,
+        });
       } catch (err) {
         setError(err.message);
       } finally {
@@ -34,14 +42,12 @@ export const useDoctors = (params = {}) => {
     };
 
     fetchDoctors();
-  }, [JSON.stringify(params)]); // Tái chạy khi params thay đổi
+  }, [JSON.stringify(params)]); // Re-run when params change
 
-  return { doctors, loading, error };
+  return { doctors, pagination, loading, error }; // Include pagination in return
 };
 
-
 // src/hooks/useDoctors.js
-
 
 export const useAdminDoctors = (params = {}) => {
   const [doctors, setDoctors] = useState([]);
@@ -54,16 +60,16 @@ export const useAdminDoctors = (params = {}) => {
       try {
         const data = await getAdminDoctors(params);
         // Ánh xạ dữ liệu từ API response sang định dạng components sử dụng
-        const mappedDoctors = data.content.map(doctor => ({
+        const mappedDoctors = data.content.map((doctor) => ({
           id: doctor.doctorId,
-          name: doctor.doctorName,           // Ánh xạ doctorName → name
+          name: doctor.doctorName, // Ánh xạ doctorName → name
           specialization: doctor.specialization,
           phone: doctor.phone,
           yearOfExperience: doctor.yearOfExperience, // Không phải yearsOfExperience
           degree: doctor.degree,
           licenseNumber: doctor.licenseNumber,
           gender: doctor.gender,
-          address: doctor.doctorAddress,     // Ánh xạ doctorAddress → address
+          address: doctor.doctorAddress, // Ánh xạ doctorAddress → address
           about: doctor.about,
         }));
         setDoctors(mappedDoctors);
