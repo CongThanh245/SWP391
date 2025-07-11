@@ -96,6 +96,25 @@
   cursor: not-allowed;
 }
 
+/* Forgot Password Link */
+.forgotPassword {
+  text-align: left;
+  margin-top: -1rem; 
+}
+
+.forgotPasswordLink {
+  color: var(--text-secondary); 
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.forgotPasswordLink:hover {
+  text-decoration: underline;
+  color: var(--text-primary);
+}
+
 /* Login Button */
 .loginButton {
   background: #802d46;

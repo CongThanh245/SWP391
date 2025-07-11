@@ -1,0 +1,106 @@
+.verifyOtpContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--primary-background);
+  padding: var(--spacing-md);
+  font-family: var(--font-family);
+}
+
+.verifyOtpContainer h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.otpInputContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.otpInput {
+  width: 3.5rem !important;
+  height: 3.5rem !important;
+  font-size: var(--font-size-lg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  text-align: center;
+  margin: 0 var(--spacing-xs);
+  background: var(--light-background);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.otpInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 8px var(--shadow-accent);
+}
+
+.otpSeparator {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  margin: 0 var(--spacing-sm);
+}
+
+.errorMessage {
+  color: var(--warning-red);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+  min-height: 1.5rem; 
+}
+
+.verifyButton {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  padding: var(--padding-1) var(--spacing-xl);
+  font-size: var(--font-size-base);
+  border: none;
+  border-radius: var(--border-radius-1);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  width: 100%;
+  max-width: 200px;
+}
+
+.verifyButton:hover:not(:disabled) {
+  background: var(--button-hover-bg);
+  transform: translateY(-2px);
+}
+
+.verifyButton:disabled {
+  background: var(--button-secondary-border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.verifyButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Responsive styles */
+@media (max-width: var(--breakpoint-sm)) {
+  .verifyOtpContainer {
+    padding: var(--spacing-sm);
+  }
+
+  .otpInput {
+    width: 3rem !important;
+    height: 3rem !important;
+    font-size: var(--font-size-base);
+  }
+
+  .verifyOtpContainer h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  .verifyButton {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+  }
+}

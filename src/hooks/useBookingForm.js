@@ -21,7 +21,7 @@ const useBookingForm = (onClose) => {
   const [loadingSlots, setLoadingSlots] = useState(false);
 
   // Get patientId from localStorage
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem("user"));
   const patientId = user?.id; // Use user.id as specified
   const { uploadedFiles, fileErrorMessage } = usePatientFiles(patientId);
 
@@ -29,19 +29,32 @@ const useBookingForm = (onClose) => {
 
   // Sync file error message with main error message
   useEffect(() => {
-    if (!patientId) {
-      setErrorMessage("Không tìm thấy thông tin bệnh nhân trong bộ nhớ.");
-    } else if (fileErrorMessage) {
-      setErrorMessage(fileErrorMessage);
-    }
-  }, [fileErrorMessage, patientId]);
+    const checkPatientId = () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const patientId = user?.id;
+
+      if (!patientId) {
+        setErrorMessage("Không tìm thấy thông tin bệnh nhân trong bộ nhớ.");
+      } else if (fileErrorMessage) {
+        setErrorMessage(fileErrorMessage);
+      } else {
+        setErrorMessage("");
+      }
+    };
+
+    const timer = setTimeout(checkPatientId, 100); // Trì hoãn 100ms
+
+    return () => clearTimeout(timer); // Dọn dẹp timer
+  }, [fileErrorMessage]);
 
   // Fetch doctors
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         const list = await getDoctorList();
-        setDoctors(list.map((d) => ({ id: d.id, name: d.doctorName || d.name })));
+        setDoctors(
+          list.map((d) => ({ id: d.id, name: d.doctorName || d.name }))
+        );
       } catch (err) {
         console.error("Error fetching doctors:", err);
         setErrorMessage("Không thể tải danh sách bác sĩ.");
@@ -54,7 +67,7 @@ const useBookingForm = (onClose) => {
   useEffect(() => {
     const fetchSlots = async () => {
       const { doctorId, date } = formData;
-      
+
       if (!doctorId || !date) {
         setTimeSlots([]);
         return;
@@ -66,86 +79,87 @@ const useBookingForm = (onClose) => {
 
       try {
         console.log(`Fetching slots for doctorId: ${doctorId}, date: ${date}`);
-        
-        let response = await apiClient.get('/slot', { 
-          params: { doctorId, date } 
+
+        let response = await apiClient.get("/slot", {
+          params: { doctorId, date },
         });
-        
+
         if (!response.data || response.data.length === 0) {
-          console.log('No slots found, generating...');
-          await apiClient.post('/slot/generate', null, { 
-            params: { doctorId, date } 
+          console.log("No slots found, generating...");
+          await apiClient.post("/slot/generate", null, {
+            params: { doctorId, date },
           });
-          
-          response = await apiClient.get('/slot', { 
-            params: { doctorId, date } 
+
+          response = await apiClient.get("/slot", {
+            params: { doctorId, date },
           });
         }
 
         if (Array.isArray(response.data)) {
           const uniqueSlots = response.data.reduce((acc, slot) => {
-            const existingSlot = acc.find(s => s.time === slot.startTime);
-            
+            const existingSlot = acc.find((s) => s.time === slot.startTime);
+
             if (!existingSlot) {
               acc.push({
                 id: slot.id,
                 time: slot.startTime,
-                available: !slot.booked
+                available: !slot.booked,
               });
             } else if (existingSlot.available && !slot.booked) {
               // Do nothing
             } else if (!existingSlot.available && !slot.booked) {
-              const index = acc.findIndex(s => s.time === slot.startTime);
+              const index = acc.findIndex((s) => s.time === slot.startTime);
               acc[index] = {
                 id: slot.id,
                 time: slot.startTime,
-                available: true
+                available: true,
               };
             }
-            
+
             return acc;
           }, []);
 
           uniqueSlots.sort((a, b) => a.time.localeCompare(b.time));
-          
+
           setTimeSlots(uniqueSlots);
           console.log(`Loaded ${uniqueSlots.length} unique slots`);
-          
+
           if (uniqueSlots.length === 0) {
-            setErrorMessage('Không có khung giờ khả dụng.');
+            setErrorMessage("Không có khung giờ khả dụng.");
           }
         } else {
-          setErrorMessage('Dữ liệu khung giờ không hợp lệ.');
+          setErrorMessage("Dữ liệu khung giờ không hợp lệ.");
         }
-        
       } catch (err) {
-        console.error('Error fetching slots:', err);
+        console.error("Error fetching slots:", err);
         if (err.response?.status === 409) {
           try {
-            const response = await apiClient.get('/slot', { 
-              params: { doctorId, date } 
+            const response = await apiClient.get("/slot", {
+              params: { doctorId, date },
             });
             if (response.data && response.data.length > 0) {
               const uniqueSlots = response.data
-                .filter((slot, index, arr) => 
-                  arr.findIndex(s => s.startTime === slot.startTime) === index
+                .filter(
+                  (slot, index, arr) =>
+                    arr.findIndex((s) => s.startTime === slot.startTime) ===
+                    index
                 )
-                .map(slot => ({
+                .map((slot) => ({
                   id: slot.id,
                   time: slot.startTime,
-                  available: !slot.booked
+                  available: !slot.booked,
                 }))
                 .sort((a, b) => a.time.localeCompare(b.time));
-              
+
               setTimeSlots(uniqueSlots);
             } else {
-              setErrorMessage('Không có khung giờ khả dụng.');
+              setErrorMessage("Không có khung giờ khả dụng.");
             }
           } catch (retryErr) {
-            setErrorMessage('Không thể tải khung giờ. Vui lòng thử lại.');
+            setErrorMessage("Không thể tải khung giờ. Vui lòng thử lại.");
           }
         } else {
-          setErrorMessage('Không thể tải khung giờ. Vui lòng thử lại.');
+          setErrorMessage("Không thể tải khung giờ. Vui lòng thử lại.");
         }
       } finally {
         setLoadingSlots(false);
@@ -170,19 +184,21 @@ const useBookingForm = (onClose) => {
   // Handle time slot focus
   const handleTimeSlotFocus = (e) => {
     if (!formData.doctorId || !formData.date) {
-      e.target.blur(); 
-      
+      e.target.blur();
+
       const newErrors = {};
       if (!formData.doctorId && !formData.date) {
-        setErrorMessage("Vui lòng chọn bác sĩ và ngày khám trước khi chọn giờ khám.");
+        setErrorMessage(
+          "Vui lòng chọn bác sĩ và ngày khám trước khi chọn giờ khám."
+        );
       } else if (!formData.doctorId) {
         setErrorMessage("Vui lòng chọn bác sĩ trước khi chọn giờ khám.");
       } else if (!formData.date) {
         newErrors.date = "Vui lòng chọn ngày trước";
         setErrorMessage("Vui lòng chọn ngày khám trước khi chọn giờ khám.");
       }
-      
-      setErrors(prev => ({ ...prev, ...newErrors }));
+
+      setErrors((prev) => ({ ...prev, ...newErrors }));
     }
   };
 
@@ -202,7 +218,7 @@ const useBookingForm = (onClose) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-    
+
     setIsSubmitting(true);
     setErrorMessage("");
 
@@ -214,25 +230,24 @@ const useBookingForm = (onClose) => {
         note: formData.notes || "",
         attachmentId: formData.files,
       };
-      
+
       console.log("Creating appointment:", payload);
       await createAppointment(payload);
-      
+
       setShowSuccess(true);
       setTimeout(handleClose, 1000);
-      
     } catch (err) {
       console.error("Create appointment error:", err);
-      
+
       let errorMsg = "Đặt lịch thất bại: ";
       if (err.response?.status === 409) {
         errorMsg += "Khung giờ đã được đặt.";
-      } else if (err.response?.data?.message?.includes('maximum')) {
+      } else if (err.response?.data?.message?.includes("maximum")) {
         errorMsg += "Bạn đã đạt giới hạn số lịch hẹn.";
       } else {
         errorMsg += err.response?.data?.message || "Lỗi không xác định.";
       }
-      
+
       setErrorMessage(errorMsg);
     } finally {
       setIsSubmitting(false);
@@ -241,13 +256,13 @@ const useBookingForm = (onClose) => {
 
   // Handle input change
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
       ...(field === "doctorId" || field === "date" ? { timeSlot: "" } : {}),
     }));
-    
-    setErrors(prev => ({ ...prev, [field]: "" }));
+
+    setErrors((prev) => ({ ...prev, [field]: "" }));
     setErrorMessage("");
   };
 

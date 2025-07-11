@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import OTPInput from 'react-otp-input';
-import {  useNavigate } from 'react-router-dom';
-import { verifyOtp } from '../../../../api/authApi';  // import hàm API bạn đã viết
+import { useNavigate } from 'react-router-dom';
+import { verifyOtp } from '../../../../api/authApi';
+import styles from './VerifyOtpPage.module.css'; 
 
 function VerifyOtpPage() {
-    const [token, setToken] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+  const [token, setToken] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-
-    const handleChange = (value) => {
+  const handleChange = (value) => {
     setToken(value);
     setError('');
   };
@@ -36,39 +36,23 @@ function VerifyOtpPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: 'auto', padding: 20 }}>
+    <div className={styles.verifyOtpContainer}>
       <h2>Nhập mã kích hoạt tài khoản</h2>
-      <OTPInput
-        value={token}
-        onChange={handleChange}
-        numInputs={6}
-        isInputNum
-        separator={<span style={{ margin: '0 8px' }}>-</span>}
-        renderInput={(props) => (
-          <input
-            {...props}
-            style={{
-              width: '3rem',
-              height: '3rem',
-              fontSize: '1.5rem',
-              borderRadius: 4,
-              border: '1px solid #ccc',
-            }}
-          />
-        )}
-      />
-
-      {error && <p style={{ color: 'red', marginTop: 10 }}>{error}</p>}
-
+      <div className={styles.otpInputContainer}>
+        <OTPInput
+          value={token}
+          onChange={handleChange}
+          numInputs={6}
+          isInputNum
+          separator={<span className={styles.otpSeparator}>-</span>}
+          renderInput={(props) => <input {...props} className={styles.otpInput} />}
+        />
+      </div>
+      {error && <p className={styles.errorMessage}>{error}</p>}
       <button
+        className={styles.verifyButton}
         onClick={handleVerify}
         disabled={loading || token.length !== 6}
-        style={{
-          marginTop: 20,
-          padding: '10px 20px',
-          fontSize: '1rem',
-          cursor: loading || token.length !== 6 ? 'not-allowed' : 'pointer',
-        }}
       >
         {loading ? 'Đang xác thực...' : 'Xác thực'}
       </button>
