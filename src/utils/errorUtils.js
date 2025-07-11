@@ -1,7 +1,7 @@
 export const translateError = (code, message) => {
   const errorMap = {
     400: {
-      "Appointments must be booked at least 24 hours in advance":
+      "Appointments must be booked at least 24 hours in advance.":
         "Lịch hẹn phải được đặt trước ít nhất 24 giờ.",
     },
     100: {
@@ -10,9 +10,6 @@ export const translateError = (code, message) => {
       "You already have another appointment at this time.":
         "Bạn đã có lịch hẹn khác vào thời điểm này.",
       default: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
-    },
-    409: {
-      default: "Khung giờ đã được đặt.",
     },
   };
 

@@ -13,7 +13,6 @@ export const useDoctors = (params = {}) => {
       setLoading(true);
       try {
         const data = await getDoctors(params);
-        // Map API response data to component-friendly format
         const mappedDoctors = data.content.map((doctor) => ({
           id: doctor.doctorId,
           name: doctor.doctorName,
@@ -42,12 +41,12 @@ export const useDoctors = (params = {}) => {
     };
 
     fetchDoctors();
-  }, [JSON.stringify(params)]); // Re-run when params change
+  }, [JSON.stringify(params)]); 
 
-  return { doctors, pagination, loading, error }; // Include pagination in return
+  return { doctors, pagination, loading, error }; 
 };
 
-// src/hooks/useDoctors.js
+
 
 export const useAdminDoctors = (params = {}) => {
   const [doctors, setDoctors] = useState([]);
@@ -59,17 +58,16 @@ export const useAdminDoctors = (params = {}) => {
       setLoading(true);
       try {
         const data = await getAdminDoctors(params);
-        // Ánh xạ dữ liệu từ API response sang định dạng components sử dụng
         const mappedDoctors = data.content.map((doctor) => ({
           id: doctor.doctorId,
-          name: doctor.doctorName, // Ánh xạ doctorName → name
+          name: doctor.doctorName,
           specialization: doctor.specialization,
           phone: doctor.phone,
-          yearOfExperience: doctor.yearOfExperience, // Không phải yearsOfExperience
+          yearOfExperience: doctor.yearOfExperience,
           degree: doctor.degree,
           licenseNumber: doctor.licenseNumber,
           gender: doctor.gender,
-          address: doctor.doctorAddress, // Ánh xạ doctorAddress → address
+          address: doctor.doctorAddress, 
           about: doctor.about,
         }));
         setDoctors(mappedDoctors);
@@ -81,7 +79,7 @@ export const useAdminDoctors = (params = {}) => {
     };
 
     fetchDoctors();
-  }, [JSON.stringify(params)]); // Tái chạy khi params thay đổi
+  }, [JSON.stringify(params)]); 
 
   return { doctors, loading, error };
 };
