@@ -237,7 +237,7 @@ const IntraUterineInseminationProcessCard: React.FC<IntraUterineInseminationProc
                     {/* Complete Process Button */}
                     {hasProcess && isProcessInProgress ? (
                         <Button variant="outline" size="sm" onClick={handleCompleteProcess} disabled={isLoadingAnyOperation}>
-                            <CheckCircle className="w-4 h-4 mr-2" /> Hoàn thành quy trình
+                              Hoàn thành quy trình
                         </Button>
                     ) : null}
 

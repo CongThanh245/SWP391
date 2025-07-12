@@ -26,6 +26,8 @@ import LoginPage from "@features/auth/pages/LoginPage/LoginPage.jsx";
 import PatientAppointmentResults from "@features/test-result/pages/PatientAppointmentResults.jsx";
 import MedicineViewPage from "@features/medicine/pages/MedicineViewPage.jsx";
 import MedicalRecordsManager from "@features/file/MedicalRecordsManager/MedicalRecordsManager.jsx";
+import PrescriptionsPage from "@features/medicine/pages/PrescriptionPage.jsx";
+import PatientResultsPage from "@features/test-result/pages/PatientResultPage.jsx";
 
 const AppRoutes = () => {
   return (
@@ -45,9 +47,9 @@ const AppRoutes = () => {
         >
           <Route index element={<ProfileContent />} />
           <Route path="profile" element={<ProfileContent />} />
-          <Route path="medical-records" element={<PatientAppointmentResults />} />
+          <Route path="medical-records" element={<PatientResultsPage />} />
           <Route path="appointments" element={<AppointmentSchedulePage />} />
-          <Route path="health-monitoring" element={<MedicineViewPage />} />
+          <Route path="health-monitoring" element={<PrescriptionsPage />} />
           <Route path="notifications" element={<AppointmentsContent />} />
           <Route path="attachments" element={<MedicalRecordsManager></MedicalRecordsManager>} />
         </Route>
