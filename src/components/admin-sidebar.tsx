@@ -36,7 +36,7 @@ const menuItems: { title: string; key: AdminSidebarProps['activeTab']; icon: Rea
   { title: "Dashboard", key: "dashboard", icon: BarChart3 },
   { title: "Doctors", key: "doctors", icon: UserCheck },
   { title: "Patients", key: "patients", icon: Users },
-   { title: "receptionist", key: "receptionist", icon: UserCheck },
+   { title: "Receptionist", key: "receptionist", icon: UserCheck },
 ];
 
 const managementItems = [

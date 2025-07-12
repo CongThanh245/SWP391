@@ -108,3 +108,79 @@ export const getPatients = async (
     throw new Error(message);
   }
 };
+
+
+export const fetchReceptionists = async () => {
+  try {
+    const response = await apiClient.get('/admin/receptionists');
+    return response.data;
+  } catch (error) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? error.response?.data?.message || 'Failed to fetch receptionists'
+        : 'An unknown error occurred while fetching receptionists';
+
+    throw new Error(message);
+  }
+};
+
+
+
+interface Patient {
+  id: string;
+  patientId: string;
+  patientName: string;
+  email: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
+  patientAddress?: string | null;
+  patientPhone?: string;
+  emergencyContact?: string | null;
+  joinDate?: string;
+  dateOfBirth?: string;
+  profileCompleted?: boolean;
+  spousePatientName?: string | null;
+  spousePatientAddress?: string | null;
+  spousePatientPhone?: string | null;
+  spouseEmergencyContact?: string | null;
+  spouseDateOfBirth?: string | null;
+  spouseGender?: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY' | null;
+}
+export const getPatientDetails = async (patientId: string): Promise<Patient> => {
+  try {
+    console.log('Gọi API getPatientDetails với patientId:', patientId);
+    const response = await apiClient.get(`/admin/patients/by_patient_id_ferticare`, {
+      params: {
+        patient_id_ferticare: patientId,
+      },
+    });
+    console.log('Response từ API:', response.data);
+
+    const data = response.data;
+    return {
+      id: data.id,
+      patientId: data.patientId,
+      patientName: data.patientName,
+      email: data.email,
+      gender: data.gender,
+      patientAddress: data.patientAddress || null,
+      patientPhone: data.patientPhone,
+      emergencyContact: data.emergencyContact || null,
+      joinDate: data.joinDate,
+      dateOfBirth: data.dateOfBirth,
+      profileCompleted: data.profileCompleted,
+      spousePatientName: data.spousePatientName || null,
+      spousePatientAddress: data.spousePatientAddress || null,
+      spousePatientPhone: data.spousePatientPhone || null,
+      spouseEmergencyContact: data.spouseEmergencyContact || null,
+      spouseDateOfBirth: data.spouseDateOfBirth || null,
+      spouseGender: data.spouseGender || null,
+    };
+  } catch (error) {
+    console.error('Lỗi khi gọi API getPatientDetails:', error);
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? error.response?.data?.message || 'Failed to fetch patient details'
+        : 'An unknown error occurred while fetching patient details';
+    throw new Error(message);
+  }
+};
