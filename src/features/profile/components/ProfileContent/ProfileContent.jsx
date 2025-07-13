@@ -12,21 +12,23 @@ import { useToast } from "@hooks/use-toast";
 
 // Validation Schema với Yup
 const validationSchema = Yup.object({
-  patientName: Yup.string()
+  name: Yup.string()
     .min(2, "Họ tên phải có ít nhất 2 ký tự")
     .max(100, "Họ tên không được vượt quá 100 ký tự")
     .matches(/^[a-zA-ZÀ-ỹ\s]+$/, "Họ tên chỉ được chứa chữ cái và khoảng trắng")
     .required("Họ tên là bắt buộc"),
-  patientPhone: Yup.string()
+  phone: Yup.string()
+    .transform((value) => value.replace(/[\s-]/g, "")) // Remove spaces and dashes
     .matches(
-      /^(\+84|0)[3-9][0-9]{8}$/,
+      /^(\+84|0)[3-9]\d{8}$/,
       "Nhập số điện thoại hợp lệ (VD: 0901234567 hoặc +84901234567)"
     )
     .required("Số điện thoại là bắt buộc"),
-  patientAddress: Yup.string()
+  address: Yup.string()
     .max(255, "Địa chỉ không được vượt quá 255 ký tự")
     .required("Địa chỉ là bắt buộc"),
   dateOfBirth: Yup.date()
+    .typeError("Ngày sinh phải là định dạng hợp lệ")
     .required("Ngày sinh là bắt buộc")
     .max(new Date(), "Ngày sinh phải trong quá khứ")
     .test("age", "Tuổi phải từ 1 đến 120", function (value) {
@@ -37,18 +39,29 @@ const validationSchema = Yup.object({
       return age >= 1 && age <= 120;
     }),
   gender: Yup.string()
-    .oneOf(["MALE", "FEMALE", "OTHER"], "Vui lòng chọn giới tính")
+    .oneOf(
+      ["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"],
+      "Vui lòng chọn giới tính"
+    )
     .required("Giới tính là bắt buộc"),
+  emergencyContact: Yup.string()
+    .transform((value) => value.replace(/[\s-]/g, ""))
+    .matches(
+      /^(\+84|0)[3-9]\d{8}$/,
+      "Nhập số điện thoại liên hệ khẩn cấp hợp lệ (VD: 0901234567 hoặc +84901234567)"
+    )
+    .required("Số liên hệ khẩn cấp là bắt buộc"),
   maritalStatus: Yup.string()
     .oneOf(
       ["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"],
       "Vui lòng chọn tình trạng hôn nhân"
     )
-    .required("Tình trạng hôn nhân là bắt buộc"),
-  marriageDate: Yup.date()
-    .max(new Date(), "Ngày kết hôn không được là ngày trong tương lai")
     .nullable(),
-  spousePatientName: Yup.string()
+  marriageDate: Yup.date()
+    .typeError("Ngày kết hôn phải là định dạng hợp lệ")
+    .max(new Date(), "Ngày kết hôn không thể trong tương lai")
+    .nullable(),
+  spouseName: Yup.string()
     .min(2, "Tên người đi kèm phải có ít nhất 2 ký tự")
     .max(100, "Tên người đi kèm không được vượt quá 100 ký tự")
     .matches(
@@ -56,26 +69,32 @@ const validationSchema = Yup.object({
       "Tên người đi kèm chỉ được chứa chữ cái và khoảng trắng"
     )
     .nullable(),
-  spousePatientPhone: Yup.string()
+  spousePhone: Yup.string()
+    .transform((value) => value.replace(/[\s-]/g, ""))
     .matches(
-      /^(\+84|0)[3-9][0-9]{8}$/,
+      /^(\+84|0)[3-9]\d{8}$/,
       "Nhập số điện thoại hợp lệ (VD: 0901234567 hoặc +84901234567)"
     )
     .nullable(),
-  spousePatientAddress: Yup.string()
+  spouseAddress: Yup.string()
     .max(255, "Địa chỉ người đi kèm không được vượt quá 255 ký tự")
     .nullable(),
   spouseEmergencyContact: Yup.string()
+    .transform((value) => value.replace(/[\s-]/g, ""))
     .matches(
-      /^(\+84|0)[3-9][0-9]{8}$/,
-      "Số liên hệ khẩn cấp người đi kèm không hợp lệ (VD: 0901234567 hoặc +84901234567)"
+      /^(\+84|0)[3-9]\d{8}$/,
+      "Nhập số điện thoại liên hệ khẩn cấp hợp lệ (VD: 0901234567 hoặc +84901234567)"
     )
     .nullable(),
   spouseDateOfBirth: Yup.date()
-    .max(new Date(), "Ngày sinh người đi kèm phải trong quá khứ")
+    .typeError("Ngày sinh người đi kèm phải là định dạng hợp lệ")
+    .max(new Date(), "Ngày sinh phải trong quá khứ")
     .nullable(),
   spouseGender: Yup.string()
-    .oneOf(["MALE", "FEMALE", "OTHER"], "Vui lòng chọn giới tính người đi kèm")
+    .oneOf(
+      ["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"],
+      "Vui lòng chọn giới tính người đi kèm"
+    )
     .nullable(),
 });
 
@@ -125,7 +144,7 @@ const ProfileContent = () => {
     address: rawUserData?.patientAddress || "",
     dateOfBirth: rawUserData?.dateOfBirth || "",
     gender: rawUserData?.gender || "",
-    emergencyContact: rawUserData?.emergencyContact || "",
+    emergencyContact: rawUserData?.emergencyContact || "", // Added emergencyContact
     spouseName: rawUserData?.spousePatientName || "",
     spousePhone: rawUserData?.spousePatientPhone || "",
     spouseAddress: rawUserData?.spousePatientAddress || "",
