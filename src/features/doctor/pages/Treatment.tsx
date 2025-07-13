@@ -803,7 +803,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         {onBackToDashboard && (
           <div className="mb-6">
             <Button variant="outline" onClick={onBackToDashboard} className="mb-4">
-              ← Quay về Dashboard
+              ← Quay về
             </Button>
           </div>
         )}
