@@ -304,15 +304,8 @@ const PreTestResult = () => {
             <div className={styles.modalFooter}>
               <div className={styles.footerActions}>
                 <button className={styles.saveButton} onClick={handleSubmit}>
-                  <Activity size={18} />
+                  <Activity size={12} />
                   Lưu kết quả
-                </button>
-                <button
-                  className={styles.cancelButton}
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  <X size={18} />
-                  Hủy bỏ
                 </button>
               </div>
             </div>
