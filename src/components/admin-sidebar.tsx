@@ -36,7 +36,7 @@ const menuItems: { title: string; key: AdminSidebarProps['activeTab']; icon: Rea
   { title: "Dashboard", key: "dashboard", icon: BarChart3 },
   { title: "Doctors", key: "doctors", icon: UserCheck },
   { title: "Patients", key: "patients", icon: Users },
-   { title: "receptionist", key: "receptionist", icon: UserCheck },
+   { title: "Receptionist", key: "receptionist", icon: UserCheck },
 ];
 
 const managementItems = [
@@ -52,7 +52,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChan
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <Stethoscope className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold text-white">WellNest</span>
+          <span className="text-xl font-bold text-white">Ferticare</span>
         </div>
       </SidebarHeader>
 
@@ -109,8 +109,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChan
         >
           <LogOut className="mr-2 h-4 w-4" />
           Log out
-        </Button>
-        © 2024 WellNest Hospital
+        </Button> 
       </SidebarFooter>
     </Sidebar>
   );

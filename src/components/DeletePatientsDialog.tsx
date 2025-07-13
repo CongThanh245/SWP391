@@ -1,3 +1,4 @@
+"use client";
 
 import { useState } from "react";
 import { Button } from "@components/ui/button";
@@ -14,6 +15,7 @@ import {
 } from "@components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@hooks/use-toast";
+import { deletePatient } from "@api/adminApi";
 
 interface DeletePatientsDialogProps {
   patientIds: string[];
@@ -22,23 +24,32 @@ interface DeletePatientsDialogProps {
   trigger?: React.ReactNode;
 }
 
-export const DeletePatientsDialog = ({ 
-  patientIds, 
-  patientNames, 
-  onDelete, 
-  trigger 
+export const DeletePatientsDialog = ({
+  patientIds,
+  patientNames,
+  onDelete,
+  trigger,
 }: DeletePatientsDialogProps) => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
-  const handleDelete = () => {
-    onDelete(patientIds);
-    toast({
-      title: "Patients Deleted",
-      description: `${patientIds.length} patient${patientIds.length > 1 ? 's' : ''} deleted successfully.`,
-      variant: "destructive",
-    });
-    setOpen(false);
+  const handleDelete = async () => {
+    try {
+      await deletePatient(patientIds);
+      onDelete(patientIds);
+      toast({
+        title: "Xóa bệnh nhân thành công",
+        description: `${patientIds.length} bệnh nhân đã được xóa.`,
+        variant: "default",
+      });
+      setOpen(false);
+    } catch (error: any) {
+      toast({
+        title: "Lỗi",
+        description: error.message || "Không thể xóa bệnh nhân. Vui lòng thử lại.",
+        variant: "destructive",
+      });
+    }
   };
 
   const isMultiple = patientIds.length > 1;
@@ -49,17 +60,17 @@ export const DeletePatientsDialog = ({
         {trigger || (
           <Button variant="destructive" size="sm">
             <Trash2 className="w-4 h-4 mr-2" />
-            Delete {isMultiple ? `${patientIds.length} Patients` : 'Patient'}
+            Xóa {isMultiple ? `${patientIds.length} bệnh nhân` : "bệnh nhân"}
           </Button>
         )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Delete {isMultiple ? 'Patients' : 'Patient'}
+            Xóa {isMultiple ? "bệnh nhân" : "bệnh nhân"}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete {isMultiple ? 'these patients' : 'this patient'}?
+            Bạn có chắc chắn muốn xóa {isMultiple ? "những bệnh nhân này" : "bệnh nhân này"}?
             {isMultiple ? (
               <div className="mt-2 max-h-32 overflow-y-auto">
                 <ul className="list-disc list-inside space-y-1">
@@ -74,14 +85,17 @@ export const DeletePatientsDialog = ({
               </div>
             )}
             <p className="mt-2 text-sm text-muted-foreground">
-              This action cannot be undone. All patient records, appointments, and medical history will be permanently deleted.
+              Hành động này không thể hoàn tác. Tất cả hồ sơ bệnh nhân, lịch hẹn và lịch sử y tế sẽ bị xóa vĩnh viễn.
             </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-            Delete {isMultiple ? `${patientIds.length} Patients` : 'Patient'}
+          <AlertDialogCancel>Hủy</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDelete}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            Xóa {isMultiple ? `${patientIds.length} bệnh nhân` : "bệnh nhân"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
