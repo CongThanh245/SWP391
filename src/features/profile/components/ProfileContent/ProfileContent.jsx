@@ -12,22 +12,23 @@ import { useToast } from "@hooks/use-toast";
 
 // Validation Schema với Yup
 const validationSchema = Yup.object({
-  name: Yup.string()
-    .max(50, "Họ tên không được vượt quá 50 ký tự")
+  patientName: Yup.string()
+    .min(2, "Họ tên phải có ít nhất 2 ký tự")
+    .max(100, "Họ tên không được vượt quá 100 ký tự")
     .matches(/^[a-zA-ZÀ-ỹ\s]+$/, "Họ tên chỉ được chứa chữ cái và khoảng trắng")
     .required("Họ tên là bắt buộc"),
-  phone: Yup.string()
+  patientPhone: Yup.string()
     .matches(
-      /^(0|\+84)[3|5|7|8|9][0-9]{8}$/,
+      /^(\+84|0)[3-9][0-9]{8}$/,
       "Nhập số điện thoại hợp lệ (VD: 0901234567 hoặc +84901234567)"
     )
     .required("Số điện thoại là bắt buộc"),
-  address: Yup.string()
-    .max(200, "Địa chỉ không được vượt quá 200 ký tự")
+  patientAddress: Yup.string()
+    .max(255, "Địa chỉ không được vượt quá 255 ký tự")
     .required("Địa chỉ là bắt buộc"),
   dateOfBirth: Yup.date()
     .required("Ngày sinh là bắt buộc")
-    .max(new Date(), "Ngày sinh không được là ngày trong tương lai")
+    .max(new Date(), "Ngày sinh phải trong quá khứ")
     .test("age", "Tuổi phải từ 1 đến 120", function (value) {
       if (!value) return false;
       const today = new Date();
@@ -36,51 +37,45 @@ const validationSchema = Yup.object({
       return age >= 1 && age <= 120;
     }),
   gender: Yup.string()
-    .oneOf(
-      ["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"],
-      "Vui lòng chọn giới tính"
-    )
+    .oneOf(["MALE", "FEMALE", "OTHER"], "Vui lòng chọn giới tính")
     .required("Giới tính là bắt buộc"),
-  emergencyContact: Yup.string()
-    .matches(
-      /^(0|\+84)[3|5|7|8|9][0-9]{8}$/,
-      "Nhập số điện thoại liên hệ khẩn cấp hợp lệ (VD: 0901234567 hoặc +84901234567)"
+  maritalStatus: Yup.string()
+    .oneOf(
+      ["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"],
+      "Vui lòng chọn tình trạng hôn nhân"
     )
-    .required("Số liên hệ khẩn cấp là bắt buộc"),
-  spouseName: Yup.string()
+    .required("Tình trạng hôn nhân là bắt buộc"),
+  marriageDate: Yup.date()
+    .max(new Date(), "Ngày kết hôn không được là ngày trong tương lai")
+    .nullable(),
+  spousePatientName: Yup.string()
     .min(2, "Tên người đi kèm phải có ít nhất 2 ký tự")
-    .max(50, "Tên người đi kèm không được vượt quá 50 ký tự")
+    .max(100, "Tên người đi kèm không được vượt quá 100 ký tự")
     .matches(
       /^[a-zA-ZÀ-ỹ\s]+$/,
       "Tên người đi kèm chỉ được chứa chữ cái và khoảng trắng"
     )
     .nullable(),
-  spousePhone: Yup.string()
+  spousePatientPhone: Yup.string()
     .matches(
-      /^(0|\+84)[3|5|7|8|9][0-9]{8}$/,
+      /^(\+84|0)[3-9][0-9]{8}$/,
       "Nhập số điện thoại hợp lệ (VD: 0901234567 hoặc +84901234567)"
     )
     .nullable(),
-  spouseAddress: Yup.string()
-    .max(200, "Địa chỉ người đi kèm không được vượt quá 200 ký tự")
+  spousePatientAddress: Yup.string()
+    .max(255, "Địa chỉ người đi kèm không được vượt quá 255 ký tự")
     .nullable(),
   spouseEmergencyContact: Yup.string()
     .matches(
-      /^(0|\+84)[3|5|7|8|9][0-9]{8}$/,
+      /^(\+84|0)[3-9][0-9]{8}$/,
       "Số liên hệ khẩn cấp người đi kèm không hợp lệ (VD: 0901234567 hoặc +84901234567)"
     )
     .nullable(),
   spouseDateOfBirth: Yup.date()
-    .max(
-      new Date(),
-      "Ngày sinh người đi kèm không được là ngày trong tương lai"
-    )
+    .max(new Date(), "Ngày sinh người đi kèm phải trong quá khứ")
     .nullable(),
   spouseGender: Yup.string()
-    .oneOf(
-      ["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"],
-      "Vui lòng chọn giới tính người đi kèm"
-    )
+    .oneOf(["MALE", "FEMALE", "OTHER"], "Vui lòng chọn giới tính người đi kèm")
     .nullable(),
 });
 
@@ -130,7 +125,7 @@ const ProfileContent = () => {
     address: rawUserData?.patientAddress || "",
     dateOfBirth: rawUserData?.dateOfBirth || "",
     gender: rawUserData?.gender || "",
-    emergencyContact: rawUserData?.emergencyContact || "", // Added emergencyContact
+    emergencyContact: rawUserData?.emergencyContact || "",
     spouseName: rawUserData?.spousePatientName || "",
     spousePhone: rawUserData?.spousePatientPhone || "",
     spouseAddress: rawUserData?.spousePatientAddress || "",
@@ -159,8 +154,12 @@ const ProfileContent = () => {
       emergencyContact: values.emergencyContact.trim(), // Added emergencyContact
       spousePatientName: values.spouseName ? values.spouseName.trim() : null,
       spousePatientPhone: values.spousePhone ? values.spousePhone.trim() : null,
-      spousePatientAddress: values.spouseAddress ? values.spouseAddress.trim() : null,
-      spouseEmergencyContact: values.spouseEmergencyContact ? values.spouseEmergencyContact.trim() : null,
+      spousePatientAddress: values.spouseAddress
+        ? values.spouseAddress.trim()
+        : null,
+      spouseEmergencyContact: values.spouseEmergencyContact
+        ? values.spouseEmergencyContact.trim()
+        : null,
       spouseDateOfBirth: formatDateForAPI(values.spouseDateOfBirth),
       spouseGender: values.spouseGender || null,
     };
@@ -318,7 +317,9 @@ const ProfileContent = () => {
                 </div>
 
                 <div className={styles.detailItem}>
-                  <label className={styles.detailLabel}>Liên hệ khẩn cấp:</label>
+                  <label className={styles.detailLabel}>
+                    Liên hệ khẩn cấp:
+                  </label>
                   <div>
                     <Field
                       type="tel"

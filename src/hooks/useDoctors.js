@@ -1,4 +1,3 @@
-// src/hooks/useDoctors.js
 import { useState, useEffect } from "react";
 import { getAdminDoctors, getDoctorDetails, getDoctors } from "@api/doctorApi";
 
@@ -24,6 +23,7 @@ export const useDoctors = (params = {}) => {
           gender: doctor.gender,
           address: doctor.doctorAddress,
           about: doctor.about,
+          imageProfile: doctor.imageProfile,
         }));
         setDoctors(mappedDoctors);
         // Set pagination data
@@ -46,8 +46,6 @@ export const useDoctors = (params = {}) => {
   return { doctors, pagination, loading, error }; 
 };
 
-
-
 export const useAdminDoctors = (params = {}) => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -69,6 +67,7 @@ export const useAdminDoctors = (params = {}) => {
           gender: doctor.gender,
           address: doctor.doctorAddress, 
           about: doctor.about,
+          imageProfile: doctor.imageProfile,
         }));
         setDoctors(mappedDoctors);
       } catch (err) {
@@ -106,7 +105,7 @@ export const useDoctorDetails = (doctorId) => {
           gender: data.gender,
           address: data.doctorAddress,
           about: data.about,
-          image: data.imageProfile,
+          imageProfile: data.imageProfile,
         };
         setDoctor(mappedDoctor);
       } catch (err) {

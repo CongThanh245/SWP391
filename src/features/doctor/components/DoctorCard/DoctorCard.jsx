@@ -56,9 +56,13 @@ const DoctorCard = ({ doctor, onClick }) => {
     </div>
   );
 
-  // Avatar props
-  const avatarProps = doctor.image && doctor.image !== '/assets/images/bacsi.png'
-    ? { src: doctor.image, alt: doctor.name }
+  // Avatar props - Sử dụng imageProfile nếu có
+  const avatarProps = doctor.imageProfile && doctor.imageProfile !== '/assets/images/bacsi.png'
+    ? {
+        src: doctor.imageProfile,
+        alt: doctor.name,
+        className: 'w-24 h-24 rounded-full object-cover' // Tailwind CSS để đảm bảo ảnh hiển thị hợp lý
+      }
     : null;
 
   const avatarPlaceholder = getInitials(doctor.name);

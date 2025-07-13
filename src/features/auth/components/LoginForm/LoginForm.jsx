@@ -3,7 +3,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { TextField } from "@mui/material";
 import styles from "./LoginForm.module.css";
-import { useNavigate, Link } from "react-router-dom"; // Thêm Link
+import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@hooks/use-toast";
 
 const LoginForm = ({
@@ -21,11 +21,35 @@ const LoginForm = ({
     administrator: "/admin-dashboard",
   };
 
-  // Validation schema với Yup
   const validationSchema = Yup.object({
     username: Yup.string().required("Vui lòng nhập email"),
     password: Yup.string().required("Vui lòng nhập mật khẩu"),
   });
+
+  const translateErrorMessage = (errorData) => {
+    const { businessErrorCode, businessExceptionDescription, error } = errorData;
+
+    if (businessErrorCode === 303 || businessExceptionDescription === "Account is disabled" || error === "User is disabled") {
+      return "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.";
+    }
+    if (businessExceptionDescription || error) {
+      // Dịch các lỗi chung hoặc không xác định
+      switch (businessExceptionDescription || error) {
+        case "User not found":
+          return "Tài khoản không tồn tại";
+        case "Bad request":
+          return "Yêu cầu không hợp lệ";
+        case "Login and / or password is incorrect":
+          return "Email hoặc mật khẩu không đúng"
+        default:
+          return businessExceptionDescription || error || "Đã xảy ra lỗi khi đăng nhập";
+      }
+    }
+    if (errorData.validationErrors) {
+      return errorData.validationErrors.join(", ");
+    }
+    return "Đã xảy ra lỗi khi đăng nhập";
+  };
 
   const handleSubmit = async (values, { setFieldValue, setFieldError }) => {
     setLoading(true);
@@ -47,9 +71,15 @@ const LoginForm = ({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.validationErrors
-          ? errorData.validationErrors.join(", ")
-          : "Email hoặc mật khẩu không đúng";
+        const errorMessage = translateErrorMessage(errorData);
+
+        // Hiển thị thông báo lỗi qua toast
+        toast({
+          title: "Lỗi đăng nhập",
+          description: errorMessage,
+          variant: "destructive",
+        });
+
         setFieldError("username", errorMessage);
         setFieldError("password", errorMessage);
         throw new Error(errorMessage);
@@ -136,7 +166,6 @@ const LoginForm = ({
                 />
               </div>
 
-              {/* Thêm liên kết Quên mật khẩu */}
               <div className={styles.forgotPassword}>
                 <Link to="/forgot-password" className={styles.forgotPasswordLink}>
                   Quên mật khẩu?

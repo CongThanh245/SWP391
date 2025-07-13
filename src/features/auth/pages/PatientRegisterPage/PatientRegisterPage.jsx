@@ -1,4 +1,3 @@
-// src/features/auth/PatientRegisterPage/RegisterPage.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -7,14 +6,26 @@ import { registerUser } from "../../../../api/authApi";
 import styles from "./PatientRegisterPage.module.css";
 
 const validationSchema = Yup.object({
-  fullName: Yup.string()
-    .min(2, "Ít nhất 2 ký tự")
+  patientName: Yup.string()
+    .min(2, "Họ tên phải có ít nhất 2 ký tự")
+    .max(100, "Họ tên không được vượt quá 100 ký tự")
+    .matches(/^[a-zA-ZÀ-ỹ\s]+$/, "Họ tên chỉ được chứa chữ cái và khoảng trắng")
     .required("Vui lòng nhập họ và tên"),
   dateOfBirth: Yup.date()
-    .max(new Date(), "Ngày sinh không hợp lệ")
-    .required("Vui lòng chọn ngày sinh"),
-  phoneNumber: Yup.string()
-    .matches(/^(0|\+84)(\d{9,10})$/, "SĐT không hợp lệ")
+    .required("Vui lòng chọn ngày sinh")
+    .max(new Date(), "Ngày sinh phải trong quá khứ")
+    .test("age", "Tuổi phải từ 1 đến 120", function (value) {
+      if (!value) return false;
+      const today = new Date();
+      const birthDate = new Date(value);
+      const age = today.getFullYear() - birthDate.getFullYear();
+      return age >= 1 && age <= 120;
+    }),
+  patientPhone: Yup.string()
+    .matches(
+      /^(\+84|0)[3-9][0-9]{8}$/,
+      "Nhập số điện thoại hợp lệ (VD: 0901234567 hoặc +84901234567)"
+    )
     .required("Vui lòng nhập số điện thoại"),
   email: Yup.string()
     .email("Email không hợp lệ")
@@ -22,14 +33,14 @@ const validationSchema = Yup.object({
   password: Yup.string()
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-      "Ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số"
+      "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số"
     )
     .required("Vui lòng nhập mật khẩu"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Mật khẩu không khớp")
     .required("Vui lòng xác nhận mật khẩu"),
   gender: Yup.string()
-    .oneOf(["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"])
+    .oneOf(["MALE", "FEMALE", "OTHER"], "Vui lòng chọn giới tính")
     .required("Vui lòng chọn giới tính"),
 });
 
@@ -50,9 +61,9 @@ const RegisterPage = () => {
 
         <Formik
           initialValues={{
-            fullName: "",
+            patientName: "",
             dateOfBirth: "",
-            phoneNumber: "",
+            patientPhone: "",
             email: "",
             password: "",
             confirmPassword: "",
@@ -62,9 +73,9 @@ const RegisterPage = () => {
           onSubmit={async (values, { setSubmitting, setStatus }) => {
             try {
               await registerUser({
-                fullName: values.fullName,
+                patientName: values.patientName,
                 dateOfBirth: values.dateOfBirth,
-                phoneNumber: values.phoneNumber,
+                patientPhone: values.patientPhone,
                 email: values.email,
                 password: values.password,
                 gender: values.gender,
@@ -83,9 +94,9 @@ const RegisterPage = () => {
 
               <div className={styles.formGroup}>
                 <label>Họ và tên*</label>
-                <Field name="fullName" placeholder="Nhập họ và tên" />
+                <Field name="patientName" placeholder="Nhập họ và tên" />
                 <ErrorMessage
-                  name="fullName"
+                  name="patientName"
                   component="div"
                   className={styles.errorMessage}
                 />
@@ -103,9 +114,9 @@ const RegisterPage = () => {
 
               <div className={styles.formGroup}>
                 <label>Số điện thoại*</label>
-                <Field name="phoneNumber" placeholder="0xxxxxxxxx" />
+                <Field name="patientPhone" placeholder="0901234567" />
                 <ErrorMessage
-                  name="phoneNumber"
+                  name="patientPhone"
                   component="div"
                   className={styles.errorMessage}
                 />

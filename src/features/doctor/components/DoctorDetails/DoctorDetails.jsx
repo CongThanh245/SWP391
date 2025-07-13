@@ -8,6 +8,13 @@ const DoctorDetails = ({ onClose }) => {
   const { id } = useParams();
   const { doctor, loading, error } = useDoctorDetails(id);
 
+  // Lấy chữ cái đầu của từ cuối trong tên
+  const getInitials = (name) => {
+    if (!name) return 'N';
+    const lastWord = name.split(' ').pop();
+    return lastWord.charAt(0).toUpperCase();
+  };
+
   if (loading) {
     return <div className={styles.loading}>Đang tải...</div>;
   }
@@ -78,8 +85,14 @@ const DoctorDetails = ({ onClose }) => {
         <p>Chi tiết thông tin bác sĩ</p>
       </div>
       <Card
-        avatar={doctor.image ? { src: doctor.image, alt: doctor.name } : null}
-        avatarPlaceholder={doctor.name?.charAt(0)?.toUpperCase() || 'BS'}
+        avatar={doctor.imageProfile && doctor.imageProfile !== '/assets/images/bacsi.png' 
+          ? { src: doctor.imageProfile, alt: doctor.name, className: 'w-24 h-24 rounded-full object-cover border-2 border-white shadow-sm' } 
+          : null}
+        avatarPlaceholder={
+          <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold text-gray-600 border-2 border-white shadow-sm">
+            {getInitials(doctor.name)}
+          </div>
+        }
         leftContent={leftContent}
         rightContent={rightContent}
         className={styles.doctorCard}

@@ -16,22 +16,45 @@
 }
 
 .avatarWrapper {
-  background: var(--gradient-circle);
+  width: 96px; /* Đồng bộ với w-24 (24 * 4 = 96px) */
+  height: 96px;
   border-radius: 50%;
-  width: 120px;
-  height: 120px;
   margin: 0 auto 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-background) 100%); /* Gradient viền */
+  padding: 4px; /* Tạo khoảng cách cho viền gradient */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Bóng nhẹ */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.avatarWrapper:hover {
+  transform: scale(1.05); /* Phóng to nhẹ khi hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .avatar {
-  width: 120px;
-  height: 120px;
+  width: 88px; /* 96px - 2 * 4px padding */
+  height: 88px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--secondary-background);
+  border: 2px solid #fff; /* Viền trắng để nổi bật trên gradient */
+  background-color: #fff; /* Đảm bảo ảnh không bị trong suốt */
+}
+
+.avatarPlaceholder {
+  width: 88px; /* Khớp với .avatar */
+  height: 88px;
+  border-radius: 50%;
+  background-color: #e5e7eb; /* Màu xám nhạt giống bg-gray-200 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem; /* Kích thước chữ lớn */
+  font-weight: 700; /* Chữ in đậm */
+  color: #4b5563; /* Màu xám đậm giống text-gray-600 */
+  border: 2px solid #fff; /* Viền trắng giống .avatar */
 }
 
 .info {
@@ -54,6 +77,7 @@
   font-weight: bold;
   margin: 10px 0;
   color: var(--text-primary);
+      height: 57px;
 }
 
 .specialty {
@@ -70,7 +94,7 @@
 .button {
   margin-top: 12px;
   padding: 10px 16px;
-  background-color: var(--accent-color); /* Use the soft taupe color */
+  background-color: var(--accent-color);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -81,7 +105,7 @@
 }
 
 .button:hover {
-  background-color: #8c7d6a; /* Slightly darker shade of --accent-color for hover */
+  background-color: #8c7d6a;
 }
 
 .secondaryButton {

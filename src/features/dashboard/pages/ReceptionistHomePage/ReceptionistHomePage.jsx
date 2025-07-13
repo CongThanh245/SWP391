@@ -22,6 +22,21 @@ const ReceptionistHomePage = () => {
     refetchAppointments,
   } = useAppointments();
 
+  // Hàm refetch profile
+  const refetchProfile = async () => {
+    try {
+      setLoading(true);
+      const profileData = await fetchReceptionistProfile();
+      setReceptionistProfile(profileData);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching receptionist profile:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Tính toán số lượng lịch hẹn
   const appointmentCounts = React.useMemo(() => {
     const today = new Date();
@@ -55,20 +70,7 @@ const ReceptionistHomePage = () => {
       localStorage.removeItem("isFreshLogin");
     }
 
-    const loadReceptionistProfile = async () => {
-      try {
-        setLoading(true);
-        const profileData = await fetchReceptionistProfile();
-        setReceptionistProfile(profileData);
-      } catch (err) {
-        setError(err.message);
-        console.error("Error fetching receptionist profile:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadReceptionistProfile();
+    refetchProfile();
   }, [toast]);
 
   const getDisplayName = () => {
@@ -84,7 +86,6 @@ const ReceptionistHomePage = () => {
 
   return (
     <div className={styles.dashboard}>
-      {/* Phần còn lại của JSX giữ nguyên */}
       <div className={styles.dashboardHeader}>
         <div className={styles.userInfo}>
           <div className={styles.userAvatar}>
@@ -123,7 +124,6 @@ const ReceptionistHomePage = () => {
           </div>
         </div>
       </div>
-      <ReceptionistProfile />
 
       {loading && (
         <div className={styles.loadingSection}>
@@ -153,6 +153,13 @@ const ReceptionistHomePage = () => {
             <span>Không thể tải thông tin profile: {error}</span>
           </div>
         </div>
+      )}
+
+      {!loading && !error && (
+        <ReceptionistProfile
+          receptionistProfile={receptionistProfile}
+          refetchProfile={refetchProfile}
+        />
       )}
 
       <div className={styles.statsSection}>
