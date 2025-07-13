@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Button } from "@components/ui/button";
 import {
@@ -35,7 +33,13 @@ import { registerDoctor, RegisterDoctorData } from "@api/adminApi";
 const doctorFormSchema = z.object({
   email: z.string().email("Vui lòng nhập địa chỉ email hợp lệ"),
   password: z.string().min(8, "Mật khẩu phải có ít nhất 8 ký tự"),
-  phoneNumber: z.string().min(1, "Số điện thoại là bắt buộc"),
+  phoneNumber: z
+    .string()
+    .min(1, "Số điện thoại là bắt buộc")
+    .regex(
+      /^(?:\+84|0)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-4|6-9])[0-9]{7}$/,
+      "Số điện thoại không đúng định dạng Việt Nam"
+    ),
   doctorName: z.string().min(1, "Tên bác sĩ là bắt buộc"),
   dateOfBirth: z
     .string()
@@ -49,7 +53,10 @@ const doctorFormSchema = z.object({
           return false;
         }
       },
-      { message: "Vui lòng nhập ngày sinh hợp lệ theo định dạng YYYY-MM-DD (ví dụ: 2003-02-22)" }
+      {
+        message:
+          "Vui lòng nhập ngày sinh hợp lệ theo định dạng YYYY-MM-DD (ví dụ: 2003-02-22)",
+      }
     ),
   gender: z.enum(["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"], {
     errorMap: () => ({ message: "Vui lòng chọn giới tính hợp lệ" }),
@@ -103,7 +110,8 @@ export const AddDoctorDialog = ({ onAdd }: AddDoctorDialogProps) => {
     } catch (error: any) {
       toast({
         title: "Lỗi",
-        description: error.message || "Không thể thêm bác sĩ. Vui lòng thử lại.",
+        description:
+          error.message || "Không thể thêm bác sĩ. Vui lòng thử lại.",
         variant: "destructive",
       });
     } finally {
@@ -146,7 +154,11 @@ export const AddDoctorDialog = ({ onAdd }: AddDoctorDialogProps) => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="nguyen.vana@example.com" type="email" {...field} />
+                      <Input
+                        placeholder="nguyen.vana@example.com"
+                        type="email"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -159,7 +171,11 @@ export const AddDoctorDialog = ({ onAdd }: AddDoctorDialogProps) => {
                   <FormItem>
                     <FormLabel>Mật khẩu</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nhập mật khẩu" type="password" {...field} />
+                      <Input
+                        placeholder="Nhập mật khẩu"
+                        type="password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -197,7 +213,10 @@ export const AddDoctorDialog = ({ onAdd }: AddDoctorDialogProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Giới tính</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn giới tính" />
@@ -207,7 +226,9 @@ export const AddDoctorDialog = ({ onAdd }: AddDoctorDialogProps) => {
                         <SelectItem value="MALE">Nam</SelectItem>
                         <SelectItem value="FEMALE">Nữ</SelectItem>
                         <SelectItem value="OTHER">Khác</SelectItem>
-                        <SelectItem value="PREFER_NOT_TO_SAY">Không muốn tiết lộ</SelectItem>
+                        <SelectItem value="PREFER_NOT_TO_SAY">
+                          Không muốn tiết lộ
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -259,15 +280,22 @@ export const AddDoctorDialog = ({ onAdd }: AddDoctorDialogProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Chuyên môn</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn chuyên môn" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="IVF_SPECIALIST">Chuyên gia IVF</SelectItem>
-                        <SelectItem value="IUI_SPECIALIST">Chuyên gia IUI</SelectItem>
+                        <SelectItem value="IVF_SPECIALIST">
+                          Chuyên gia IVF
+                        </SelectItem>
+                        <SelectItem value="IUI_SPECIALIST">
+                          Chuyên gia IUI
+                        </SelectItem>
                         <SelectItem value="GENERAL">Tổng quát</SelectItem>
                       </SelectContent>
                     </Select>
@@ -295,7 +323,11 @@ export const AddDoctorDialog = ({ onAdd }: AddDoctorDialogProps) => {
               />
             </div>
             <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Hủy
               </Button>
               <Button
