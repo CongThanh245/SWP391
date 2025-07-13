@@ -414,7 +414,6 @@ const MedicalRecordsManager = () => {
                     <tr>
                       <th>Tên file</th>
                       <th>Loại tài liệu</th>
-                      <th>Bệnh viện</th>
                       <th>Kích thước</th>
                       <th>Ngày tải lên</th>
                       <th>Hành động</th>
@@ -425,7 +424,6 @@ const MedicalRecordsManager = () => {
                       <tr key={file.id}>
                         <td>{file.fileName}</td>
                         <td>{getTypeDisplayName(file.attachmentType)}</td>
-                        <td>{file.hospital}</td>
                         <td>{formatFileSize(file.fileSize)}</td>
                         <td>
                           {new Date(file.uploadDate).toLocaleDateString(

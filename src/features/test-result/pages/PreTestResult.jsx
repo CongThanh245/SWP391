@@ -26,6 +26,8 @@ const PreTestResult = () => {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
 
   useEffect(() => {
     fetchPatients();
@@ -62,10 +64,25 @@ const PreTestResult = () => {
     }
   };
 
+  const validateForm = () => {
+    const errors = [];
+    evaluationCriteria.forEach((criterion) => {
+      const value = formData[criterion.id]?.currentValue || "";
+      if (!value.trim()) {
+        errors.push(`Bắt buộc phải điền ${criterion.name}`);
+      } else if (isNaN(value) || value.trim() === "") {
+        errors.push(`${criterion.name} chỉ được nhập số`);
+      }
+    });
+    return errors;
+  };
+
   const handlePatientClick = (patient) => {
     setSelectedPatient(patient);
     const appointmentId = patient.latestAppointmentId;
     fetchEvaluationCriteria(appointmentId, patient.id);
+    setValidationErrors([]);
+    setShowErrorPopup(false);
   };
 
   const handleInputChange = (criterionId, field, value) => {
@@ -76,6 +93,13 @@ const PreTestResult = () => {
   };
 
   const handleSubmit = async () => {
+    const errors = validateForm();
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      setShowErrorPopup(true);
+      return;
+    }
+
     try {
       const updateData = Object.entries(formData).map(
         ([criteriaId, { currentValue, note }]) => ({
@@ -87,6 +111,8 @@ const PreTestResult = () => {
 
       await updateEvaluationCriteria(updateData);
       setIsModalOpen(false);
+      setValidationErrors([]);
+      setShowErrorPopup(false);
       await fetchPatients();
     } catch (err) {
       setError("Không thể cập nhật tiêu chí đánh giá");
@@ -165,7 +191,7 @@ const PreTestResult = () => {
       <div className={styles.patientGrid}>
         {filteredPatients.length === 0 ? (
           <div className={styles.noResults}>
-            <User style={{justifySelf: "center", marginBottom:"20px"}} size={48} />
+            <User style={{ justifySelf: "center", marginBottom: "20px" }} size={48} />
             <h3>Không tìm thấy bệnh nhân</h3>
             <p>Thử tìm kiếm với từ khóa khác</p>
           </div>
@@ -232,6 +258,25 @@ const PreTestResult = () => {
               </button>
             </div>
 
+            {showErrorPopup && (
+              <div className={styles.errorPopup}>
+                <div className={styles.errorPopupContent}>
+                  <h4>Lỗi xác thực</h4>
+                  <ul>
+                    {validationErrors.map((error, index) => (
+                      <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                  <button
+                    className={styles.errorPopupClose}
+                    onClick={() => setShowErrorPopup(false)}
+                  >
+                    Đóng
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className={styles.modalContent}>
               <div className={styles.testResultsContainer}>
                 <div className={styles.tableHeader}>
@@ -274,7 +319,13 @@ const PreTestResult = () => {
                       <div className={styles.testCell}>
                         <input
                           type="text"
-                          className={styles.resultInput}
+                          className={`${styles.resultInput} ${
+                            validationErrors.some((err) =>
+                              err.includes(criterion.name)
+                            )
+                              ? styles.inputError
+                              : ""
+                          }`}
                           value={formData[criterion.id]?.currentValue || ""}
                           onChange={(e) =>
                             handleInputChange(

@@ -1,4 +1,4 @@
-"use client";
+
 
 import { Header } from "@components/AdminHeader";
 import { Card, CardContent } from "@components/ui/card";
@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getPatients, deletePatient } from '@api/adminApi';
 import { formatDate } from '@utils/format';
 import { PatientDetailsDialog } from '@components/PatientDetailsDialog';
@@ -67,18 +67,19 @@ const Patients = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedPatients, setSelectedPatients] = useState<string[]>([]);
   const [patientsData, setPatientsData] = useState<Patient[]>([]);
+  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(5);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fetchPatients = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     const params = {
-      search: searchInput,
       page: String(currentPage),
       size: String(pageSize),
     };
@@ -113,6 +114,7 @@ const Patients = () => {
         spouseGender: null,
       }));
       setPatientsData(mappedPatients);
+      setFilteredPatients(mappedPatients); // Initialize filtered list
       setTotalElements(response.totalElements);
       setTotalPages(response.totalPages);
       setCurrentPage(response.number);
@@ -132,32 +134,36 @@ const Patients = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, pageSize, searchInput, toast]);
+  }, [currentPage, pageSize, toast]);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      fetchPatients();
-    }, 300);
-
-    return () => {
-      clearTimeout(handler);
-    };
+    fetchPatients();
   }, [fetchPatients]);
 
+  useEffect(() => {
+    // Client-side filtering based on searchQuery
+    const filtered = patientsData.filter(
+      (patient) =>
+        patient.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (patient.phone && patient.phone.includes(searchQuery))
+    );
+    setFilteredPatients(filtered);
+    setCurrentPage(0); // Reset to first page on search
+  }, [searchQuery, patientsData]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
-    setCurrentPage(0); // Reset to first page on new search
+    setSearchQuery(e.target.value);
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 0) {
-      setCurrentPage(prev => prev - 1);
+      setCurrentPage((prev) => prev - 1);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
-      setCurrentPage(prev => prev + 1);
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
@@ -208,11 +214,10 @@ const Patients = () => {
   const handleDeletePatients = async (patientIds: string[]) => {
     try {
       await deletePatient(patientIds);
-      setPatientsData(prevData =>
-        prevData.filter(patient => !patientIds.includes(patient.id))
-      );
+      setPatientsData((prevData) => prevData.filter((patient) => !patientIds.includes(patient.id)));
+      setFilteredPatients((prevData) => prevData.filter((patient) => !patientIds.includes(patient.id)));
       setSelectedPatients([]);
-      fetchPatients(); // Refresh the list after deletion
+      fetchPatients(); // Refresh data from API
       toast({
         title: "Xóa bệnh nhân thành công",
         description: `${patientIds.length} bệnh nhân đã được xóa.`,
@@ -227,18 +232,18 @@ const Patients = () => {
   };
 
   const handleSelectPatient = (patientId: string) => {
-    setSelectedPatients(prev =>
+    setSelectedPatients((prev) =>
       prev.includes(patientId)
-        ? prev.filter(id => id !== patientId)
+        ? prev.filter((id) => id !== patientId)
         : [...prev, patientId]
     );
   };
 
   const handleSelectAll = () => {
-    if (selectedPatients.length === patientsData.length) {
+    if (selectedPatients.length === filteredPatients.length) {
       setSelectedPatients([]);
     } else {
-      setSelectedPatients(patientsData.map(patient => patient.id));
+      setSelectedPatients(filteredPatients.map((patient) => patient.id));
     }
   };
 
@@ -291,20 +296,19 @@ const Patients = () => {
                 <div className="relative flex-1 max-w-md">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#4D3C2D]/60 w-4 h-4" />
                   <Input
+                    key="search-input"
+                    ref={searchInputRef}
                     placeholder="Tìm kiếm theo tên hoặc sđt"
                     className="pl-10 bg-white/80 border-[#D9CAC2] focus:border-[#4D3C2D]"
-                    value={searchInput}
+                    value={searchQuery}
                     onChange={handleSearchChange}
                   />
-                  {loading && (
-                    <div className="text-sm text-[#4D3C2D]/70 mt-2">Đang tìm kiếm...</div>
-                  )}
                 </div>
                 {selectedPatients.length > 0 && (
                   <DeletePatientsDialog
                     patientIds={selectedPatients}
-                    patientNames={selectedPatients.map(id =>
-                      patientsData.find(p => p.id === id)?.patientName || ''
+                    patientNames={selectedPatients.map((id) =>
+                      filteredPatients.find((p) => p.id === id)?.patientName || ''
                     )}
                     onDelete={handleDeletePatients}
                   />
@@ -323,7 +327,7 @@ const Patients = () => {
                         <input
                           type="checkbox"
                           className="rounded"
-                          checked={selectedPatients.length === patientsData.length}
+                          checked={selectedPatients.length === filteredPatients.length}
                           onChange={handleSelectAll}
                         />
                       </TableHead>
@@ -337,7 +341,7 @@ const Patients = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {patientsData.map((patient) => (
+                    {filteredPatients.map((patient) => (
                       <TableRow key={patient.id} className="hover:bg-muted/50">
                         <TableCell>
                           <input
@@ -352,7 +356,7 @@ const Patients = () => {
                             <Avatar className="w-10 h-10">
                               <AvatarImage src="/placeholder.svg" />
                               <AvatarFallback className="text-sm font-medium">
-                                {patient.patientName.split(' ').map(n => n[0]).join('')}
+                                {patient.patientName.split(' ').map((n) => n[0]).join('')}
                               </AvatarFallback>
                             </Avatar>
                             <div>
@@ -432,7 +436,7 @@ const Patients = () => {
 
                 <div className="flex items-center justify-between p-6 border-t border-border bg-muted/20">
                   <div className="text-sm text-muted-foreground font-medium">
-                    Hiển thị {patientsData.length} trên tổng số {totalElements} bệnh nhân
+                    Hiển thị {filteredPatients.length} trên tổng số {totalElements} bệnh nhân
                     {selectedPatients.length > 0 && (
                       <span className="ml-2 text-primary">
                         ({selectedPatients.length} được chọn)
