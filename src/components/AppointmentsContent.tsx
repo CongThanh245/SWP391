@@ -31,7 +31,7 @@ interface Appointment {
 }
   
 export const AppointmentsContent: React.FC<AppointmentsContentProps> = ({ onPatientSelect }) => {
-    const [viewType, setViewType] = useState<'day' | 'week' | 'month'>('day');
+    const [viewType, setViewType] = useState<'day' | 'week' | 'month'>('week');
     const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'completed'>('all');
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [appointments, setAppointments] = useState<Appointment[]>([]);

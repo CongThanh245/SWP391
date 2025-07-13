@@ -9,6 +9,7 @@ import {
     getPostInterventionStageStatus,  
     completePostInterventionStage 
 } from '@api/doctorApi' // Make sure these are correctly imported from your API file
+import { Check } from 'lucide-react';
 
 // Định nghĩa các kiểu dữ liệu cần thiết
 interface Stage {
@@ -187,6 +188,7 @@ export const useTreatmentProgress = ({
     }, [patientId, currentStageKey, isStageCompleted, onStageComplete, toast, stages, isLoadingInitialStatus]);
 
     // Component ProgressBar (UI)
+
     const ProgressBarComponent: React.FC = () => (
         <div className="bg-white rounded-lg p-4 mb-6 shadow-sm border">
             <div className="flex items-center justify-between mb-3">
@@ -202,18 +204,18 @@ export const useTreatmentProgress = ({
                         <div className="flex flex-col items-center flex-shrink-0">
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 border-2
                                 ${isStageCompleted(stage.key)
-                                    ? 'bg-green-500 text-white border-green-500 shadow-lg'
+                                    ? 'bg-[#1B9C85] text-white border-[#1B9C85] shadow-lg'
                                     : currentStage === index
-                                        ? 'bg-blue-500 text-white border-blue-500 shadow-md'
+                                        ? 'bg-[#6C9BCF] text-white border-[#6C9BCF] shadow-md'
                                         : 'bg-white text-gray-600 border-gray-300'}`}
                             >
-                                {isStageCompleted(stage.key) ? '✓' : index + 1}
+                                {isStageCompleted(stage.key) ? <Check className="w-4 h-4 text-white inline" /> : index + 1}
                             </div>
                             <span className={`text-xs mt-2 text-center font-medium max-w-20 leading-tight
                                 ${isStageCompleted(stage.key)
-                                    ? 'text-green-600'
+                                    ? 'text-[#1B9C85]'
                                     : currentStage === index
-                                        ? 'text-blue-600'
+                                        ? 'text-[#6C9BCF]'
                                         : 'text-gray-500'}`}
                             >
                                 {stage.name}
@@ -222,7 +224,7 @@ export const useTreatmentProgress = ({
 
                         {index < stages.length - 1 && (
                             <div className={`flex-1 h-0.5 mx-4 transition-all duration-300
-                                ${isStageCompleted(stage.key) ? 'bg-green-500' : 'bg-gray-300'}`}
+                                ${isStageCompleted(stage.key) ? 'bg-[#1B9C85]' : 'bg-gray-300'}`}
                             />
                         )}
                     </React.Fragment>
@@ -247,7 +249,7 @@ export const useTreatmentProgress = ({
             <div className="flex justify-end pt-4">
                 <Button
                     onClick={() => completeStage(stageKey, stageName)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+                    className="bg-[#1B9C85] hover:bg-[#21B297] text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 active:scale-95"
                 >
                     Hoàn thành giai đoạn {stageName}
                 </Button>
