@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Phone, Users } from 'lucide-react';
+import { Phone, Users } from 'lucide-react';
 import { useAdminDoctors } from '@hooks/useDoctors';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import styles from './DoctorList.module.css';
@@ -26,6 +26,13 @@ const DoctorList = () => {
   const [page, setPage] = useState(0);
   const pageSize = 10;
   const { doctors, loading, error } = useAdminDoctors({ page, size: pageSize });
+
+  // Lấy chữ cái đầu của từ cuối trong tên
+  const getInitials = (name) => {
+    if (!name) return 'N';
+    const lastWord = name.split(' ').pop();
+    return lastWord.charAt(0).toUpperCase();
+  };
 
   const handleCloseModal = () => {
     navigate('/receptionist-dashboard/doctors');
@@ -69,7 +76,17 @@ const DoctorList = () => {
               {/* Avatar Column */}
               <div className={styles.avatarColumn}>
                 <div className={styles.doctorAvatar}>
-                  <User size={24} />
+                  {doctor.imageProfile && doctor.imageProfile !== '/assets/images/bacsi.png' ? (
+                    <img
+                      src={doctor.imageProfile}
+                      alt={doctor.name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-600 border-2 border-white shadow-sm">
+                      {getInitials(doctor.name)}
+                    </div>
+                  )}
                 </div>
               </div>
 

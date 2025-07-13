@@ -45,7 +45,7 @@ const ProfilePage = () => {
           spouseGender: genderMap[parsed.spouseGender] || 'Chưa cập nhật',
         });
 
-        // localStorage.setItem('user', JSON.stringify(parsed));
+        localStorage.setItem('user', JSON.stringify(parsed));
       } catch (error) {
         console.error('Lỗi khi lấy dữ liệu từ API:', error);
         setError('Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.');

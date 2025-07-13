@@ -5,7 +5,7 @@
   border-radius: 0.75rem;
   padding: var(--spacing-lg);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  margin:   20px 0;
+  margin: 20px 0;
 }
 
 /* Header: title + edit button */
@@ -30,13 +30,18 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.editButton:hover {
+  background-color: var(--hover-accent);
 }
 
 /* Info grid: two columns, each item label above, value below */
 .infoGrid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--spacing-lg) var(--spacing-xl); 
+  gap: var(--spacing-lg) var(--spacing-xl);
 }
 .infoItem {
   display: flex;
@@ -65,9 +70,83 @@
   font-weight: 600;
 }
 
+/* Action buttons */
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+.actionButtons .primaryButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--accent-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.actionButtons .primaryButton:hover {
+  background-color: #8c7d6a;
+}
+.actionButtons .secondaryButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--card-border);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.actionButtons .secondaryButton:hover {
+  background-color: var(--hover-accent);
+}
+
+/* Modal buttons */
+.modalPrimaryButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--accent-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.modalPrimaryButton:hover {
+  background-color: #8c7d6a;
+}
+.modalSecondaryButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--card-border);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.modalSecondaryButton:hover {
+  background-color: var(--hover-accent);
+}
+
 /* Hide unused sections */
 .avatarSection,
-.actionButtons,
 .statusBadge {
   display: none;
 }
@@ -76,5 +155,14 @@
 @media (max-width: 480px) {
   .infoGrid {
     grid-template-columns: 1fr;
+  }
+  .actionButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+  .modalPrimaryButton,
+  .modalSecondaryButton {
+    width: 100%;
+    justify-content: center;
   }
 }

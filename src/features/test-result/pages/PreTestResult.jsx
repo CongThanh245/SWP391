@@ -165,7 +165,7 @@ const PreTestResult = () => {
       <div className={styles.patientGrid}>
         {filteredPatients.length === 0 ? (
           <div className={styles.noResults}>
-            <User size={48} />
+            <User style={{justifySelf: "center", marginBottom:"20px"}} size={48} />
             <h3>Không tìm thấy bệnh nhân</h3>
             <p>Thử tìm kiếm với từ khóa khác</p>
           </div>

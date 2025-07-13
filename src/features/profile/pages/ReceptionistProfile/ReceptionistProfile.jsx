@@ -1,37 +1,28 @@
-// @features/dashboard/components/ReceptionistProfile.jsx
-import React, { useState, useEffect } from "react";
+import React, { useCallback, memo } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import Button from "@components/common/Button/Button";
 import styles from "./ReceptionistProfile.module.css";
-import { useNavigate } from "react-router-dom";
-import { fetchReceptionistProfile } from "@api/receptionistApi"; // Giả sử apiClient được cấu hình đúng
+import { updateReceptionistProfile } from "@api/receptionistApi";
 
-const ReceptionistProfile = () => {
-  const navigate = useNavigate();
-  const [receptionistProfile, setReceptionistProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// Validation schema với Yup
+const validationSchema = Yup.object({
+  receptionistName: Yup.string()
+    .min(2, "Tên phải có ít nhất 2 ký tự")
+    .max(100, "Tên không được vượt quá 100 ký tự")
+    .required("Họ và tên là bắt buộc"),
+  receptionistPhone: Yup.string()
+    .matches(/^(\+84|0)[3-9]\d{8}$/, "Số điện thoại không đúng định dạng Việt Nam")
+    .required("Số điện thoại là bắt buộc"),
+  receptionistAddress: Yup.string()
+    .max(255, "Địa chỉ không được vượt quá 255 ký tự")
+    .optional(),
+});
+const ReceptionistProfile = ({ receptionistProfile, refetchProfile }) => {
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
 
-  // Fetch receptionist profile on component mount
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchReceptionistProfile();
-        setReceptionistProfile(data);
-        setError(null);
-      } catch (err) {
-        setError("Không thể tải thông tin cá nhân. Vui lòng thử lại sau.");
-        console.error("Error fetching profile:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProfile();
-  }, []);
-
-  // Format date (e.g., from ISO string to DD/MM/YYYY)
-  const formatDate = (dateString) => {
+  // Format date
+  const formatDate = useCallback((dateString) => {
     if (!dateString) return "Chưa cập nhật";
     const date = new Date(dateString);
     return date.toLocaleDateString("vi-VN", {
@@ -39,10 +30,10 @@ const ReceptionistProfile = () => {
       month: "2-digit",
       year: "numeric",
     });
-  };
+  }, []);
 
-  // Calculate age from date of birth
-  const calculateAge = (dateOfBirth) => {
+  // Calculate age
+  const calculateAge = useCallback((dateOfBirth) => {
     if (!dateOfBirth) return "Chưa cập nhật";
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -52,59 +43,152 @@ const ReceptionistProfile = () => {
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-
     return `${age} tuổi`;
-  };
+  }, []);
 
   // Format gender
-  const formatGender = (gender) => {
+  const formatGender = useCallback((gender) => {
     return gender === "MALE" ? "Nam" : gender === "FEMALE" ? "Nữ" : "Khác";
-  };
+  }, []);
 
   // Format phone number
-  const formatPhone = (phone) => {
+  const formatPhone = useCallback((phone) => {
     if (!phone) return "Chưa cập nhật";
     return phone.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
-  };
+  }, []);
 
-  if (loading) {
+  // Memoized EditModal
+  const EditModal = memo(({ isOpen, onClose, receptionistProfile, refetchProfile }) => {
+    const formik = useFormik({
+      initialValues: {
+        receptionistName: receptionistProfile?.receptionistName || "",
+        receptionistPhone: receptionistProfile?.receptionistPhone || "",
+        receptionistAddress: receptionistProfile?.receptionistAddress || "",
+      },
+      enableReinitialize: true,
+      validationSchema,
+      onSubmit: async (values, { setSubmitting, setStatus }) => {
+        try {
+          setStatus(null);
+          console.log("Submitting form with values:", values);
+          await updateReceptionistProfile(values);
+          setStatus({ success: "Cập nhật thông tin thành công!" });
+          await refetchProfile();
+          onClose();
+        } catch (err) {
+          setStatus({ error: "Cập nhật thất bại. Vui lòng kiểm tra lại thông tin." });
+          console.error("Error updating profile:", err);
+        } finally {
+          setSubmitting(false);
+        }
+      },
+    });
+
+    const handleInputChange = useCallback(
+      (e) => {
+        console.log(`${e.target.name} input change:`, e.target.value);
+        formik.handleChange(e);
+      },
+      [formik.handleChange]
+    );
+
+    if (!isOpen) return null;
+
     return (
-      <div className={styles.profileContainer}>
-        <div className={styles.loadingState}>
-          <div className={styles.loadingSpinner}></div>
-          <p>Đang tải thông tin...</p>
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        onClick={onClose}
+      >
+        <div
+          className="bg-white rounded-lg p-6 w-full max-w-md"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Chỉnh sửa thông tin</h2>
+            <button onClick={onClose} className="text-gray-600 hover:text-gray-800 text-xl">
+              ×
+            </button>
+          </div>
+          <form onSubmit={formik.handleSubmit}>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Họ và tên
+              </label>
+              <input
+                type="text"
+                name="receptionistName"
+                value={formik.values.receptionistName}
+                onChange={handleInputChange}
+                onBlur={formik.handleBlur}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-color"
+                required
+              />
+              {formik.touched.receptionistName && formik.errors.receptionistName && (
+                <p className="text-red-500 text-sm mt-1">{formik.errors.receptionistName}</p>
+              )}
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Số điện thoại
+              </label>
+              <input
+                type="tel"
+                name="receptionistPhone"
+                value={formik.values.receptionistPhone}
+                onChange={handleInputChange}
+                onBlur={formik.handleBlur}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-color"
+                placeholder="+84xxxxxxxxx"
+                required
+              />
+              {formik.touched.receptionistPhone && formik.errors.receptionistPhone && (
+                <p className="text-red-500 text-sm mt-1">{formik.errors.receptionistPhone}</p>
+              )}
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Địa chỉ
+              </label>
+              <input
+                type="text"
+                name="receptionistAddress"
+                value={formik.values.receptionistAddress}
+                onChange={handleInputChange}
+                onBlur={formik.handleBlur}
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-accent-color"
+              />
+              {formik.touched.receptionistAddress && formik.errors.receptionistAddress && (
+                <p className="text-red-500 text-sm mt-1">{formik.errors.receptionistAddress}</p>
+              )}
+            </div>
+            {formik.status?.error && <p className="text-red-500 text-sm mb-4">{formik.status.error}</p>}
+            {formik.status?.success && <p className="text-green-500 text-sm mb-4">{formik.status.success}</p>}
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="secondary"
+                className={styles.modalSecondaryButton}
+                onClick={onClose}
+                disabled={formik.isSubmitting}
+              >
+                Hủy
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                className={styles.modalPrimaryButton}
+                disabled={formik.isSubmitting}
+              >
+                Lưu
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     );
-  }
+  });
 
-  if (error) {
-    return (
-      <div className={styles.profileContainer}>
-        <div className={styles.errorState}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#DC2626"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="m15 9-6 6" />
-            <path d="m9 9 6 6" />
-          </svg>
-          <h3>Không thể tải thông tin</h3>
-          <p>{error}</p>
-          <Button variant="primary" onClick={() => window.location.reload()}>
-            Thử lại
-          </Button>
-        </div>
-      </div>
-    );
+  if (!receptionistProfile) {
+    return null; // Parent handles loading/error states
   }
 
   return (
@@ -112,11 +196,36 @@ const ReceptionistProfile = () => {
       {/* Header */}
       <div className={styles.profileHeader}>
         <h1 className={styles.pageTitle}>Thông tin cá nhân</h1>
+        <div className={styles.actionButtons}>
+          <Button
+            variant="primary"
+            className={styles.primaryButton}
+            onClick={() => {
+              console.log("Opening edit modal");
+              setIsEditModalOpen(true);
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+              <path d="m15 5 4 4" />
+            </svg>
+            Chỉnh sửa thông tin
+          </Button>
+        </div>
       </div>
 
       {/* Profile Card */}
       <div className={styles.profileCard}>
-        {/* Avatar Section */}
         <div className={styles.avatarSection}>
           <div className={styles.avatarContainer}>
             <svg
@@ -152,7 +261,6 @@ const ReceptionistProfile = () => {
           </div>
         </div>
 
-        {/* Information Grid */}
         <div className={styles.infoGrid}>
           <div className={styles.infoSection}>
             <h3 className={styles.sectionTitle}>Thông tin cơ bản</h3>
@@ -181,7 +289,6 @@ const ReceptionistProfile = () => {
                   </span>
                 </div>
               </div>
-
               <div className={styles.infoItem}>
                 <div className={styles.infoIcon}>
                   <svg
@@ -207,7 +314,6 @@ const ReceptionistProfile = () => {
                   </span>
                 </div>
               </div>
-
               <div className={styles.infoItem}>
                 <div className={styles.infoIcon}>
                   <svg
@@ -237,7 +343,6 @@ const ReceptionistProfile = () => {
               </div>
             </div>
           </div>
-
           <div className={styles.infoSection}>
             <h3 className={styles.sectionTitle}>Thông tin liên hệ</h3>
             <div className={styles.infoList}>
@@ -264,7 +369,6 @@ const ReceptionistProfile = () => {
                   </span>
                 </div>
               </div>
-
               <div className={styles.infoItem}>
                 <div className={styles.infoIcon}>
                   <svg
@@ -291,7 +395,6 @@ const ReceptionistProfile = () => {
               </div>
             </div>
           </div>
-
           <div className={styles.infoSection}>
             <h3 className={styles.sectionTitle}>Thông tin công việc</h3>
             <div className={styles.infoList}>
@@ -324,52 +427,14 @@ const ReceptionistProfile = () => {
             </div>
           </div>
         </div>
-
-        {/* Action Buttons */}
-        {/* <div className={styles.actionButtons}>
-          <Button
-            variant="primary"
-            onClick={() => navigate("/receptionist-dashboard/profile/edit")}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-              <path d="m15 5 4 4" />
-            </svg>
-            Chỉnh sửa thông tin
-          </Button>
-
-          <Button
-            variant="secondary"
-            onClick={() => navigate("/receptionist-dashboard/change-password")}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            Đổi mật khẩu
-          </Button>
-        </div> */}
       </div>
+
+      <EditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        receptionistProfile={receptionistProfile}
+        refetchProfile={refetchProfile}
+      />
     </div>
   );
 };
