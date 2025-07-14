@@ -1,3 +1,4 @@
+// src/features/auth/PatientRegisterPage/RegisterPage.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -6,22 +7,15 @@ import { registerUser } from "../../../../api/authApi";
 import styles from "./PatientRegisterPage.module.css";
 
 const validationSchema = Yup.object({
-  patientName: Yup.string()
+  fullName: Yup.string()
     .min(2, "Họ tên phải có ít nhất 2 ký tự")
     .max(100, "Họ tên không được vượt quá 100 ký tự")
     .matches(/^[a-zA-ZÀ-ỹ\s]+$/, "Họ tên chỉ được chứa chữ cái và khoảng trắng")
     .required("Vui lòng nhập họ và tên"),
   dateOfBirth: Yup.date()
-    .required("Vui lòng chọn ngày sinh")
-    .max(new Date(), "Ngày sinh phải trong quá khứ")
-    .test("age", "Tuổi phải từ 1 đến 120", function (value) {
-      if (!value) return false;
-      const today = new Date();
-      const birthDate = new Date(value);
-      const age = today.getFullYear() - birthDate.getFullYear();
-      return age >= 1 && age <= 120;
-    }),
-  patientPhone: Yup.string()
+    .max(new Date(), "Ngày sinh không hợp lệ")
+    .required("Vui lòng chọn ngày sinh"),
+  phoneNumber: Yup.string()
     .matches(
       /^(\+84|0)[3-9][0-9]{8}$/,
       "Nhập số điện thoại hợp lệ (VD: 0901234567 hoặc +84901234567)"
@@ -33,14 +27,14 @@ const validationSchema = Yup.object({
   password: Yup.string()
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-      "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số"
+      "Ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số"
     )
     .required("Vui lòng nhập mật khẩu"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Mật khẩu không khớp")
     .required("Vui lòng xác nhận mật khẩu"),
   gender: Yup.string()
-    .oneOf(["MALE", "FEMALE", "OTHER"], "Vui lòng chọn giới tính")
+    .oneOf(["MALE", "FEMALE", "OTHER"])
     .required("Vui lòng chọn giới tính"),
 });
 
@@ -61,9 +55,9 @@ const RegisterPage = () => {
 
         <Formik
           initialValues={{
-            patientName: "",
+            fullName: "",
             dateOfBirth: "",
-            patientPhone: "",
+            phoneNumber: "",
             email: "",
             password: "",
             confirmPassword: "",
@@ -73,9 +67,9 @@ const RegisterPage = () => {
           onSubmit={async (values, { setSubmitting, setStatus }) => {
             try {
               await registerUser({
-                patientName: values.patientName,
+                fullName: values.fullName,
                 dateOfBirth: values.dateOfBirth,
-                patientPhone: values.patientPhone,
+                phoneNumber: values.phoneNumber,
                 email: values.email,
                 password: values.password,
                 gender: values.gender,
@@ -94,9 +88,9 @@ const RegisterPage = () => {
 
               <div className={styles.formGroup}>
                 <label>Họ và tên*</label>
-                <Field name="patientName" placeholder="Nhập họ và tên" />
+                <Field name="fullName" placeholder="Nhập họ và tên" />
                 <ErrorMessage
-                  name="patientName"
+                  name="fullName"
                   component="div"
                   className={styles.errorMessage}
                 />
@@ -114,9 +108,9 @@ const RegisterPage = () => {
 
               <div className={styles.formGroup}>
                 <label>Số điện thoại*</label>
-                <Field name="patientPhone" placeholder="0901234567" />
+                <Field name="phoneNumber" placeholder="0xxxxxxxxx" />
                 <ErrorMessage
-                  name="patientPhone"
+                  name="phoneNumber"
                   component="div"
                   className={styles.errorMessage}
                 />
@@ -134,11 +128,7 @@ const RegisterPage = () => {
 
               <div className={styles.formGroup}>
                 <label>Mật khẩu*</label>
-                <Field
-                  name="password"
-                  type="password"
-                  placeholder="Mật khẩu"
-                />
+                <Field name="password" type="password" placeholder="Mật khẩu" />
                 <ErrorMessage
                   name="password"
                   component="div"
