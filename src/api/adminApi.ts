@@ -263,3 +263,29 @@ export const registerReceptionist = async (data: RegisterReceptionistData) => {
     throw new Error(message);
   }
 };
+
+
+export const deletePatient = async (patientIds: string[]): Promise<void> => {
+  try {
+    await apiClient.patch('/admin/patients/soft-delete', patientIds);
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Không thể xóa bệnh nhân'
+        : 'Đã xảy ra lỗi không xác định khi xóa bệnh nhân';
+    throw new Error(message);
+  }
+};
+
+
+export const deleteReceptionist = async (employeeId: string): Promise<void> => {
+  try {
+    await apiClient.patch(`/admin/receptionists/${employeeId}`);
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Không thể xóa lễ tân'
+        : 'Đã xảy ra lỗi không xác định khi xóa lễ tân';
+    throw new Error(message);
+  }
+};

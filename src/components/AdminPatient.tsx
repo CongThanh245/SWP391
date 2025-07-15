@@ -1,3 +1,5 @@
+"use client";
+
 import { Header } from "@components/AdminHeader";
 import { Card, CardContent } from "@components/ui/card";
 import { Button } from "@components/ui/button";
@@ -14,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
-import { Plus, Search, Filter, MoreHorizontal, Eye, Edit, Phone, Mail, Trash2, Calendar } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Eye, Edit, Trash2, Calendar, Phone, Mail } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,11 +25,12 @@ import {
 } from "@components/ui/dropdown-menu";
 import { CSVImportDialog } from "@components/CSVImportDialog";
 import React, { useState, useEffect, useCallback } from 'react';
-import { getPatients } from '@api/adminApi';
+import { getPatients, deletePatient } from '@api/adminApi';
 import { formatDate } from '@utils/format';
 import { PatientDetailsDialog } from '@components/PatientDetailsDialog';
 import { EditPatientDialog } from '@components/EditPatientDialog';
 import { DeletePatientsDialog } from '@components/DeletePatientsDialog';
+import { useToast } from "@hooks/use-toast";
 
 interface Patient {
   id: string;
@@ -68,13 +71,13 @@ interface ApiResponse {
 }
 
 const Patients = () => {
+  const { toast } = useToast();
   const [finalImportStatus, setFinalImportStatus] = useState<'success' | 'failed' | null>(null);
   const [finalImportMessage, setFinalImportMessage] = useState<string>('');
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPatients, setSelectedPatients] = useState<string[]>([]);
-
   const [patientsData, setPatientsData] = useState<Patient[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(5);
@@ -107,7 +110,7 @@ const Patients = () => {
         nextAppointment: patient.nextAppointment,
         status: patient.status,
         patientAddress: null,
-        patientPhone: patient.phone, // Map phone to patientPhone
+        patientPhone: patient.phone,
         emergencyContact: null,
         joinDate: undefined,
         dateOfBirth: undefined,
@@ -198,44 +201,6 @@ const Patients = () => {
     return links;
   };
 
-  if (loading) {
-    return <div>Đang tải danh sách bệnh nhân...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500">Lỗi: {error}</div>;
-  }
-
-  const formatGender = (gender: 'MALE' | 'FEMALE' | 'PREFER_NOT_TO_SAY' | 'OTHER' | null): string => {
-    switch (gender) {
-      case 'MALE':
-        return 'Nam';
-      case 'FEMALE':
-        return 'Nữ';
-      case 'PREFER_NOT_TO_SAY':
-        return 'Không muốn tiết lộ';
-      case 'OTHER':
-        return 'Khác';
-      default:
-        return 'Không xác định';
-    }
-  };
-
-  const getStatusBadge = (status?: string) => {
-    switch (status) {
-      case 'ACTIVE':
-        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Đang điều trị</Badge>;
-      case 'IN_PROGRESS':
-        return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Đang điều trị</Badge>;
-      case 'COMPLETED':
-        return <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100">Đã hoàn tất điều trị</Badge>;
-      case 'CANCELLED':
-        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Điều trị đã hủy</Badge>;
-      default:
-        return <Badge variant="secondary">Chưa bắt đầu điều trị</Badge>;
-    }
-  };
-
   const handleUpdatePatient = (updatedPatient: Patient) => {
     setPatientsData(prevData =>
       prevData.map(patient =>
@@ -245,11 +210,25 @@ const Patients = () => {
     console.log("Bệnh nhân đã được cập nhật:", updatedPatient);
   };
 
-  const handleDeletePatients = (patientIds: string[]) => {
-    setPatientsData(prevData =>
-      prevData.filter(patient => !patientIds.includes(patient.id))
-    );
-    setSelectedPatients([]);
+  const handleDeletePatients = async (patientIds: string[]) => {
+    try {
+      await deletePatient(patientIds);
+      setPatientsData(prevData =>
+        prevData.filter(patient => !patientIds.includes(patient.id))
+      );
+      setSelectedPatients([]);
+      fetchPatients(); // Refresh the list after deletion
+      toast({
+        title: "Xóa bệnh nhân thành công",
+        description: `${patientIds.length} bệnh nhân đã được xóa.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Lỗi",
+        description: error.message || "Không thể xóa bệnh nhân. Vui lòng thử lại.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSelectPatient = (patientId: string) => {
@@ -300,6 +279,44 @@ const Patients = () => {
       "Trạng thái": "PLANNED"
     }
   ];
+
+  const formatGender = (gender: 'MALE' | 'FEMALE' | 'PREFER_NOT_TO_SAY' | 'OTHER' | null): string => {
+    switch (gender) {
+      case 'MALE':
+        return 'Nam';
+      case 'FEMALE':
+        return 'Nữ';
+      case 'PREFER_NOT_TO_SAY':
+        return 'Không muốn tiết lộ';
+      case 'OTHER':
+        return 'Khác';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  const getStatusBadge = (status?: string) => {
+    switch (status) {
+      case 'ACTIVE':
+        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Đang điều trị</Badge>;
+      case 'IN_PROGRESS':
+        return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Đang điều trị</Badge>;
+      case 'COMPLETED':
+        return <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100">Đã hoàn tất điều trị</Badge>;
+      case 'CANCELLED':
+        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Điều trị đã hủy</Badge>;
+      default:
+        return <Badge variant="secondary">Chưa bắt đầu điều trị</Badge>;
+    }
+  };
+
+  if (loading) {
+    return <div className="text-center py-8">Đang tải danh sách bệnh nhân...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500 text-center py-8">Lỗi: {error}</div>;
+  }
 
   return (
     <div className="flex flex-col h-screen">
@@ -485,14 +502,18 @@ const Patients = () => {
                         <PaginationPrevious
                           onClick={handlePreviousPage}
                           className={currentPage === 0 ? 'pointer-events-none opacity-50' : ''}
-                        />
+                        >
+                          Trước
+                        </PaginationPrevious>
                       </PaginationItem>
                       {renderPaginationLinks()}
                       <PaginationItem>
                         <PaginationNext
                           onClick={handleNextPage}
                           className={currentPage === totalPages - 1 ? 'pointer-events-none opacity-50' : ''}
-                        />
+                        >
+                          Tiếp
+                        </PaginationNext>
                       </PaginationItem>
                     </PaginationContent>
                   </Pagination>

@@ -17,6 +17,7 @@ import {
 import { useToast } from "@hooks/use-toast";
 import { fetchReceptionists } from '@api/adminApi';
 import { AddReceptionistDialog } from '@components/AddReceptionistDialog';
+import { DeleteReceptionistDialog } from '@components/DeleteReceptionistDialog';
 
 interface Receptionist {
   employeeId: string;
@@ -89,7 +90,7 @@ const Receptionists = () => {
       receptionist.employeeId.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredReceptionists(filtered);
-    setCurrentPage(0); 
+    setCurrentPage(0);
   }, [searchQuery, receptionists]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,10 +110,8 @@ const Receptionists = () => {
   };
 
   const handleDeleteReceptionist = (employeeId: string) => {
-    toast({
-      title: "Lễ tân đã bị xóa",
-      description: "Lễ tân đã được xóa thành công khỏi hệ thống.",
-    });
+    setReceptionists(prev => prev.filter(r => r.employeeId !== employeeId));
+    setFilteredReceptionists(prev => prev.filter(r => r.employeeId !== employeeId));
     fetchData(); // Refresh data after deletion
   };
 
@@ -248,13 +247,12 @@ const Receptionists = () => {
                             Chỉnh sửa
                           </div>
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-red-600 hover:bg-red-50 cursor-pointer"
-                          onClick={() => handleDeleteReceptionist(receptionist.employeeId)}
-                        >
-                          <div className="flex items-center">
-                            Xóa
-                          </div>
+                        <DropdownMenuItem asChild>
+                          <DeleteReceptionistDialog
+                            employeeId={receptionist.employeeId}
+                            receptionistName={receptionist.receptionistName}
+                            onDelete={handleDeleteReceptionist}
+                          />
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
