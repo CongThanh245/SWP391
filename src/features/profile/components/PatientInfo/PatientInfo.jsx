@@ -10,7 +10,6 @@ const PatientInfo = ({ user, onEdit }) => {
     { icon: Phone, label: 'Số điện thoại', value: user.phone },
     { icon: User, label: 'Giới tính', value: user.gender },
     { icon: Mail, label: 'Email', value: user.email },
-    { icon: Heart, label: 'Tình trạng hôn nhân', value: user.maritalStatus },
     { icon: ShieldAlert, label: 'Liên hệ khẩn cấp', value: user.emergencyContact }, 
     { icon: User, label: 'Tên người đi kèm', value: user.spouseName },
     { icon: MapPin, label: 'Địa chỉ người đi kèm', value: user.spouseAddress },
