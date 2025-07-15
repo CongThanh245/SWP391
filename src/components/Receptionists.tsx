@@ -7,13 +7,16 @@ import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { Badge } from "@components/ui/badge";
 import { Avatar, AvatarFallback } from "@components/ui/avatar";
-import { Search, MoreHorizontal } from "lucide-react";
+import { Search } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@components/ui/dropdown-menu";
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@components/ui/pagination";
 import { useToast } from "@hooks/use-toast";
 import { fetchReceptionists } from '@api/adminApi';
 import { AddReceptionistDialog } from '@components/AddReceptionistDialog';
@@ -29,14 +32,26 @@ interface Receptionist {
   active: boolean;
 }
 
+interface ReceptionistApiResponse {
+  content: Receptionist[];
+  number: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+}
+
 const Receptionists = () => {
   const { toast } = useToast();
   const [receptionists, setReceptionists] = useState<Receptionist[]>([]);
-  const [filteredReceptionists, setFilteredReceptionists] = useState<Receptionist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(6);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const getInitials = useCallback((name: string) => {
     if (!name || typeof name !== "string") {
@@ -57,61 +72,100 @@ const Receptionists = () => {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const response = await fetchReceptionists();
-      if (!Array.isArray(response)) {
-        console.warn("Không nhận được dữ liệu lễ tân hoặc định dạng không hợp lệ");
-        setReceptionists([]);
-        setFilteredReceptionists([]);
-      } else {
-        setReceptionists(response);
-        setFilteredReceptionists(response);
-      }
+      const response: ReceptionistApiResponse = await fetchReceptionists({
+        page: currentPage,
+        size: pageSize,
+        search: searchQuery,
+      });
+      const activeReceptionists = response.content.filter(r => r.active);
+      setReceptionists(activeReceptionists);
+      setTotalElements(response.totalElements);
+      setTotalPages(response.totalPages);
+      setCurrentPage(response.number);
+      setPageSize(response.size);
     } catch (error: any) {
+      const message = error.message || "Không thể tải dữ liệu lễ tân";
+      setError(message);
       toast({
         title: "Lỗi",
-        description: error.message || "Không thể tải dữ liệu lễ tân",
+        description: message,
         variant: "destructive",
       });
       setReceptionists([]);
-      setFilteredReceptionists([]);
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [currentPage, pageSize, searchQuery, toast]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  useEffect(() => {
-    const filtered = receptionists.filter((receptionist) =>
-      receptionist.receptionistName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      receptionist.employeeId.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredReceptionists(filtered);
-    setCurrentPage(0);
-  }, [searchQuery, receptionists]);
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+    setCurrentPage(0); // Reset to first page on search
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(prev => prev - 1);
+    }
   };
 
   const handleNextPage = () => {
-    if ((currentPage + 1) * pageSize < filteredReceptionists.length) {
-      setCurrentPage((prev) => prev + 1);
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(prev => prev + 1);
     }
   };
 
-  const handlePrevPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage((prev) => prev - 1);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page - 1);
+  };
+
+  const renderPaginationLinks = () => {
+    const links = [];
+    const maxPagesToShow = 5;
+    const startPage = Math.max(0, currentPage - Math.floor(maxPagesToShow / 2));
+    const endPage = Math.min(totalPages - 1, startPage + maxPagesToShow - 1);
+
+    if (startPage > 0) {
+      links.push(
+        <PaginationItem key="1">
+          <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
+        </PaginationItem>
+      );
+      if (startPage > 1) {
+        links.push(<PaginationItem key="ellipsis-start"><PaginationEllipsis /></PaginationItem>);
+      }
     }
+
+    for (let i = startPage; i <= endPage; i++) {
+      links.push(
+        <PaginationItem key={i}>
+          <PaginationLink onClick={() => handlePageChange(i + 1)} isActive={currentPage === i}>
+            {i + 1}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    if (endPage < totalPages - 1) {
+      if (endPage < totalPages - 2) {
+        links.push(<PaginationItem key="ellipsis-end"><PaginationEllipsis /></PaginationItem>);
+      }
+      links.push(
+        <PaginationItem key={totalPages - 1}>
+          <PaginationLink onClick={() => handlePageChange(totalPages)}>{totalPages}</PaginationLink>
+        </PaginationItem>
+      );
+    }
+    return links;
   };
 
   const handleDeleteReceptionist = (employeeId: string) => {
     setReceptionists(prev => prev.filter(r => r.employeeId !== employeeId));
-    setFilteredReceptionists(prev => prev.filter(r => r.employeeId !== employeeId));
     fetchData(); // Refresh data after deletion
   };
 
@@ -122,15 +176,6 @@ const Receptionists = () => {
       <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Không hoạt động</Badge>
     );
   };
-
-  const paginatedReceptionists = filteredReceptionists.slice(
-    currentPage * pageSize,
-    (currentPage + 1) * pageSize
-  );
-
-  const totalPages = Math.ceil(filteredReceptionists.length / pageSize);
-  const isFirstPage = currentPage === 0;
-  const isLastPage = (currentPage + 1) * pageSize >= filteredReceptionists.length;
 
   return (
     <div className="flex flex-col h-screen bg-[#EAE4E1]">
@@ -144,52 +189,20 @@ const Receptionists = () => {
               <p className="text-[#4D3C2D]/70">Quản lý nhân viên lễ tân của bệnh viện</p>
             </div>
             <div className="flex gap-3">
-              <AddReceptionistDialog />
+              <AddReceptionistDialog onAdd={fetchData} />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 gap-6 mb-6">
             <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-3xl font-bold text-[#4D3C2D] mb-1">{receptionists.length}</div>
+                    <div className="text-3xl font-bold text-[#4D3C2D] mb-1">{totalElements}</div>
                     <div className="text-sm font-medium text-[#4D3C2D]/70">Tổng số lễ tân</div>
                   </div>
                   <div className="w-12 h-12 bg-[#D9CAC2]/20 rounded-full flex items-center justify-center">
                     <div className="w-6 h-6 bg-[#D9CAC2] rounded-full"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-3xl font-bold text-green-600 mb-1">
-                      {receptionists.filter(r => r.active).length}
-                    </div>
-                    <div className="text-sm font-medium text-[#4D3C2D]/70">Hoạt động</div>
-                  </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-green-500 rounded-full"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/90 border-[#D9CAC2] hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-3xl font-bold text-red-600 mb-1">
-                      {receptionists.filter(r => !r.active).length}
-                    </div>
-                    <div className="text-sm font-medium text-[#4D3C2D]/70">Không hoạt động</div>
-                  </div>
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-red-500 rounded-full"></div>
                   </div>
                 </div>
               </CardContent>
@@ -209,13 +222,15 @@ const Receptionists = () => {
 
         {loading ? (
           <div className="text-center text-[#4D3C2D]">Đang tải...</div>
-        ) : filteredReceptionists.length === 0 ? (
+        ) : error ? (
+          <div className="text-center py-8 text-red-500">Lỗi: {error}</div>
+        ) : receptionists.length === 0 ? (
           <div className="text-center py-8 text-[#4D3C2D]/70">
             Không tìm thấy lễ tân nào.
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {paginatedReceptionists.map((receptionist) => (
+            {receptionists.map((receptionist) => (
               <Card key={receptionist.employeeId} className="bg-white/95 border-[#D9CAC2] hover:shadow-xl transition-all duration-300 hover:bg-white hover:scale-[1.02]">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
@@ -230,62 +245,41 @@ const Receptionists = () => {
                         <p className="text-sm text-[#4D3C2D]/60 font-medium">{receptionist.employeeId}</p>
                       </div>
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-[#4D3C2D] hover:bg-[#D9CAC2]/20">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border-[#D9CAC2]">
-                        <DropdownMenuItem className="cursor-pointer">
-                          <div className="flex items-center">
-                            Xem chi tiết
-                          </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
-                          <div className="flex items-center">
-                            Chỉnh sửa
-                          </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <DeleteReceptionistDialog
-                            employeeId={receptionist.employeeId}
-                            receptionistName={receptionist.receptionistName}
-                            onDelete={handleDeleteReceptionist}
-                          />
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                   
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-semibold text-[#4D3C2D]">{receptionist.receptionistPhone}</p>
-                      <p className="text-sm text-[#4D3C2D]/60">Số điện thoại</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-[#4D3C2D]/60 min-w-[100px]">Số điện thoại:</span>
+                      <span className="text-sm font-semibold text-[#4D3C2D]">{receptionist.receptionistPhone}</span>
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-[#4D3C2D]">{receptionist.receptionistAddress}</p>
-                      <p className="text-sm text-[#4D3C2D]/60">Địa chỉ</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-[#4D3C2D]/60 min-w-[100px]">Địa chỉ:</span>
+                      <span className="text-sm font-semibold text-[#4D3C2D]">{receptionist.receptionistAddress}</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-3 bg-[#EAE4E1]/50 rounded-lg">
-                        <div className="text-lg font-bold text-[#4D3C2D]">{receptionist.dateOfBirth}</div>
-                        <div className="text-xs text-[#4D3C2D]/70">Ngày sinh</div>
-                      </div>
-                      <div className="text-center p-3 bg-[#EAE4E1]/50 rounded-lg">
-                        <div className="text-lg font-bold text-[#4D3C2D]">{receptionist.joinDate}</div>
-                        <div className="text-xs text-[#4D3C2D]/70">Ngày tham gia</div>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-[#4D3C2D]/60 min-w-[100px]">Ngày sinh:</span>
+                      <span className="text-sm font-semibold text-[#4D3C2D]">{receptionist.dateOfBirth}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-[#4D3C2D]/60 min-w-[100px]">Ngày tham gia:</span>
+                      <span className="text-sm font-semibold text-[#4D3C2D]">{receptionist.joinDate}</span>
                     </div>
                     <div className="flex justify-between items-center pt-2">
                       {getStatusBadge(receptionist.active)}
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="border-[#4D3C2D] text-[#4D3C2D] hover:bg-[#4D3C2D] hover:text-white"
-                      >
-                        Xem hồ sơ
-                      </Button>
+                      <DeleteReceptionistDialog
+                        employeeId={receptionist.employeeId}
+                        receptionistName={receptionist.receptionistName}
+                        onDelete={handleDeleteReceptionist}
+                        trigger={
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-[#4D3C2D] text-[#4D3C2D] hover:bg-[#4D3C2D] hover:text-white"
+                          >
+                            Xóa
+                          </Button>
+                        }
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -296,36 +290,29 @@ const Receptionists = () => {
         
         <div className="flex items-center justify-between mt-8 p-4">
           <div className="text-sm text-[#4D3C2D]/70">
-            Hiển thị {paginatedReceptionists.length} trong số {filteredReceptionists.length} lễ tân
+            Hiển thị {receptionists.length} trong số {totalElements} lễ tân
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-[#D9CAC2] text-[#4D3C2D]"
-              onClick={handlePrevPage}
-              disabled={isFirstPage || loading}
-            >
-              Trước
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-[#4D3C2D] text-white border-[#4D3C2D]"
-              disabled
-            >
-              Trang {currentPage + 1} / {totalPages}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-[#D9CAC2] text-[#4D3C2D]"
-              onClick={handleNextPage}
-              disabled={isLastPage || loading}
-            >
-              Tiếp
-            </Button>
-          </div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={handlePreviousPage}
+                  className={currentPage === 0 ? 'pointer-events-none opacity-50' : ''}
+                >
+                  Trước
+                </PaginationPrevious>
+              </PaginationItem>
+              {renderPaginationLinks()}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={handleNextPage}
+                  className={currentPage === totalPages - 1 ? 'pointer-events-none opacity-50' : ''}
+                >
+                  Tiếp
+                </PaginationNext>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
     </div>

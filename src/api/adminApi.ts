@@ -109,17 +109,44 @@ export const getPatients = async (
   }
 };
 
+interface Receptionist {
+  employeeId: string;
+  receptionistName: string;
+  receptionistPhone: string;
+  receptionistAddress: string;
+  dateOfBirth: string;
+  joinDate: string;
+  active: boolean;
+}
 
-export const fetchReceptionists = async () => {
+interface ReceptionistApiResponse {
+  content: Receptionist[];
+  number: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+}
+
+
+export const fetchReceptionists = async (
+  params: { page?: number; size?: number; search?: string }
+): Promise<ReceptionistApiResponse> => {
   try {
-    const response = await apiClient.get('/admin/receptionists');
+    const response = await apiClient.get('/admin/receptionists', {
+      params: {
+        page: params.page ?? 0,
+        size: params.size ?? 5,
+        ...(params.search && { search: params.search }),
+      },
+    });
     return response.data;
-  } catch (error) {
+  } catch (error: unknown) {
     const message =
       error && typeof error === 'object' && 'response' in error
-        ? error.response?.data?.message || 'Failed to fetch receptionists'
-        : 'An unknown error occurred while fetching receptionists';
-
+        ? (error as any).response?.data?.message || 'Không thể tải danh sách lễ tân'
+        : 'Đã xảy ra lỗi không xác định khi tải danh sách lễ tân';
     throw new Error(message);
   }
 };

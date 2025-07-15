@@ -43,7 +43,6 @@ const doctorFormSchema = z.object({
     .refine(
       (value) => {
         try {
-          // Validate if the date string is a valid ISO date (YYYY-MM-DD)
           const date = new Date(value);
           return !isNaN(date.getTime()) && value.match(/^\d{4}-\d{2}-\d{2}$/);
         } catch {
@@ -64,8 +63,13 @@ const doctorFormSchema = z.object({
 
 type DoctorFormData = z.infer<typeof doctorFormSchema>;
 
-export const AddDoctorDialog = () => {
+interface AddDoctorDialogProps {
+  onAdd?: () => void;
+}
+
+export const AddDoctorDialog = ({ onAdd }: AddDoctorDialogProps) => {
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<DoctorFormData>({
@@ -86,6 +90,7 @@ export const AddDoctorDialog = () => {
   });
 
   const onSubmit = async (data: RegisterDoctorData) => {
+    setIsSubmitting(true);
     try {
       await registerDoctor(data);
       toast({
@@ -94,13 +99,15 @@ export const AddDoctorDialog = () => {
       });
       setOpen(false);
       form.reset();
+      if (onAdd) onAdd(); // Trigger refresh
     } catch (error: any) {
       toast({
         title: "Lỗi",
-        description:
-          error.message || "Không thể thêm bác sĩ. Vui lòng thử lại.",
+        description: error.message || "Không thể thêm bác sĩ. Vui lòng thử lại.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -291,8 +298,12 @@ export const AddDoctorDialog = () => {
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Hủy
               </Button>
-              <Button type="submit" className="bg-[#4D3C2D] hover:bg-[#4D3C2D]/90">
-                Thêm bác sĩ
+              <Button
+                type="submit"
+                className="bg-[#4D3C2D] hover:bg-[#4D3C2D]/90"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Đang thêm..." : "Thêm bác sĩ"}
               </Button>
             </div>
           </form>

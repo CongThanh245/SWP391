@@ -9,26 +9,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@components/ui/table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@components/ui/pagination";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@components/ui/select";
-import { Plus, Search, Filter, MoreHorizontal, Eye, Edit, Trash2, Calendar, Phone, Mail } from "lucide-react";
+import { Search, MoreHorizontal, Eye, Trash2, Calendar, Phone, Mail } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
-import { CSVImportDialog } from "@components/CSVImportDialog";
 import React, { useState, useEffect, useCallback } from 'react';
 import { getPatients, deletePatient } from '@api/adminApi';
 import { formatDate } from '@utils/format';
 import { PatientDetailsDialog } from '@components/PatientDetailsDialog';
-import { EditPatientDialog } from '@components/EditPatientDialog';
 import { DeletePatientsDialog } from '@components/DeletePatientsDialog';
 import { useToast } from "@hooks/use-toast";
 
@@ -72,9 +63,6 @@ interface ApiResponse {
 
 const Patients = () => {
   const { toast } = useToast();
-  const [finalImportStatus, setFinalImportStatus] = useState<'success' | 'failed' | null>(null);
-  const [finalImportMessage, setFinalImportMessage] = useState<string>('');
-  const [showImportDialog, setShowImportDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPatients, setSelectedPatients] = useState<string[]>([]);
@@ -83,14 +71,14 @@ const Patients = () => {
   const [pageSize, setPageSize] = useState(5);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
 
   const fetchPatients = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     const params = {
-      search: searchQuery,
+      search: searchInput,
       page: String(currentPage),
       size: String(pageSize),
     };
@@ -135,15 +123,31 @@ const Patients = () => {
           ? err.message
           : 'Đã xảy ra lỗi khi tải danh sách bệnh nhân.';
       setError(message);
+      toast({
+        title: "Lỗi tìm kiếm",
+        description: message,
+        variant: "destructive",
+      });
       console.error("Lỗi khi lấy danh sách bệnh nhân:", err);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, pageSize, searchQuery]);
+  }, [currentPage, pageSize, searchInput, toast]);
 
   useEffect(() => {
-    fetchPatients();
+    const handler = setTimeout(() => {
+      fetchPatients();
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    };
   }, [fetchPatients]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
+    setCurrentPage(0); // Reset to first page on new search
+  };
 
   const handlePreviousPage = () => {
     if (currentPage > 0) {
@@ -201,15 +205,6 @@ const Patients = () => {
     return links;
   };
 
-  const handleUpdatePatient = (updatedPatient: Patient) => {
-    setPatientsData(prevData =>
-      prevData.map(patient =>
-        patient.id === updatedPatient.id ? { ...patient, ...updatedPatient } : patient
-      )
-    );
-    console.log("Bệnh nhân đã được cập nhật:", updatedPatient);
-  };
-
   const handleDeletePatients = async (patientIds: string[]) => {
     try {
       await deletePatient(patientIds);
@@ -246,39 +241,6 @@ const Patients = () => {
       setSelectedPatients(patientsData.map(patient => patient.id));
     }
   };
-
-  const csvTemplateFields = [
-    "Tên", "Số điện thoại", "Email", "Địa chỉ", "Ngày tham gia", "Ngày sinh",
-    "Giới tính", "Tình trạng hôn nhân", "Ngày kết hôn", "Hồ sơ hoàn thiện",
-    "Tên vợ/chồng", "Địa chỉ vợ/chồng", "Số điện thoại vợ/chồng",
-    "Liên hệ khẩn cấp vợ/chồng", "Ngày sinh vợ/chồng", "Giới tính vợ/chồng",
-    "Tuổi", "Bác sĩ", "Lần khám gần nhất", "Cuộc hẹn tiếp theo", "Trạng thái"
-  ];
-  const csvSampleData = [
-    {
-      Tên: "Nguyễn Thị Lan",
-      "Số điện thoại": "+84 123-456-7890",
-      Email: "lan.nguyen@email.com",
-      "Địa chỉ": "123 Đường Láng, Hà Nội",
-      "Ngày tham gia": "2025-06-19",
-      "Ngày sinh": "1995-08-15",
-      "Giới tính": "Nữ",
-      "Tình trạng hôn nhân": "Đã kết hôn",
-      "Ngày kết hôn": "2020-01-01",
-      "Hồ sơ hoàn thiện": "true",
-      "Tên vợ/chồng": "Trần Văn Hùng",
-      "Địa chỉ vợ/chồng": "123 Nguyễn Trãi, Hà Nội",
-      "Số điện thoại vợ/chồng": "+84 912-345-678",
-      "Liên hệ khẩn cấp vợ/chồng": "Nguyễn Văn Nam - +84 987-654-321",
-      "Ngày sinh vợ/chồng": "1992-01-01",
-      "Giới tính vợ/chồng": "Nam",
-      Tuổi: "29",
-      "Bác sĩ": "BS. Trần Văn Hùng",
-      "Lần khám gần nhất": "2025-07-11",
-      "Cuộc hẹn tiếp theo": "2025-07-11",
-      "Trạng thái": "PLANNED"
-    }
-  ];
 
   const formatGender = (gender: 'MALE' | 'FEMALE' | 'PREFER_NOT_TO_SAY' | 'OTHER' | null): string => {
     switch (gender) {
@@ -319,48 +281,37 @@ const Patients = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-[#EAE4E1]">
       <Header title="Bệnh nhân" subtitle="Quản lý hồ sơ và thông tin y tế của bệnh nhân" />
       <div className="flex-1 overflow-auto p-6">
         <Tabs defaultValue="all" className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div className="flex gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Tìm kiếm bệnh nhân..."
-                  className="pl-10 w-80"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <Select>
-                <SelectTrigger className="w-[180px]">
-                  <Filter className="w-4 h-4 mr-2" />
-                  <SelectValue placeholder="Lọc theo bác sĩ" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tất cả bác sĩ</SelectItem>
-                  <SelectItem value="hung">BS. Trần Văn Hùng</SelectItem>
-                  <SelectItem value="hong">BS. Lê Thị Hồng</SelectItem>
-                  <SelectItem value="minh">BS. Nguyễn Văn Minh</SelectItem>
-                </SelectContent>
-              </Select>
-              {selectedPatients.length > 0 && (
-                <DeletePatientsDialog
-                  patientIds={selectedPatients}
-                  patientNames={selectedPatients.map(id =>
-                    patientsData.find(p => p.id === id)?.patientName || ''
+          <Card className="bg-white/90 border-[#D9CAC2] mb-6">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#4D3C2D]/60 w-4 h-4" />
+                  <Input
+                    placeholder="Tìm kiếm theo tên hoặc sđt"
+                    className="pl-10 bg-white/80 border-[#D9CAC2] focus:border-[#4D3C2D]"
+                    value={searchInput}
+                    onChange={handleSearchChange}
+                  />
+                  {loading && (
+                    <div className="text-sm text-[#4D3C2D]/70 mt-2">Đang tìm kiếm...</div>
                   )}
-                  onDelete={handleDeletePatients}
-                />
-              )}
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Thêm bệnh nhân
-              </Button>
-            </div>
-          </div>
+                </div>
+                {selectedPatients.length > 0 && (
+                  <DeletePatientsDialog
+                    patientIds={selectedPatients}
+                    patientNames={selectedPatients.map(id =>
+                      patientsData.find(p => p.id === id)?.patientName || ''
+                    )}
+                    onDelete={handleDeletePatients}
+                  />
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           <TabsContent value="all">
             <Card>
@@ -457,14 +408,6 @@ const Patients = () => {
                                     Xem chi tiết
                                   </Button>
                                 </PatientDetailsDialog>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <EditPatientDialog patient={patient} onUpdate={handleUpdatePatient}>
-                                  <Button variant="ghost" size="sm" className="justify-start w-full">
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    Sửa thông tin
-                                  </Button>
-                                </EditPatientDialog>
                               </DropdownMenuItem>
                               <DropdownMenuItem asChild>
                                 <DeletePatientsDialog

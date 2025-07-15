@@ -59,7 +59,11 @@ const receptionistFormSchema = z.object({
 
 type ReceptionistFormData = z.infer<typeof receptionistFormSchema>;
 
-export const AddReceptionistDialog = () => {
+interface AddReceptionistDialogProps {
+  onAdd?: () => void;
+}
+
+export const AddReceptionistDialog = ({ onAdd }: AddReceptionistDialogProps) => {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -87,6 +91,7 @@ export const AddReceptionistDialog = () => {
       });
       setOpen(false);
       form.reset();
+      if (onAdd) onAdd(); // Trigger refresh
     } catch (error: any) {
       toast({
         title: "Lỗi",
