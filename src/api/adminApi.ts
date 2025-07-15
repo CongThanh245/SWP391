@@ -240,3 +240,26 @@ export const registerDoctor = async (data: RegisterDoctorData) => {
     throw new Error(message);
   }
 };
+
+export interface RegisterReceptionistData {
+  email: string;
+  password: string;
+  receptionistName: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
+  receptionistAddress: string;
+  phoneNumber: string;
+  dateOfBirth: string;
+}
+
+export const registerReceptionist = async (data: RegisterReceptionistData) => {
+  try {
+    const response = await apiClient.post('/auth/receptionist_register', data);
+    return response.data;
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Không thể đăng ký lễ tân'
+        : 'Đã xảy ra lỗi không xác định khi đăng ký lễ tân';
+    throw new Error(message);
+  }
+};
