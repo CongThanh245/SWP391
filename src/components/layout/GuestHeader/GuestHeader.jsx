@@ -6,12 +6,14 @@ import apiClient from "@api/axiosConfig";
 import { User, Settings, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "@utils/authUtils";
+import { useTheme } from "@themes/ThemeContext"; 
 
 const Header = () => {
   const dropdownRef = useRef(null);
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme(); 
 
   const handleMouseEnter = () => setIsDropdownOpen(true);
   const handleMouseLeave = () => setIsDropdownOpen(false);
@@ -67,7 +69,7 @@ const Header = () => {
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#4D3C2D"
+                stroke="var(--text-primary)" // Use CSS variable
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -84,7 +86,7 @@ const Header = () => {
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#4D3C2D"
+                stroke="var(--text-primary)" // Use CSS variable
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -107,7 +109,7 @@ const Header = () => {
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#4D3C2D"
+                stroke="var(--text-primary)" // Use CSS variable
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -173,7 +175,7 @@ const Header = () => {
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt="avatar" />
                 ) : (
-                  <User size={20} color="#fff" />
+                  <User size={20} color="var(--button-primary-text)" /> // Use CSS variable
                 )}
               </div>
               <span className="username">{user.patientName}</span>
@@ -202,6 +204,10 @@ const Header = () => {
               Đăng nhập
             </button>
           )}
+          {/* Add Theme Toggle Button */}
+          <button className="theme-toggle" onClick={toggleTheme}>
+            {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+          </button>
         </div>
       </div>
     </header>

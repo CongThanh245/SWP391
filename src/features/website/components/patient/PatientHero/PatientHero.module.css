@@ -1,6 +1,6 @@
 .container {
-  background: linear-gradient(135deg, #f9f6f6 0%, #EAE4E1 100%);
-  padding: 150px 24px;
+  background: linear-gradient(135deg, #f9f6f6, #EAE4E1);
+  padding: var(--spacing-xl) var(--spacing-md);
   min-height: 600px;
   position: relative;
   overflow: hidden;
@@ -9,13 +9,17 @@
   justify-content: center;
 }
 
+[data-theme="dark"] .container {
+  background: linear-gradient(135deg, var(--primary-background), var(--secondary-background));
+}
+
 .backgroundDecoration {
   position: absolute;
   top: -20%;
   right: -10%;
   width: 400px;
   height: 400px;
-  background: linear-gradient(45deg, rgba(97, 71, 76, 0.2), rgba(234, 228, 225, 0.3));
+  background: linear-gradient(45deg, var(--deep-taupe-alpha), var(--card-background-alpha));
   border-radius: 50%;
   opacity: 0.5;
   z-index: 0;
@@ -33,7 +37,7 @@
   left: 50%;
   width: 200px;
   height: 200px;
-  background: #61474C;
+  background: var(--deep-taupe);
   border-radius: 50%;
   opacity: 0.15;
   transform: translate(-50%, -50%) scale(1);
@@ -63,7 +67,7 @@
   position: absolute;
   width: 8px;
   height: 8px;
-  background: #4d3c2d;
+  background: var(--accent-color);
   border-radius: 50%;
   opacity: 0.3;
   animation: particleFloat 5s infinite ease-in-out;
@@ -99,7 +103,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: var(--spacing-lg);
   position: relative;
   z-index: 1;
 }
@@ -109,37 +113,37 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 1.5rem;
+  gap: var(--spacing-md);
   max-width: 600px;
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: var(--font-size-xl);
   font-weight: 700;
-  color: #333333;
+  color: var(--text-primary);
   line-height: 1.3;
   margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: var(--shadow-accent);
 }
 
 .subtitle {
-  font-size: 1.125rem;
-  color: #4A2C2A;
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
 }
 
 .primaryButton {
-  background: linear-gradient(45deg, #4d3c2d, #61474C);
-  color: #fbf9f6;
+  background: var(--gradient-accent);
+  color: var(--button-primary-text);
   border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 12px;
-  font-size: 1rem;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(97, 71, 76, 0.25);
+  box-shadow: var(--shadow-accent);
   position: relative;
   overflow: hidden;
   display: inline-flex;
@@ -149,9 +153,9 @@
 }
 
 .primaryButton:hover {
-  background: linear-gradient(45deg, #61474C, #4a3639);
+  background: var(--button-hover-bg);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(97, 71, 76, 0.4);
+  box-shadow: var(--shadow-dark-gray);
 }
 
 .glowEffect {
@@ -160,14 +164,14 @@
 
 @keyframes glowIn {
   0% { transform: scale(0.95); opacity: 0; box-shadow: none; }
-  50% { transform: scale(1.05); opacity: 1; box-shadow: 0 4px 12px rgba(97, 71, 76, 0.4); }
+  50% { transform: scale(1.05); opacity: 1; box-shadow: var(--shadow-accent); }
   100% { transform: scale(1); opacity: 1; }
 }
 
 .ripple {
   position: absolute;
   border-radius: 50%;
-  background: rgba(251, 249, 246, 0.3);
+  background: var(--button-primary-text-alpha);
   transform: scale(0);
   animation: rippleEffect 0.6s linear;
   pointer-events: none;
@@ -192,43 +196,43 @@
 .actionSection {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: var(--spacing-md);
   justify-content: center;
   width: 100%;
   max-width: 800px;
 }
 
 .actionButton {
-  background: #ffffff;
-  border: 1px solid #bdbdbd;
-  border-radius: 8px;
-  padding: 0.75rem;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  padding: var(--spacing-sm);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
   font-weight: 500;
-  color: #333333;
+  color: var(--text-primary);
   text-decoration: none;
   transition: all 0.3s ease;
   min-width: 150px;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-accent);
 }
 
 .actionButton:hover {
-  background: #4a3639;
-  color: #fbf9f6;
+  background: var(--dark-accent);
+  color: var(--button-primary-text);
   transform: translateY(-3px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-dark-gray);
 }
 
 .icon {
-  stroke: #61474C;
+  stroke: var(--deep-taupe);
 }
 
 .actionButton:hover .icon {
-  stroke: #fbf9f6;
+  stroke: var(--button-primary-text);
 }
 
 .fadeInUp {
@@ -244,16 +248,16 @@
 /* Responsive */
 @media (max-width: 768px) {
   .container {
-    padding: 2rem 1rem;
+    padding: var(--spacing-lg) var(--spacing-md);
   }
 
   .title {
-    font-size: 2rem;
+    font-size: var(--font-size-lg);
   }
 
   .primaryButton {
     min-width: 180px;
-    padding: 0.5rem 1.5rem;
+    padding: var(--spacing-xs) var(--spacing-md);
   }
 
   .actionSection {
@@ -269,15 +273,15 @@
 
 @media (max-width: 480px) {
   .container {
-    padding: 1rem;
+    padding: var(--spacing-md);
   }
 
   .title {
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
   }
 
   .subtitle {
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
   }
 
   .pulseRing {
@@ -287,25 +291,25 @@
 
   .primaryButton {
     min-width: 160px;
-    font-size: 0.875rem;
+    font-size: var(--font-size-xs);
   }
 }
 
-/* Style mới cho modal thông báo */
+/* Modal styles */
 :local(.profileIncompleteModal) {
   outline: none;
   max-height: 80vh;
   overflow-y: auto;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px var(--shadow-accent);
-  padding: 24px;
+  background: var(--card-background);
+  border-radius: var(--border-radius-1);
+  box-shadow: var(--shadow-accent);
+  padding: var(--spacing-lg);
   max-width: 500px;
   margin: 0 auto;
 }
 
 :local(.profileIncompleteOverlay) {
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--modal-overlay, rgba(0, 0, 0, 0.5));
   position: fixed;
   top: 0;
   left: 0;
@@ -324,72 +328,74 @@
 }
 
 :local(.profileModalTitle) {
-  font-size: 20px;
+  font-size: var(--font-size-lg);
   font-weight: 700;
-  color: var(--deep-taupe);
-  margin-bottom: 8px;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
   text-align: center;
 }
 
 :local(.profileModalDescription) {
-  font-size: 16px;
-  color: #4b5563;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-lg);
 }
 
 :local(.profileModalButtonContainer) {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: var(--spacing-md);
   width: 100%;
 }
 
 :local(.profileModalCloseButton) {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  background: #d1d5db;
-  color: #ffffff;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  border: 1px solid var(--button-secondary-border);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 :local(.profileModalCloseButton):hover {
-  background: #9ca3af;
+  background: var(--button-hover-bg);
 }
 
 :local(.profileModalActionButton) {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  background: var(--deep-taupe);
-  color: #ffffff;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-1);
+  font-size: var(--font-size-sm);
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 :local(.profileModalActionButton):hover {
-  background: var(--dark-accent);
+  background: var(--button-hover-bg);
 }
 
 @media (max-width: 640px) {
   :local(.profileIncompleteModal) {
     width: 90%;
-    padding: 16px;
+    padding: var(--spacing-md);
   }
 
   :local(.profileModalTitle) {
-    font-size: 18px;
+    font-size: var(--font-size-md);
   }
 
   :local(.profileModalDescription) {
-    font-size: 14px;
+    font-size: var(--font-size-xs);
   }
 
   :local(.profileModalCloseButton),
   :local(.profileModalActionButton) {
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
   }
 }
+

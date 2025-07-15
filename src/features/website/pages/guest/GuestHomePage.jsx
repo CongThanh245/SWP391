@@ -56,21 +56,21 @@ const GuestHomePage = () => {
           />
         </>
       ) : (
-        <AnimatedSection animationType="fade" minHeight="600px">
+        <AnimatedSection animationType="fade" >
           <HeroSection />
         </AnimatedSection>
       )}
 
-      <AnimatedSection animationType="slideUp" minHeight="400px">
+      <AnimatedSection animationType="slideUp" >
         <JourneySection />
       </AnimatedSection>
-      <AnimatedSection animationType="scale" minHeight="300px">
+      <AnimatedSection animationType="scale" >
         <DoctorsCarousel />
       </AnimatedSection>
-      <AnimatedSection animationType="fade" minHeight="400px">
+      <AnimatedSection animationType="fade" >
         <TestimonialSection />
       </AnimatedSection>
-      <AnimatedSection animationType="slideUp" minHeight="300px">
+      <AnimatedSection animationType="slideUp" >
         <FAQ />
       </AnimatedSection>
     </div>

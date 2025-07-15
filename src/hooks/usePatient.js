@@ -12,7 +12,6 @@ const usePatient = () => {
         setPatientId(id);
         setError("");
       } else {
-        setError("Không tìm thấy thông tin bệnh nhân trong bộ nhớ.");
       }
     };
 

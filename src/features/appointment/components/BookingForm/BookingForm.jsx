@@ -24,7 +24,7 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
 
   useEffect(() => {
     if (showSuccess) {
-      handleClose(); 
+      handleClose();
       onSuccess?.();
     }
   }, [showSuccess]);
@@ -162,13 +162,17 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
           {/* Frame 3 - Files */}
           <div className={styles.frame}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Ghi chú thêm</label>
+              <label style={{gap: "1%"}} className={styles.label}>
+                Ghi chú thêm <p>{formData.notes.length}/100</p>
+              </label>
+
               <textarea
                 className={styles.textarea}
                 placeholder="Mô tả triệu chứng hoặc yêu cầu đặc biệt..."
                 value={formData.notes}
                 onChange={(e) => handleInputChange("notes", e.target.value)}
                 disabled={isSubmitting}
+                maxLength={100}
               />
             </div>
           </div>

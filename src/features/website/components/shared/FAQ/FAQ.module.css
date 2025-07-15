@@ -1,6 +1,10 @@
 .faqSection {
   padding: 80px 0;
-  background-color: var(--primary-background);
+  background: #e7e2dd; /* Darker taupe for light mode distinction */
+}
+
+[data-theme="dark"] .faqSection {
+  background: linear-gradient(135deg, #322620, #3d2d24);
 }
 
 .container {
@@ -16,7 +20,7 @@
 }
 
 .subtitle {
-  color: var(--accent-color);
+  color: var(--text-accent);
   font-weight: 600;
   margin-bottom: 10px;
   font-size: 18px;
@@ -43,10 +47,21 @@
 }
 
 .faqItem {
-  background-color: #fff;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
-  box-shadow: 0 5px 15px var(--shadow-accent);
+  box-shadow: var(--shadow-dark-gray);
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+[data-theme="dark"] .faqItem {
+  border-color: var(--card-hover-border);
+}
+
+.faqItem:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-dark-gray);
 }
 
 .faqQuestion {
@@ -58,11 +73,11 @@
   font-weight: 600;
   font-size: 18px;
   color: var(--text-primary);
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .faqQuestion:hover {
-  background-color: var(--hover-accent);
+  background: var(--card-background-alpha);
 }
 
 .faqAnswer {
@@ -75,7 +90,7 @@
 .toggleIcon {
   font-size: 20px;
   font-weight: 700;
-  color: var(--accent-color);
+  color: var(--text-accent);
 }
 
 .moreQuestionsWrapper {
@@ -85,5 +100,29 @@
 
 .moreQuestions {
   font-size: 18px;
+  color: var(--text-secondary);
   margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .faqSection {
+    padding: 60px 0;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+
+  .subtitle, .description, .moreQuestions {
+    font-size: 16px;
+  }
+
+  .faqQuestion {
+    font-size: 16px;
+  }
+
+  .faqAnswer {
+    font-size: 14px;
+  }
 }

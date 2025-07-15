@@ -1,38 +1,20 @@
 /* Container chính */
 .workingHoursContainer {
   max-width: 1400px;
-  margin: 0 auto;
+  margin: 80px auto;
   padding: 80px 20px;
+  background: var(--primary-background); 
 }
 
-/* Layout chính - chia 2 cột */
-.mainGrid {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 60px;
-  align-items: start;
+[data-theme="dark"] .workingHoursContainer {
+  background: var(--secondary-background); /* #2a1f1b dark */
 }
-
-/* Card section chung */
-.section {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 20px 40px var(--shadow-accent);
-  border: 1px solid rgba(158, 142, 123, 0.2);
-  transition: all 0.3s ease;
-}
-
 
 /* Tiêu đề section */
 .sectionTitle {
   font-size: 2.2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #61474C, var(--accent-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary); /* #333333 light, #f0ede8 dark */
   margin-bottom: 35px;
   text-align: center;
   position: relative;
@@ -46,7 +28,7 @@
   transform: translateX(-50%);
   width: 80px;
   height: 4px;
-  background: linear-gradient(90deg, var(--accent-color), #61474C);
+  background: var(--text-accent); /* #61474C light, #d4a574 dark */
   border-radius: 2px;
 }
 
@@ -56,10 +38,10 @@
 }
 
 .scheduleCard {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, var(--secondary-background) 100%);
+  background: var(--card-background); /* #ffffff light, #2a1f1b dark */
   border-radius: 20px;
   padding: 32px;
-  border: 1px solid #4d3c2d;
+  border: 1px solid var(--card-border); /* rgba(158, 142, 123, 0.2) light, rgba(196, 169, 146, 0.2) dark */
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -73,7 +55,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 0;
-  border-bottom: 1px solid #4d3c2d;
+  border-bottom: 1px solid var(--card-border);
   transition: all 0.3s ease;
   position: relative;
 }
@@ -82,26 +64,24 @@
   border-bottom: none;
 }
 
-
-
 .scheduleItem.closed {
-  color: #4d3c2d;
+  color: var(--text-secondary); /* #4A2C2A light, #c4a992 dark */
 }
 
 .scheduleItem.closed .time {
-  color: #4d3c2d;
+  color: var(--text-secondary);
 }
 
 .day {
   font-weight: 600;
-  color: #4d3c2d;
+  color: var(--text-primary); /* #333333 light, #f0ede8 dark */
   font-size: 1.05rem;
   flex: 1;
 }
 
 .time {
   font-weight: 600;
-  color: #61474C;
+  color: var(--text-accent); /* #61474C light, #d4a574 dark */
   font-size: 1.05rem;
   flex: 1;
   text-align: center;
@@ -109,21 +89,25 @@
 
 .status {
   font-size: 1.3rem;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
   flex: 0 0 auto;
 }
 
 /* Ghi chú */
 .note {
-  background:  #D9CAC2;
+  background: var(--secondary-background); /* #EAE4E1 light, #2a1f1b dark */
   border-radius: 16px;
   padding: 10px;
   position: relative;
   margin-bottom: 20px;
 }
 
+[data-theme="dark"] .note {
+  background: var(--light-background); /* #322620 dark */
+}
+
 .note p {
-  color: #4d3c2d;
+  color: var(--text-primary); /* #333333 light, #f0ede8 dark */
   line-height: 1.6;
   font-size: 1rem;
   margin-left: 20px;
@@ -146,9 +130,9 @@
   align-items: center;
   gap: 20px;
   padding: 24px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, var(--secondary-background) 100%);
+  background: var(--card-background); /* #ffffff light, #2a1f1b dark */
   border-radius: 16px;
-  border: 1px solid rgba(158, 142, 123, 0.2);
+  border: 1px solid var(--card-border);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
@@ -166,7 +150,6 @@
   transition: left 0.5s ease;
 }
 
-
 .contactIcon {
   font-size: 1.8rem;
   width: 45px;
@@ -174,13 +157,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #D9CAC2;
+  background: var(--text-accent); /* #61474C light, #d4a574 dark */
   border-radius: 14px;
-  color: white;
+  color: var(--button-primary-text); /* #fbf9f6 light, #1a1512 dark */
   transition: all 0.3s ease;
 }
 
-
+.contactIcon svg {
+  stroke: var(--button-primary-text); /* #fbf9f6 light, #1a1512 dark */
+}
 
 .contactDetails {
   flex: 1;
@@ -191,7 +176,7 @@
 
 .contactLabel {
   font-size: 0.9rem;
-  color: var(--accent-color);
+  color: var(--text-accent); /* #61474C light, #d4a574 dark */
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -199,65 +184,15 @@
 
 .contactValue {
   font-size: 1.1rem;
-  color: var(--text-primary);
+  color: var(--text-primary); /* #333333 light, #f0ede8 dark */
   font-weight: 700;
   word-break: break-all;
 }
 
-/* Nút hành động */
-.actionButtons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.actionButtons button {
-  padding: 16px 32px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.actionButtons button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-
-
-
 /* Responsive */
-@media (max-width: 1200px) {
-  .mainGrid {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-  
-  .workingHoursContainer {
-    padding: 60px 20px;
-  }
-}
-
 @media (max-width: 768px) {
   .workingHoursContainer {
     padding: 40px 15px;
-  }
-
-  .section {
-    padding: 24px;
-    border-radius: 16px;
   }
 
   .sectionTitle {
@@ -277,8 +212,6 @@
     align-items: center;
   }
 
-
-  
   .day, .time {
     text-align: center;
     flex: none;
@@ -297,14 +230,6 @@
 
   .contactValue {
     font-size: 1rem;
-  }
-
-  .actionButtons {
-    flex-direction: column;
-  }
-
-  .actionButtons button {
-    padding: 14px 28px;
   }
 
   .note {

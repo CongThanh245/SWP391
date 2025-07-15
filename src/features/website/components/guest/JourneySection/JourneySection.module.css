@@ -1,16 +1,10 @@
-:root {
-  --primary-color: #9D8D7A;
-  --text-primary: #333333;
-  --text-secondary: #666666;
-  --background-light: #f5f7fa;
-  --white: #ffffff;
-  --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.05);
-  --shadow-medium: 0 5px 15px rgba(0, 0, 0, 0.1);
+.journeySection {
+  padding: var(--spacing-xl) var(--spacing-md);
+  background-color: #d9cac2;
 }
 
-.journeySection {
-  padding: 60px 20px;
-  background-color: #d9cac2;
+[data-theme="dark"] .journeySection {
+  background-color: #3d2d24;
 }
 
 .journeyContainer {
@@ -21,52 +15,58 @@
 .journeyWrapper {
   display: flex;
   flex-direction: column;
-  
 }
 
 .journeyText {
-  margin-bottom: 40px;
+  margin-bottom: var(--spacing-lg);
   text-align: center;
 }
 
 .journeyHeader {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-md);
 }
 
 .journeyTitle {
-  font-size: 36px;
+  font-size: var(--font-size-xl);
   font-weight: 700;
-  margin-bottom: 15px;
+  margin-bottom: var(--spacing-sm);
   color: var(--text-primary);
 }
 
 .journeyHighlight {
   font-style: italic;
-  color: #FFFFFF;
+  color: var(--text-accent);
 }
 
 .journeySubtitle {
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   color: var(--text-secondary);
 }
 
 .journeyCards {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: var(--spacing-md);
 }
 
 .journeyCard {
-  background-color: var(--white);
-  border-radius: 10px;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-1);
   overflow: hidden;
-  box-shadow: var(--shadow-light);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-dark-gray);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="dark"] .journeyCard {
+  background: var(--card-background);
+  border-color: var(--card-hover-border);
 }
 
 .journeyCard:hover {
   transform: translateY(-5px);
-  box-shadow: var(--shadow-medium);
+  box-shadow: var(--shadow-dark-gray);
+  border-color: var(--card-hover-border);
 }
 
 .journeyCardImageContainer {
@@ -82,33 +82,38 @@
 
 .journeyCardButton {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: var(--white);
-  border: none;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-accent);
+}
+
+[data-theme="dark"] .journeyCardButton {
+  background: var(--card-background);
+  border-color: var(--card-hover-border);
 }
 
 .journeyCardContent {
-  padding: 16px;
+  padding: var(--spacing-md);
 }
 
 .journeyCardTitle {
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-sm);
   color: var(--text-primary);
 }
 
 .journeyCardDescription {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
   line-height: 1.5;
 }
@@ -117,7 +122,7 @@
 @media (min-width: 768px) {
   .journeyCards {
     grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+    gap: var(--spacing-lg);
   }
 }
 
@@ -129,7 +134,7 @@
   
   .journeyText {
     width: 35%;
-    padding-right: 40px;
+    padding-right: var(--spacing-lg);
     margin-bottom: 0;
     text-align: left;
   }

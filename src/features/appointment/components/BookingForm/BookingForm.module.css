@@ -114,7 +114,7 @@
 
 /* Textarea specific styling */
 .textarea {
-  min-height: 200px;
+  min-height: 150px;
   resize: vertical;
   font-family: var(--font-family);
   padding: 20px;
