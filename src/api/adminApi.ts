@@ -213,3 +213,30 @@ export const updateDoctor = async (doctorId: string, data: UpdateDoctorData) => 
     throw new Error(message);
   }
 };
+
+export interface RegisterDoctorData {
+  email: string;
+  password: string;
+  phoneNumber: string;
+  doctorName: string;
+  dateOfBirth: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
+  doctorAddress: string;
+  degree: string;
+  licenseNumber: string;
+  specicalization: string;
+  yearOfExperience: number;
+}
+
+export const registerDoctor = async (data: RegisterDoctorData) => {
+  try {
+    const response = await apiClient.post('/auth/doctor_register', data);
+    return response.data;
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Failed to register doctor'
+        : 'An unknown error occurred while registering doctor';
+    throw new Error(message);
+  }
+};

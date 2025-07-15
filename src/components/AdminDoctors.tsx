@@ -1,4 +1,3 @@
-"use client";
 
 import { Header } from "@components/AdminHeader";
 import { Card, CardContent } from "@components/ui/card";
