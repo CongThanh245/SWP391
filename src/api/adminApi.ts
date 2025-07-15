@@ -82,7 +82,7 @@ export const uploadDoctorAvatar = async (doctorId: string, file: File): Promise<
 
 export const deleteDoctor  = async (doctorId: string): Promise<void>=>{
   try {
-    await apiClient.delete(`/admin/${doctorId}`); 
+    await apiClient.patch(`/admin/${doctorId}`); 
   } catch (error: unknown) {
     const message =
       error && typeof error === 'object' && 'response' in error
@@ -181,6 +181,35 @@ export const getPatientDetails = async (patientId: string): Promise<Patient> => 
       error && typeof error === 'object' && 'response' in error
         ? error.response?.data?.message || 'Failed to fetch patient details'
         : 'An unknown error occurred while fetching patient details';
+    throw new Error(message);
+  }
+};
+
+
+
+interface UpdateDoctorData {
+  doctorName?: string;
+  doctorPhone?: string;
+  doctorAddress?: string;
+  doctorEmail?: string;
+  doctorStatus?: string; // "Available" or "Unavailable"
+  doctorSpecialization?: string;
+  doctorGender?: string;
+  degree?: string;
+  dateOfBirth?: string;
+  yearOfExperience?: number;
+  licenseNumber?: string;
+}
+
+export const updateDoctor = async (doctorId: string, data: UpdateDoctorData) => {
+  try {
+    const response = await apiClient.patch(`/admin/doctors/doctor_id_ferticare`, data);
+    return response.data;
+  } catch (error: unknown) {
+    const message =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as any).response?.data?.message || 'Failed to update doctor'
+        : 'An unknown error occurred while updating doctor';
     throw new Error(message);
   }
 };
