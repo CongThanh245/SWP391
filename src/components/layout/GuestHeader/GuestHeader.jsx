@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../GuestHeader/GuestHeader.css";
-import logo from "../../../assets/images/LogoFertiCare.svg";
+import logo from "../../../assets/images/Logo2.svg";
 import apiClient from "@api/axiosConfig";
 import { User, Settings, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";

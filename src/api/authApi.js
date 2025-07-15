@@ -27,7 +27,7 @@ export const registerUser = async (data) => {
             patientName: `${firstName} ${lastName}`,
             email: data.email,
             password: data.password,
-            dateOfBirth: "2025-06-19",
+            dateOfBirth: data.dateOfBirth,
             phoneNumber: data.phoneNumber,
             gender: 'MALE'
         };
@@ -56,7 +56,7 @@ export const registerUser = async (data) => {
 
             switch (status) {
                 case 409:
-                    throw new Error(message || 'Email hoặc tên đăng nhập đã được sử dụng');
+                    throw new Error(message || 'Email đã được sử dụng');
                 case 400:
                     throw new Error(message || 'Dữ liệu không hợp lệ');
                 case 422:
