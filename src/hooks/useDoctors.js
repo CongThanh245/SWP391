@@ -60,7 +60,7 @@ export const useAdminDoctors = (params = {}) => {
           id: doctor.doctorId,
           name: doctor.doctorName,
           specialization: doctor.specialization,
-          phone: doctor.phone,
+          phone: doctor.phoneNumber,
           yearOfExperience: doctor.yearOfExperience,
           degree: doctor.degree,
           licenseNumber: doctor.licenseNumber,
