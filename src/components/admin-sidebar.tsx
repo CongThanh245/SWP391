@@ -9,6 +9,7 @@ import {
   Stethoscope,
   CalendarDays,
   Heart,
+  LogOut,
 } from "lucide-react";
 
 import {
@@ -23,9 +24,11 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@components/ui/sidebar";
-
+import { Button } from '@components/ui/button';
+import { logout } from '@utils/authUtils';
+import { useNavigate } from 'react-router-dom';
 interface AdminSidebarProps {
-  activeTab: 'dashboard' | 'doctors' | 'patients' | 'appointments' | 'schedule' | 'records';
+  activeTab: 'dashboard' | 'doctors' | 'patients' | 'receptionist';
   onTabChange: (tab: AdminSidebarProps['activeTab']) => void;
 }
 
@@ -33,19 +36,15 @@ const menuItems: { title: string; key: AdminSidebarProps['activeTab']; icon: Rea
   { title: "Dashboard", key: "dashboard", icon: BarChart3 },
   { title: "Doctors", key: "doctors", icon: UserCheck },
   { title: "Patients", key: "patients", icon: Users },
-  { title: "Appointments", key: "appointments", icon: ClipboardList },
-  { title: "Schedule", key: "schedule", icon: Calendar },
-  { title: "Doctors' Schedule", key: "schedule", icon: CalendarDays },
-  { title: "Medical Records", key: "records", icon: Heart },
+   { title: "Receptionist", key: "receptionist", icon: UserCheck },
 ];
 
 const managementItems = [
-  { title: "Treatment Protocols", icon: FileText },
   { title: "Documents", icon: FileText },
-  { title: "Settings", icon: Settings },
 ];
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange }) => {
+  const navigate = useNavigate();
   return (
     <Sidebar className="w-64 border-r theme-primary-bg">
       <SidebarHeader className="p-6 border-b border-[#3a2a1f]">
@@ -53,7 +52,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChan
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <Stethoscope className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold text-white">WellNest</span>
+          <span className="text-xl font-bold text-white">Ferticare</span>
         </div>
       </SidebarHeader>
 
@@ -103,7 +102,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChan
       </SidebarContent>
 
       <SidebarFooter className="p-6 bg-[#4D3C2D] border-t border-[#3a2a1f] text-[#EAE4E1] text-xs">
-        © 2024 WellNest Hospital
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-[#EAE4E1] hover:text-white hover:bg-[#3a2a1f]"
+          onClick={() => logout(navigate)}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Log out
+        </Button> 
       </SidebarFooter>
     </Sidebar>
   );

@@ -131,9 +131,6 @@ const WorkingHours = () => {
             </div>
           ))}
         </div>
-        <div className={styles.actionButtons}>
-          <Button variant="primary">Đặt lịch ngay</Button>
-        </div>
       </div>
     </div>
   );

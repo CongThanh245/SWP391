@@ -39,25 +39,30 @@ export interface MappedDoctorTwo {
   totalPatients: number;
   todayAppointments: number;
   doctorEmail?: string; 
+  imageProfile: string;
 }
 
 // UI Doctor interface (what your JSX expects)
 export interface UIDoctorData {
-   id: string;
+  id: string;
   name: string;
   department: string;
   specialist: string;
   totalPatients: number;
   todayAppointments: number;
-  status: string;
+  status: "Available" | "Unavailable";
   avatar: string;
   phone: string;
   email: string;
-  degree?: string;
-  experience?: number;
-  about?: string;
-  address?: string;
-  joinDate?: string;
+  degree: string;
+  experience: number;
+  about: string;
+  address: string;
+  joinDate: string;
+  imageProfile: string;
+  gender?: "MALE" | "FEMALE" | "OTHER";
+  dateOfBirth?: string;
+  licenseNumber?: string;
 }
 
 export interface ImportOptions {

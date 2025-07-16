@@ -13,7 +13,7 @@ import AppointmentManagement from "@features/appointment/pages/AppointmentManage
 import PreTestResult from "@features/test-result/pages/PreTestResult.jsx";
 import PatientList from "@features/patient/pages/PatientList/PatientList.jsx";
 import DoctorList from "@features/doctor/pages/DoctorList/DoctorList.jsx";
-import React, { useState } from "react";
+import React from "react";
 import DoctorDashboard from "@features/doctor/pages/DoctorDashboard";
 import ReceptionistHomePage from "@features/dashboard/pages/ReceptionistHomePage/ReceptionistHomePage.jsx";
 import DoctorsPage from "@features/doctor/components/DoctorPage/DoctorPage.jsx";
@@ -23,6 +23,12 @@ import AppointmentSchedulePage from "@features/appointment/pages/AppointmentSche
 import ServicesPage from "@features/website/pages/guest/ServicesPage.jsx";
 import AdminDashboard from "@features/AdminDashboard.tsx";
 import LoginPage from "@features/auth/pages/LoginPage/LoginPage.jsx";
+import MedicalRecordsManager from "@features/file/MedicalRecordsManager/MedicalRecordsManager.jsx";
+import PrescriptionsPage from "@features/medicine/pages/PrescriptionPage.jsx";
+import PatientResultsPage from "@features/test-result/pages/PatientResultPage.jsx";
+import NotFoundPage from "@features/website/NotFoundPage.jsx";
+import ForgotPasswordPage from "@features/auth/pages/ForgotPasswordPage.jsx";
+
 
 const AppRoutes = () => {
   return (
@@ -42,10 +48,10 @@ const AppRoutes = () => {
         >
           <Route index element={<ProfileContent />} />
           <Route path="profile" element={<ProfileContent />} />
-          <Route path="medical-records" element={<AppointmentsContent />} />
+          <Route path="medical-records" element={<PatientResultsPage />} />
           <Route path="appointments" element={<AppointmentSchedulePage />} />
-          <Route path="health-monitoring" element={<AppointmentsContent />} />
-          <Route path="notifications" element={<AppointmentsContent />} />
+          <Route path="prescriptions" element={<PrescriptionsPage />} />
+          <Route path="attachments" element={<MedicalRecordsManager/>} />
         </Route>
       </Route>
 
@@ -54,7 +60,6 @@ const AppRoutes = () => {
       <Route path="/verify-otp" element={<VerifyOtpPage />} />
       <Route path="/receptionist-dashboard" element={<ReceptionistDashboard />}>
         <Route index element={<ReceptionistHomePage />} />
-        {/* Trang chủ sẽ được xử lý trong ReceptionistDashboard */}
         <Route path="appointment" element={<AppointmentManagement />} />
         <Route path="test-results" element={<PreTestResult />} />
         <Route path="patients" element={<PatientList />} />
@@ -64,6 +69,8 @@ const AppRoutes = () => {
       </Route>
       <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

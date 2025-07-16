@@ -1,7 +1,7 @@
-import styles from '../JourneySection/JourneySection.module.css'; // Adjust the path as necessary
-import journeyPic from '../../../../../assets/images/bac-si-tu-van.jpg'; // Adjust the path as necessary
-import journeyPic2 from '../../../../../assets/images/bac-si-tu-van-2.jpeg'; // Adjust the path as necessary
-import journeyPic3 from '../../../../../assets/images/bac-si-tu-van-3.jpg'; // Adjust the path as necessary
+import styles from './JourneySection.module.css';
+import journeyPic from '../../../../../assets/images/bac-si-tu-van.jpg';
+import journeyPic2 from '../../../../../assets/images/bac-si-tu-van-2.jpeg';
+import journeyPic3 from '../../../../../assets/images/bac-si-tu-van-3.jpg';
 
 // Sample placeholder images
 const placeholderImages = {
@@ -9,22 +9,22 @@ const placeholderImages = {
   consultation: journeyPic2,
   treatmentTracking: journeyPic3
 };
-    
+
 const journeyStages = [
   {
-    id: 'appointment', // phù hợp với "Đặt lịch khám"
+    id: 'appointment',
     title: 'Đặt lịch khám',
     description: 'Đặt lịch khám, theo dõi lịch hẹn cùng với bác sĩ bạn chọn',
     image: placeholderImages.appointment
   },
   {
-    id: 'consultation', // phù hợp với "Hỗ trợ tư vấn"
+    id: 'consultation',
     title: 'Hỗ trợ tư vấn',
     description: 'Tư vấn sức khỏe sinh sản, lựa chọn phương pháp điều trị phù hợp',
     image: placeholderImages.consultation
   },
   {
-    id: 'treatment-tracking', // phù hợp với "Theo dõi kết quả từng quá trình"
+    id: 'treatment-tracking',
     title: 'Theo dõi kết quả',
     description: 'Theo dõi kết quả xét nghiệm theo từng giai đoạn điều trị.',
     image: placeholderImages.treatmentTracking

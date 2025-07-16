@@ -73,8 +73,6 @@
   font-weight: 600;
   color: var(--text-primary);
   transform: translateY(-50%);
-  /* background-color: var(--secondary-background); */
-  /* padding: 0 0.5rem; */
   padding-bottom: 0.5rem;
 }
 
@@ -89,15 +87,32 @@
 }
 
 .formGroup input:focus {
+
   outline: none;
-  border-color: var(--accent-color);
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 3px var(--hover-accent);
 }
 
 .formGroup input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Forgot Password Link */
+.forgotPassword {
+  text-align: left;
+  margin-top: -1rem; 
+}
+
+.forgotPasswordLink {
+  color: var(--text-secondary); 
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.forgotPasswordLink:hover {
+  text-decoration: underline;
+  color: var(--text-primary);
 }
 
 /* Login Button */
@@ -143,4 +158,19 @@
   .loginButton {
     padding: 0.9rem;
   }
+}
+/* Cách 1: Sử dụng !important để override mạnh hơn */
+.formGroup .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #ff6b6b !important; /* Thay đổi màu này theo ý muốn */
+  border-width: 2px !important;
+}
+
+.formGroup .MuiOutlinedInput-root.Mui-focused {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2) !important; /* Shadow màu tương ứng */
+}
+
+.formGroup .MuiInputLabel-root.Mui-focused {
+  color: #ff6b6b !important; /* Màu label khi focus */
+  font-weight: 500 !important;
 }

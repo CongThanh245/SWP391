@@ -8,3 +8,8 @@ import apiClient from "./axiosConfig";
     throw error;
   }
  }
+
+ export const updateReceptionistProfile = async (data) => {
+  const response = await apiClient.patch('/receptionists/me', data);
+  return response.data;
+};

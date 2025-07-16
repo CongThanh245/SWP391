@@ -1,52 +1,91 @@
-// @features/dashboard/components/DashboardHome.jsx
 import React, { useState, useEffect } from "react";
 import Button from "@components/common/Button/Button";
 import styles from "../../components/ReceptionistDashboard/ReceptionistDashboard.module.css";
 import { useNavigate } from "react-router-dom";
-import { fetchReceptionistProfile } from "@api/receptionistApi"; // Adjust import path as needed
+import { fetchReceptionistProfile } from "@api/receptionistApi";
 import ReceptionistProfile from "@features/profile/pages/ReceptionistProfile/ReceptionistProfile";
+import { useToast } from "@hooks/use-toast";
+import { useAppointments } from "@hooks/useAppointments";
 
 const ReceptionistHomePage = () => {
   const navigate = useNavigate();
   const [receptionistProfile, setReceptionistProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { toast } = useToast();
 
-  // Fetch receptionist profile on component mount
-  useEffect(() => {
-    const loadReceptionistProfile = async () => {
-      try {
-        setLoading(true);
-        const profileData = await fetchReceptionistProfile();
-        setReceptionistProfile(profileData);
-      } catch (err) {
-        setError(err.message);
-        console.error('Error fetching receptionist profile:', err);
-      } finally {
-        setLoading(false);
-      }
+  // Gọi useAppointments mà không truyền filters
+  const {
+    appointments,
+    isLoading: appointmentsLoading,
+    error: appointmentsError,
+    refetchAppointments,
+  } = useAppointments();
+
+  // Hàm refetch profile
+  const refetchProfile = async () => {
+    try {
+      setLoading(true);
+      const profileData = await fetchReceptionistProfile();
+      setReceptionistProfile(profileData);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching receptionist profile:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Tính toán số lượng lịch hẹn
+  const appointmentCounts = React.useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const isToday = (appointmentDate) => {
+      if (!appointmentDate) return false;
+      const appointmentDay = new Date(appointmentDate);
+      appointmentDay.setHours(0, 0, 0, 0);
+      return appointmentDay.getTime() === today.getTime();
     };
 
-    loadReceptionistProfile();
-  }, []);
+    return {
+      pending: appointments.filter((app) => app.status === "pending").length,
+      confirmed: appointments.filter((app) => app.status === "confirmed").length,
+      completed: appointments.filter((app) => app.status === "completed").length,
+      cancelled: appointments.filter((app) => app.status === "cancelled").length,
+      today: appointments.filter((app) => isToday(app.date)).length,
+    };
+  }, [appointments]);
 
-  // Format name for display
+  // Fetch profile và hiển thị toast
+  useEffect(() => {
+    const isFreshLogin = localStorage.getItem("isFreshLogin");
+    if (isFreshLogin === "true") {
+      toast({
+        title: "Đăng nhập thành công",
+        description: "Chào mừng bạn đã quay trở lại.",
+        variant: "success",
+      });
+      localStorage.removeItem("isFreshLogin");
+    }
+
+    refetchProfile();
+  }, [toast]);
+
   const getDisplayName = () => {
     if (loading) return "Đang tải...";
     if (error || !receptionistProfile?.receptionistName) return "Receptionist";
     return receptionistProfile.receptionistName;
   };
 
-  // Get greeting message with name
   const getGreetingMessage = () => {
     const name = getDisplayName();
     return `Chào mừng, ${name}`;
   };
 
-
   return (
     <div className={styles.dashboard}>
-      {/* Header với thông tin user */}
       <div className={styles.dashboardHeader}>
         <div className={styles.userInfo}>
           <div className={styles.userAvatar}>
@@ -68,9 +107,7 @@ const ReceptionistHomePage = () => {
           </div>
           <div className={styles.userDetails}>
             <div className={styles.userNameSection}>
-              <h2 className={styles.welcomeText}>
-                {getGreetingMessage()}
-              </h2>
+              <h2 className={styles.welcomeText}>{getGreetingMessage()}</h2>
               {receptionistProfile && (
                 <div className={styles.userMeta}>
                   {receptionistProfile.employeeId && (
@@ -87,9 +124,7 @@ const ReceptionistHomePage = () => {
           </div>
         </div>
       </div>
-      <ReceptionistProfile></ReceptionistProfile>
 
-      {/* Loading/Error States */}
       {loading && (
         <div className={styles.loadingSection}>
           <div className={styles.loadingSpinner}></div>
@@ -120,13 +155,19 @@ const ReceptionistHomePage = () => {
         </div>
       )}
 
-      {/* Thống kê tổng quan */}
+      {!loading && !error && (
+        <ReceptionistProfile
+          receptionistProfile={receptionistProfile}
+          refetchProfile={refetchProfile}
+        />
+      )}
+
       <div className={styles.statsSection}>
         <div className={styles.statsGrid}>
           {[
             {
               label: "Lịch hẹn hôm nay",
-              value: "24",
+              value: appointmentCounts.today,
               color: "blue",
               icon: (
                 <svg
@@ -149,7 +190,7 @@ const ReceptionistHomePage = () => {
             },
             {
               label: "Chờ xác nhận",
-              value: "12",
+              value: appointmentCounts.pending,
               color: "orange",
               icon: (
                 <svg
@@ -170,8 +211,8 @@ const ReceptionistHomePage = () => {
               ),
             },
             {
-              label: "Kết quả chờ nhập",
-              value: "5",
+              label: "Hoàn tất",
+              value: appointmentCounts.completed,
               color: "purple",
               icon: (
                 <svg
@@ -209,33 +250,10 @@ const ReceptionistHomePage = () => {
         </div>
       </div>
 
-      {/* Thao tác nhanh */}
       <div className={styles.quickActionsSection}>
         <h3 className={styles.sectionTitle}>Thao tác nhanh</h3>
         <div className={styles.actionsGrid}>
           {[
-            {
-              title: "Tạo lịch hẹn mới",
-              description: "Tạo lịch hẹn cho bệnh nhân",
-              icon: (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="32"
-                  height="32"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#4D3C2D"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14" />
-                  <path d="M12 5v14" />
-                </svg>
-              ),
-              color: "blue",
-              path: "/receptionist-dashboard/appointment",
-            },
             {
               title: "Xác nhận lịch hẹn",
               description: "Xác nhận các lịch hẹn đang chờ",
@@ -293,10 +311,7 @@ const ReceptionistHomePage = () => {
                 <p className={styles.actionDescription}>{action.description}</p>
               </div>
               <div className={styles.actionButton}>
-                <Button
-                  variant="primary"
-                  onClick={() => navigate(action.path)}
-                >
+                <Button variant="primary" onClick={() => navigate(action.path)}>
                   Thực hiện
                 </Button>
               </div>

@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import BaseModal from "@components/common/BaseModal/BaseModal";
 import styles from "./BookingForm.module.css";
 import useBookingForm from "@hooks/useBookingForm";
-import { useEffect } from "react";
 
 const BookingModal = ({ isOpen, onClose, onSuccess }) => {
   const {
@@ -13,19 +12,20 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
     errorMessage,
     doctors,
     timeSlots,
+    uploadedFiles,
     handleSubmit,
     handleInputChange,
+    handleFileSelection,
     handleClose,
-    handleTimeSlotFocus, // Thêm handler này
+    handleTimeSlotFocus,
     today,
     loadingSlots,
   } = useBookingForm(onClose);
 
-  // Khi booking thành công:
   useEffect(() => {
     if (showSuccess) {
-      handleClose(); // 1. Đóng modal
-      onSuccess?.(); // 2. Báo lên parent để show toast
+      handleClose();
+      onSuccess?.();
     }
   }, [showSuccess]);
 
@@ -42,9 +42,8 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
         )}
 
         <div className={styles.formContent}>
-          {/* Left Column - Doctor & Date */}
-          <div className={styles.leftColumn}>
-            {/* Doctor Selection */}
+          {/* Frame 1 - Doctor & Date */}
+          <div className={styles.frame}>
             <div className={styles.formGroup}>
               <label className={styles.label}>
                 Chọn bác sĩ <span className={styles.required}>*</span>
@@ -66,8 +65,6 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
                 <span className={styles.errorMessage}>{errors.doctorId}</span>
               )}
             </div>
-
-            {/* Date Selection */}
             <div className={styles.formGroup}>
               <label className={styles.label}>
                 Ngày khám <span className={styles.required}>*</span>
@@ -86,9 +83,8 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* Right Column - Time & Notes */}
-          <div className={styles.rightColumn}>
-            {/* Time Slot Selection */}
+          {/* Frame 2 - Time & Notes */}
+          <div className={styles.frame}>
             <div className={styles.formGroup}>
               <label className={styles.label}>
                 Giờ khám <span className={styles.required}>*</span>
@@ -97,7 +93,7 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
                 className={styles.select}
                 value={formData.timeSlot}
                 onChange={(e) => handleInputChange("timeSlot", e.target.value)}
-                onFocus={handleTimeSlotFocus} // Thêm handler này
+                onFocus={handleTimeSlotFocus}
                 disabled={isSubmitting || loadingSlots}
               >
                 <option value="">Chọn giờ khám</option>
@@ -113,16 +109,70 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
                 <span className={styles.errorMessage}>{errors.timeSlot}</span>
               )}
             </div>
-
-            {/* Notes Section */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>Ghi chú thêm</label>
+              <label className={styles.label + " flex items-center gap-1"}>
+                File đã tải lên
+                <span
+                  className={styles.infoIcon}
+                  title="Đây là file bạn đã tải lên từ trang quản lý hồ sơ cá nhân (Hồ sơ đính kèm)."
+                >
+                  ?
+                </span>
+              </label>
+              <div className={styles.fileList}>
+                {uploadedFiles.length > 0 ? (
+                  uploadedFiles.map((file) => (
+                    <div key={file.id} className={styles.fileCard}>
+                      <input
+                        type="checkbox"
+                        id={`file-${file.id}`}
+                        checked={formData.files?.includes(file.id) || false}
+                        onChange={() => handleFileSelection(file.id)}
+                        disabled={isSubmitting}
+                      />
+                      <label
+                        htmlFor={`file-${file.id}`}
+                        className={styles.fileLabel}
+                      >
+                        <div className={styles.filePreview}>
+                          {file.type.startsWith("image/") ? (
+                            <img
+                              src={file.url}
+                              alt={file.name}
+                              className={styles.fileImage}
+                            />
+                          ) : (
+                            <div className={styles.fileIcon}>📄</div>
+                          )}
+                          <span className={styles.fileName}>{file.name}</span>
+                        </div>
+                      </label>
+                    </div>
+                  ))
+                ) : (
+                  <p className={styles.noFiles}>Không có tài liệu nào.</p>
+                )}
+              </div>
+              {errors.files && (
+                <span className={styles.errorMessage}>{errors.files}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Frame 3 - Files */}
+          <div className={styles.frame}>
+            <div className={styles.formGroup}>
+              <label style={{gap: "1%"}} className={styles.label}>
+                Ghi chú thêm <p>{formData.notes.length}/100</p>
+              </label>
+
               <textarea
                 className={styles.textarea}
                 placeholder="Mô tả triệu chứng hoặc yêu cầu đặc biệt..."
                 value={formData.notes}
                 onChange={(e) => handleInputChange("notes", e.target.value)}
                 disabled={isSubmitting}
+                maxLength={100}
               />
             </div>
           </div>
@@ -130,14 +180,6 @@ const BookingModal = ({ isOpen, onClose, onSuccess }) => {
 
         {/* Buttons */}
         <div className={styles.buttonGroup}>
-          <button
-            type="button"
-            className={styles.cancelButton}
-            onClick={handleClose}
-            disabled={isSubmitting}
-          >
-            Hủy
-          </button>
           <button
             type="submit"
             className={styles.submitButton}

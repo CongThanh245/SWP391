@@ -237,7 +237,7 @@ const IntraUterineInseminationProcessCard: React.FC<IntraUterineInseminationProc
                     {/* Complete Process Button */}
                     {hasProcess && isProcessInProgress ? (
                         <Button variant="outline" size="sm" onClick={handleCompleteProcess} disabled={isLoadingAnyOperation}>
-                            <CheckCircle className="w-4 h-4 mr-2" /> Hoàn thành quy trình
+                              Hoàn thành quy trình
                         </Button>
                     ) : null}
 
@@ -327,9 +327,6 @@ const IntraUterineInseminationProcessCard: React.FC<IntraUterineInseminationProc
                         {isSaving && <Loader2 className="h-5 w-5 animate-spin mr-2 text-[color:var(--deep-taupe)]" />}
                         {saveError && <p className="text-red-500 text-sm mr-2">{saveError}</p>}
                         {saveSuccess && <p className="text-green-500 text-sm mr-2">Lưu thành công!</p>}
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>
-                            <X className="w-4 h-4 mr-2" /> Hủy
-                        </Button>
                         <Button onClick={handleSave} disabled={isSaving}>
                             <Save className="w-4 h-4 mr-2" /> Lưu
                         </Button>

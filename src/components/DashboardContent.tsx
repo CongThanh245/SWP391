@@ -1,33 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/card';
 import { Badge } from '@components/ui/badge';
-import { Button } from '@components/ui/button';
-import { 
-  Calendar, 
-  Users, 
-  Clock, 
-  TrendingUp, 
-  FileText, 
-  TestTube,
-  Heart,
-  Activity,
-  AlertTriangle
+import {
+  Calendar,
+  Users,
+  TrendingUp,
+  LineChart as LineChartIcon,
 } from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell,
+} from 'recharts';
+import { getDoctorTreatmentStats } from '@api/statsApi';
 
+// Giao diện DoctorStats từ API
 export interface DoctorStats {
-  ivfThisMonth: number;
-  iuiThisMonth: number;
-  completedTreatments: number;
-  totalPatients: number;
-  activePatients: number;
   todayAppointments: number;
+  diffFromYesterday: number;
+  activePatients: number;
+  newThisWeek: number;
+  completedTreatments: number;
+  completedRateChangeFromLastMonth: number;
+  successRateThisMonth: number;
+  successRateChangeFromLastMonth: number;
+  successRateByProtocol: { [key: string]: number };
+  treatmentDistribution: { [key: string]: number };
 }
 
 interface DashboardContentProps {
-  stats: DoctorStats;
+  // Không cần props vì dữ liệu lấy trực tiếp trong component
 }
 
-export const DashboardContent: React.FC<DashboardContentProps> = ({stats}) => {
+const COLORS = ['#4D3C2D', '#D9CAC2', '#C2D9CA', '#A2D9CC', '#B2D9C2'];
+
+export const DashboardContent: React.FC<DashboardContentProps> = () => {
+  const [stats, setStats] = useState<DoctorStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Gọi API khi component mount
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await getDoctorTreatmentStats();
+        setStats(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message || 'Đã xảy ra lỗi khi lấy dữ liệu');
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center">Đang tải...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-600">{error}</div>;
+  }
+
+  if (!stats) {
+    return <div className="text-center">Không có dữ liệu</div>;
+  }
+
+  // Chuẩn bị dữ liệu cho biểu đồ Tỉ lệ thành công theo phác đồ
+  const successRateByProtocolData = Object.keys(stats.successRateByProtocol).map((key) => ({
+    protocol: key, // e.g., IUI, IVF
+    rate: stats.successRateByProtocol[key], // Sử dụng trực tiếp giá trị từ API
+  }));
+
+  // Chuẩn bị dữ liệu cho biểu đồ phân bổ điều trị
+  const treatmentDistributionData = Object.keys(stats.treatmentDistribution)
+    .map((key) => ({
+      name: key,
+      value: stats.treatmentDistribution[key] || 0,
+    }))
+    .filter((item) => item.value > 0);
+
   return (
     <div className="space-y-6 theme-gradient-bg min-h-screen p-6">
       {/* Header */}
@@ -48,7 +100,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({stats}) => {
           <CardContent>
             <div className="text-2xl font-bold" style={{ color: '#4D3C2D' }}>{stats.todayAppointments}</div>
             <p className="text-xs text-gray-500 mt-1">
-              <span className="text-green-600">+2</span> so với hôm qua
+              <span className={stats.diffFromYesterday >= 0 ? "text-green-600" : "text-red-600"}>
+                {stats.diffFromYesterday >= 0 ? `+${stats.diffFromYesterday}` : stats.diffFromYesterday}{' '}
+              </span>
+              so với hôm qua
             </p>
           </CardContent>
         </Card>
@@ -61,7 +116,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({stats}) => {
           <CardContent>
             <div className="text-2xl font-bold" style={{ color: '#4D3C2D' }}>{stats.activePatients}</div>
             <p className="text-xs text-gray-500 mt-1">
-              <span className="text-blue-600">8</span> ca mới tuần này
+              <span className="text-blue-600">{stats.newThisWeek}</span> ca mới tuần này
             </p>
           </CardContent>
         </Card>
@@ -72,150 +127,93 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({stats}) => {
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">73%</div>
+            <div className="text-2xl font-bold text-green-600">{stats.successRateThisMonth}%</div>
             <p className="text-xs text-gray-500 mt-1">
-              <span className="text-green-600">+5%</span> so với tháng trước
+              <span className={stats.successRateChangeFromLastMonth >= 0 ? "text-green-600" : "text-red-600"}>
+                {stats.successRateChangeFromLastMonth >= 0 ? `+${stats.successRateChangeFromLastMonth}%` : `${stats.successRateChangeFromLastMonth}%`}
+              </span>{' '}
+              so với tháng trước
             </p>
           </CardContent>
         </Card>
 
-         <Card className="theme-card">
+        <Card className="theme-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Tổng số ca đã hoàn thành</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">73%</div>
+            <div className="text-2xl font-bold text-green-600">{stats.completedTreatments}</div>
             <p className="text-xs text-gray-500 mt-1">
-              <span className="text-green-600">+5%</span> so với tháng trước
+              <span className={stats.completedRateChangeFromLastMonth >= 0 ? "text-green-600" : "text-red-600"}>
+                {stats.completedRateChangeFromLastMonth >= 0 ? `+${stats.completedRateChangeFromLastMonth}%` : `${stats.completedRateChangeFromLastMonth}%`}
+              </span>{' '}
+              so với tháng trước
             </p>
           </CardContent>
         </Card>
-
       </div>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Today's Appointments */}
+        {/* Biểu đồ Tỉ lệ thành công theo phác đồ */}
         <Card className="lg:col-span-2 theme-card">
           <CardHeader>
             <CardTitle className="flex items-center" style={{ color: '#4D3C2D' }}>
-              <Calendar className="mr-2 h-5 w-5" />
-              Lịch hẹn hôm nay
+              <LineChartIcon className="mr-2 h-5 w-5" />
+              Tỉ lệ thành công theo phác đồ
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[
-                { time: '08:00', patient: 'BN001 - Nguyễn Thị A', purpose: 'Tái khám IVF', status: 'confirmed' },
-                { time: '09:30', patient: 'BN002 - Trần Văn B', purpose: 'Siêu âm theo dõi', status: 'waiting' },
-                { time: '10:15', patient: 'BN003 - Lê Thị C', purpose: 'Tư vấn IUI', status: 'confirmed' },
-                { time: '11:00', patient: 'BN004 - Phạm Thị D', purpose: 'Xem kết quả', status: 'completed' },
-              ].map((appointment, index) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-lg border" style={{ borderColor: '#D9CAC2' }}>
-                  <div className="flex items-center space-x-3">
-                    <div className="text-sm font-medium" style={{ color: '#4D3C2D' }}>{appointment.time}</div>
-                    <div>
-                      <div className="font-medium">{appointment.patient}</div>
-                      <div className="text-sm text-gray-500">{appointment.purpose}</div>
-                    </div>
-                  </div>
-                  <Badge 
-                    variant={appointment.status === 'completed' ? 'default' : 'secondary'}
-                    className={
-                      appointment.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                      appointment.status === 'waiting' ? 'theme-accent-bg' :
-                      'bg-gray-100 text-gray-800'
-                    }
-                  >
-                    {appointment.status === 'confirmed' ? 'Đã xác nhận' :
-                     appointment.status === 'waiting' ? 'Chờ khám' : 'Hoàn tất'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={successRateByProtocolData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#D9CAC2" />
+                <XAxis dataKey="protocol" stroke="#4D3C2D" /> 
+                <YAxis unit="%" stroke="#4D3C2D" />
+                <Tooltip formatter={(value) => `${value}%`} />
+                Ascending
+                <Bar dataKey="rate" fill="#4D3C2D" />
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Quick Actions & Stats */}
-        <div className="space-y-6">
-          {/* Quick Actions */}
-          <Card className="theme-card">
-            <CardHeader>
-              <CardTitle style={{ color: '#4D3C2D' }}>Thao tác nhanh</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start border-[#D9CAC2] text-[#4D3C2D] hover:bg-[#D9CAC2]">
-                <TestTube className="mr-2 h-4 w-4" />
-                Xem kết quả xét nghiệm mới
-              </Button>
-              <Button variant="outline" className="w-full justify-start border-[#D9CAC2] text-[#4D3C2D] hover:bg-[#D9CAC2]">
-                <FileText className="mr-2 h-4 w-4" />
-                Hồ sơ truy cập gần đây
-              </Button>
-              <Button variant="outline" className="w-full justify-start border-[#D9CAC2] text-[#4D3C2D] hover:bg-[#D9CAC2]">
-                <Heart className="mr-2 h-4 w-4" />
-                Theo dõi ca đặc biệt
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Treatment Stats */}
-          <Card className="theme-card">
-            <CardHeader>
-              <CardTitle style={{ color: '#4D3C2D' }}>Thống kê điều trị</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">IVF tháng này:</span>
-                <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.ivfThisMonth} ca</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">IUI tháng này:</span>
-                <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.iuiThisMonth} ca</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Hoàn tất điều trị:</span>
-                <span className="font-semibold text-green-600">{stats.completedTreatments} ca</span>
-              </div>
-              <div className="pt-2 border-t" style={{ borderColor: '#D9CAC2' }}>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Tổng bệnh nhân:</span>
-                  <span className="font-semibold" style={{ color: '#4D3C2D' }}>{stats.totalPatients}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Biểu đồ Phân bổ loại điều trị */}
+        <Card className="theme-card">
+          <CardHeader>
+            <CardTitle style={{ color: '#4D3C2D' }}>Phân bổ loại điều trị</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {treatmentDistributionData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={treatmentDistributionData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, value }) => `${name} (${value})`}
+                  >
+                    {treatmentDistributionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => `${value}`} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-center text-gray-500 pt-10">Không có dữ liệu phân bổ điều trị.</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
-
-      {/* Recent Activity */}
-      <Card className="theme-card">
-        <CardHeader>
-          <CardTitle className="flex items-center" style={{ color: '#4D3C2D' }}>
-            <Activity className="mr-2 h-5 w-5" />
-            Hoạt động gần đây
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[
-              { time: '2 giờ trước', action: 'Cập nhật hồ sơ BN001 - Kết quả IVF cycle 2' },
-              { time: '4 giờ trước', action: 'Thêm lịch hẹn cho BN005 - Tư vấn điều trị' },
-              { time: '1 ngày trước', action: 'Hoàn tất điều trị BN003 - IUI thành công' },
-              { time: '2 ngày trước', action: 'Xem kết quả xét nghiệm BN007 - Hormone profile' },
-            ].map((activity, index) => (
-              <div key={index} className="flex items-start space-x-3 p-2 rounded border-l-4" style={{ borderLeftColor: '#D9CAC2' }}>
-                <Clock className="h-4 w-4 mt-0.5" style={{ color: '#4D3C2D' }} />
-                <div>
-                  <div className="text-sm text-gray-500">{activity.time}</div>
-                  <div className="text-sm">{activity.action}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

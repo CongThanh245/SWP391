@@ -1,31 +1,39 @@
-
 .carouselContainer {
   position: relative;
   display: flex;
   align-items: center;
   padding: 5rem 0 8rem 0;
   margin: 0 auto;
-  background-color: #EAE4E1;
+  background: var(--secondary-background);
   justify-content: center;
 }
 
+[data-theme="dark"] .carouselContainer {
+  background: var(--light-background);
+}
+
 .carouselWrapper {
-  width: 1064px; /* Width of 4 cards (266px * 4) */
+  width: 1064px; /* 4 * (266px card + 16px margin) */
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .carousel {
   display: flex;
   transition: transform 0.5s ease;
-  width: max-content; /* Allow content to determine width */
+  width: max-content;
 }
+
 .carouseTitle {
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--error-color);
-    margin-bottom: 16px;
-    justify-self: center;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-accent);
+  margin-bottom: 16px;
+  text-align: center;
 }
+
 .carouselItem {
   flex: 0 0 auto;
   width: 250px;
@@ -33,24 +41,68 @@
 }
 
 .scrollButton {
-  background-color: white;
-  border: none;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-dark-gray);
   margin: 0 8px;
   z-index: 1;
-  transition: background-color 0.2s;
+  transition: background 0.2s ease, transform 0.2s ease;
   flex-shrink: 0;
 }
 
-.scrollButton:hover {
-  background-color: #f0f0f0;
+.scrollButton:hover:not(:disabled) {
+  background: var(--button-hover-bg);
+  transform: translateY(-2px);
 }
 
 .scrollButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background-color: #f0f0f0;
+  background: var(--card-background-alpha);
+}
+
+.viewMoreLinkUnderline {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-accent);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.viewMoreLinkUnderline:hover {
+  color: var(--button-hover-bg);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 1064px) {
+  .carouselWrapper {
+    width: 100%;
+    padding: 0 var(--spacing-md);
+  }
+
+  .carouselItem {
+    width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .carouselContainer {
+    padding: 3rem 0 5rem 0;
+  }
+
+  .carouseTitle {
+    font-size: var(--font-size-xl);
+  }
+
+  .viewMoreLinkUnderline {
+    font-size: var(--font-size-base);
+  }
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Search, User, Phone, Calendar, X, Heart, Users } from "lucide-react";
+import { Search, User, Phone, Calendar } from "lucide-react";
 import { getPatients, getPatientDetails } from "@api/patientApi";
+import PatientDetailsModal from "@features/patient/components/PatientDetailsModal/PatientDetailsModal";
 import styles from "./PatientList.module.css";
 
 const PatientList = () => {
@@ -67,21 +68,6 @@ const PatientList = () => {
     }
   };
 
-  const getMaritalStatusText = (status) => {
-    switch (status) {
-      case "Single":
-        return "Độc thân";
-      case "Married":
-        return "Đã kết hôn";
-      case "Divorced":
-        return "Đã ly hôn";
-      case "Widowed":
-        return "Góa";
-      default:
-        return "Chưa xác định";
-    }
-  };
-
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return "N/A";
     const today = new Date();
@@ -125,7 +111,7 @@ const PatientList = () => {
       <div className={styles.patientGrid}>
         {filteredPatients.length === 0 ? (
           <div className={styles.noResults}>
-            <User size={48} />
+            <User style={{justifySelf: "center", marginBottom:"20px"}}  size={48} />
             <h3>Không tìm thấy bệnh nhân</h3>
             <p>Thử tìm kiếm với từ khóa khác</p>
           </div>
@@ -172,189 +158,11 @@ const PatientList = () => {
         )}
       </div>
 
-      {isModalOpen && selectedPatient && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <div className={styles.modalTitle}>
-                <h3>Thông tin chi tiết bệnh nhân</h3>
-                <p>ID: {selectedPatient.patientId}</p>
-                <div className={styles.infoItem}>
-                  <label>Trạng thái hồ sơ:</label>
-                  <span
-                    className={
-                      selectedPatient.profileCompleted
-                        ? styles.statusActive
-                        : styles.statusInactive
-                    }
-                  >
-                    {selectedPatient.profileCompleted
-                      ? "Đã hoàn thiện"
-                      : "Chưa hoàn thiện"}
-                  </span>
-                </div>
-              </div>
-              <button
-                className={styles.closeButton}
-                onClick={() => setIsModalOpen(false)}
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className={styles.modalContent}>
-              {/* Thông tin cơ bản */}
-              <div className={styles.modalSection}>
-                <div className={styles.sectionHeader}>
-                  <User size={20} />
-                  <h4>Thông tin cơ bản</h4>
-                </div>
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoItem}>
-                    <label>Họ và tên:</label>
-                    <span>{selectedPatient.patientName}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Tuổi:</label>
-                    <span>
-                      {calculateAge(selectedPatient.dateOfBirth)} tuổi
-                    </span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Giới tính:</label>
-                    <span>{getGenderText(selectedPatient.gender)}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Ngày sinh:</label>
-                    <span>{formatDate(selectedPatient.dateOfBirth)}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Thông tin liên lạc */}
-              <div className={styles.modalSection}>
-                <div className={styles.sectionHeader}>
-                  <Phone size={20} />
-                  <h4>Thông tin liên lạc</h4>
-                </div>
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoItem}>
-                    <label>Email:</label>
-                    <span>{selectedPatient.email || "Chưa có thông tin"}</span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Số điện thoại:</label>
-                    <span>
-                      {selectedPatient.patientPhone || "Chưa có thông tin"}
-                    </span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Địa chỉ:</label>
-                    <span>
-                      {selectedPatient.patientAddress || "Chưa có thông tin"}
-                    </span>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <label>Liên hệ khẩn cấp:</label>
-                    <span>
-                      {selectedPatient.emergencyContact || "Chưa có thông tin"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tình trạng hôn nhân */}
-              <div className={styles.modalSection}>
-                <div className={styles.sectionHeader}>
-                  <Heart size={20} />
-                  <h4>Tình trạng hôn nhân</h4>
-                </div>
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoItem}>
-                    <label>Tình trạng:</label>
-                    <span>
-                      {getMaritalStatusText(selectedPatient.maritalStatus)}
-                    </span>
-                  </div>
-                  {selectedPatient.marriageDate &&
-                    selectedPatient.maritalStatus !== "Single" && (
-                      <div className={styles.infoItem}>
-                        <label>Ngày kết hôn:</label>
-                        <span>{formatDate(selectedPatient.marriageDate)}</span>
-                      </div>
-                    )}
-                </div>
-              </div>
-
-              {/* Thông tin vợ/chồng (nếu có) */}
-              {selectedPatient.maritalStatus === "Married" &&
-                selectedPatient.spousePatientName && (
-                  <div className={styles.modalSection}>
-                    <div className={styles.sectionHeader}>
-                      <Users size={20} />
-                      <h4>Thông tin vợ/chồng</h4>
-                    </div>
-                    <div className={styles.infoGrid}>
-                      <div className={styles.infoItem}>
-                        <label>Họ và tên:</label>
-                        <span>{selectedPatient.spousePatientName}</span>
-                      </div>
-                      <div className={styles.infoItem}>
-                        <label>Giới tính:</label>
-                        <span>
-                          {getGenderText(selectedPatient.spouseGender)}
-                        </span>
-                      </div>
-                      <div className={styles.infoItem}>
-                        <label>Ngày sinh:</label>
-                        <span>
-                          {formatDate(selectedPatient.spouseDateOfBirth)}
-                        </span>
-                      </div>
-                      <div className={styles.infoItem}>
-                        <label>Ngày tham gia:</label>
-                        <span>{formatDate(selectedPatient.joinDate)}</span>
-                      </div>
-                      <div className={styles.infoItem}>
-                        <label>Số điện thoại:</label>
-                        <span>
-                          {selectedPatient.spousePatientPhone ||
-                            "Chưa có thông tin"}
-                        </span>
-                      </div>
-                      <div className={styles.infoItem}>
-                        <label>Địa chỉ:</label>
-                        <span>
-                          {selectedPatient.spousePatientAddress ||
-                            "Chưa có thông tin"}
-                        </span>
-                      </div>
-                      <div className={styles.infoItem}>
-                        <label>Liên hệ khẩn cấp:</label>
-                        <span>
-                          {selectedPatient.spouseEmergencyContact ||
-                            "Chưa có thông tin"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-            </div>
-
-            <div className={styles.modalFooter}>
-              <button
-                className={styles.modalCloseButton}
-                onClick={() => setIsModalOpen(false)}
-              >
-                Đóng
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <PatientDetailsModal
+        patient={selectedPatient}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };

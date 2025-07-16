@@ -1,9 +1,27 @@
-/* DoctorCard.module.css */
+.doctorCard {
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--border-radius-1);
+  overflow: hidden;
+  box-shadow: var(--shadow-dark-gray);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
 
+[data-theme="dark"] .doctorCard {
+  background: var(--card-background);
+  border-color: var(--card-hover-border);
+}
+
+.doctorCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-dark-gray);
+  border-color: var(--card-hover-border);
+}
 
 /* Basic Info - Left content */
 .basicInfo {
   width: 100%;
+  padding: var(--spacing-md);
 }
 
 .doctorName {
@@ -24,6 +42,11 @@
   margin-bottom: var(--spacing-sm);
 }
 
+[data-theme="dark"] .genderBadge {
+  background: var(--card-background-alpha);
+  color: var(--text-accent);
+}
+
 .experience {
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
@@ -34,7 +57,8 @@
 .doctorDetails {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
 }
 
 .section {
@@ -72,7 +96,7 @@
 }
 
 .specializationTag {
-  background: var(--secondary-background);
+  background: var(--card-background-alpha);
   color: var(--text-accent);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius-1);
@@ -82,37 +106,15 @@
   transition: all 0.2s ease;
 }
 
+[data-theme="dark"] .specializationTag {
+  background: var(--card-background-alpha);
+  border-color: var(--card-hover-border);
+}
+
 .specializationTag:hover {
   background: var(--deep-taupe);
   color: var(--button-primary-text);
-}
-
-/* Contact Grid */
-.contactGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-xs);
-}
-
-.contactItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--spacing-sm);
-}
-
-.contactLabel {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.contactValue {
-  font-size: var(--font-size-sm);
-  color: var(--text-primary);
-  text-align: right;
-  word-break: break-word;
+  border-color: var(--card-hover-border);
 }
 
 /* Achievements */
@@ -143,6 +145,10 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .doctorCard {
+    padding: var(--spacing-sm);
+  }
+
   .doctorName {
     font-size: var(--font-size-base);
   }
@@ -150,19 +156,14 @@
   .doctorDetails {
     gap: var(--spacing-md);
   }
-  
-  .contactItem {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .contactValue {
-    text-align: left;
-  }
 }
 
 @media (max-width: 480px) {
   .specializationTags {
     justify-content: center;
+  }
+
+  .basicInfo, .doctorDetails {
+    padding: var(--spacing-sm);
   }
 }

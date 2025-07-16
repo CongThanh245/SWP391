@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect  } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/card';
 import { Button } from '@components/ui/button';
 import { Badge } from '@components/ui/badge';
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, Filter, Calendar, FileText } from 'lucide-react';
 import { Input } from '@components/ui/input';
 import { getPatientList } from '@api/doctorApi'
-import {formatDate} from '@utils/format'
+import { formatDate } from '@utils/format'
 
 interface PatientsContentProps {
     onPatientSelect?: (patientId: string) => void;
@@ -27,8 +27,6 @@ interface Patient {
 
 export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelect }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState<'all' | 'waiting' | 'treating' | 'completed'>('all');
-    const [stageFilter, setStageFilter] = useState<'all' | 'specialist' | 'intervention' | 'post-intervention'>('all');
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [patients, setPatients] = useState<Patient[]>([]);
@@ -45,19 +43,31 @@ export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelec
                 setTotalPages(data.totalPages);
 
                 const converted = data.content.map((item, index) => {
-                    const last = new Date(item.lastAppointmentDate);
-                    const next = new Date(item.nextAppointmentDate);
-                    const dateStrLast = formatDate(last.toISOString().split('T')[0]);
-                    const dateStrNext = formatDate(next.toISOString().split('T')[0]);
+                    let dateStrLast = 'Chưa có thông tin';
+                    if (item.lastAppointmentDate) { // Chỉ xử lý nếu có giá trị
+                        const last = new Date(item.lastAppointmentDate);
+                        // Kiểm tra xem date có hợp lệ không trước khi format
+                        if (!isNaN(last.getTime())) { // isNaN(date.getTime()) là cách đáng tin cậy để kiểm tra Invalid Date
+                            dateStrLast = formatDate(last.toISOString().split('T')[0]);
+                        }
+                    }
+
+                    let dateStrNext = 'Chưa có thông tin'; // Giá trị mặc định nếu không có dữ liệu
+                    if (item.nextAppointmentDate) { // Chỉ xử lý nếu có giá trị
+                        const next = new Date(item.nextAppointmentDate);
+                        if (!isNaN(next.getTime())) {
+                            dateStrNext = formatDate(next.toISOString().split('T')[0]);
+                        }
+                    }
 
                     return {
                         id: currentPage * 4 + index + 1,
                         patientId: item.patientId,
                         patientName: item.patientName,
                         age: item.age,
-                        treatmentStatus: item.treatmentStatus || 'unknown',
-                        interventionType: item.interventionType || 'N/A',
-                        treatmentStage: item.treatmentStage || 'unknown',
+                        treatmentStatus: item.treatmentStatus || 'chưa có thông tin',
+                        interventionType: item.interventionType || 'chưa có thông tin',
+                        treatmentStage: item.treatmentStage || 'chưa có thông tin',
                         lastAppointmentDate: dateStrLast,
                         nextAppointmentDate: dateStrNext
                     };
@@ -70,31 +80,31 @@ export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelec
         };
 
         fetchPatientList();
-    }, [searchTerm, statusFilter, currentPage]);
+    }, [searchTerm, currentPage]);
 
 
 
-   
+
 
     const filteredPatients = patients.filter(patient => {
         const matchesSearch = patient.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             patient.patientId.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === 'all' || patient.treatmentStatus === statusFilter;
-        const matchesStage = stageFilter === 'all' || patient.treatmentStage === stageFilter;
 
-        return matchesSearch && matchesStatus && matchesStage;
+        return matchesSearch;
     });
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'IN_PROGRESS':
+            case 'ACTIVE':
                 return <Badge variant="secondary">Chờ khám</Badge>;
-            case 'treating':
+            case 'IN_PROGRESS':
                 return <Badge className="bg-blue-100 text-blue-800">Đang điều trị</Badge>;
-            case 'completed':
+            case 'COMPLETED':
                 return <Badge className="bg-green-100 text-green-800">Hoàn tất</Badge>;
+            case 'CANCELLED':
+                return <Badge className="bg-green-100 text-green-800">Đã hủy bỏ</Badge>;
             default:
-                return <Badge variant="outline">{status}</Badge>;
+                return <Badge variant="outline">Chưa biết</Badge>;
         }
     };
 
@@ -102,12 +112,12 @@ export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelec
         switch (stage) {
             case 'PREPARATION':
                 return <Badge variant="outline" className="bg-yellow-50 text-yellow-700">Chuyên khoa</Badge>;
-            case 'intervention':
+            case 'INTERVENTION':
                 return <Badge variant="outline" className="bg-purple-50 text-purple-700">Can thiệp</Badge>;
-            case 'post-intervention':
+            case 'POST_INTERVENTION':
                 return <Badge variant="outline" className="bg-indigo-50 text-indigo-700">Hậu can thiệp</Badge>;
             default:
-                return <Badge variant="outline">{stage}</Badge>;
+                return <Badge variant="outline">Chưa có thông tin</Badge>;
         }
     };
 
@@ -143,36 +153,7 @@ export const PatientsContent: React.FC<PatientsContentProps> = ({ onPatientSelec
                             </div>
                         </div>
 
-                        <div className="flex items-center space-x-2">
-                            <Filter className="h-4 w-4" style={{ color: '#4D3C2D' }} />
-                            <span className="text-sm font-medium" style={{ color: '#4D3C2D' }}>Trạng thái:</span>
-                            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as 'all' | 'waiting' | 'treating' | 'completed')}>
-                                <SelectTrigger className="w-40 border-[#D9CAC2] focus:ring-[#4D3C2D]">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Tất cả</SelectItem>
-                                    <SelectItem value="waiting">Chờ khám</SelectItem>
-                                    <SelectItem value="treating">Đang điều trị</SelectItem>
-                                    <SelectItem value="completed">Hoàn tất</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
 
-                        <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium" style={{ color: '#4D3C2D' }}>Giai đoạn:</span>
-                            <Select value={stageFilter} onValueChange={(value) => setStageFilter(value as 'all' | 'specialist' | 'intervention' | 'post-intervention')}>
-                                <SelectTrigger className="w-40 border-[#D9CAC2] focus:ring-[#4D3C2D]">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Tất cả</SelectItem>
-                                    <SelectItem value="specialist">Chuyên khoa</SelectItem>
-                                    <SelectItem value="intervention">Can thiệp</SelectItem>
-                                    <SelectItem value="post-intervention">Hậu can thiệp</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
                     </div>
                 </CardContent>
             </Card>

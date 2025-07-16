@@ -6,38 +6,57 @@ import { Button } from '@components/ui/button';
 import { Label } from '@components/ui/label';
 import { Textarea } from '@components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui/select';
-import { Plus, Loader2, Edit, Save, X, Trash2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@components/ui/dialog';
+import { Plus, Loader2, Edit, Save, X, CheckCircle, Ban, Trash2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@components/ui/dialog';
 import { formatDate } from '@utils/format';
-import { getMedicationList, getOvarianStimulationProcess, updateOvarianStimulationProcess } from '@api/doctorInterventionApi';
+import {
+    getMedicationList,
+    getOvarianStimulationProcess,
+    updateOvarianStimulationProcess,
+    completeOvarianStimulationProcess,
+    cancelOvarianStimulationProcess,
+} from '@api/doctorInterventionApi';
 
 // Re-declare interfaces or import them from a shared types file
 interface Medication { id: string; name: string; }
 interface PrescriptionItem { medicationId: string; drugName?: string; dosage: string; frequency: string; duration: string; quantity: number; }
 interface Prescription { dateIssued: string; notes: string; items: PrescriptionItem[]; }
-interface OvarianStimulationData { prescription: Prescription; startDate: string; drugResponse: string; }
+
+// Define possible statuses with your specific enum values
+type OvarianStimulationStatus = 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+interface OvarianStimulationData {
+    prescription: Prescription;
+    startDate: string;
+    drugResponse: string;
+    status: OvarianStimulationStatus; // Corrected status field
+}
 
 // New component for the Prescription Item Dialog
-import PrescriptionItemFormDialog from './PrescriptionItemFormDialog'; // Create this file
+import PrescriptionItemFormDialog from './PrescriptionItemFormDialog';
 
 interface OvarianStimulationProtocolCardProps {
     patientId: string;
 }
 
 const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardProps> = ({ patientId }) => {
-    // 1. Initialize ovarianStimulationData with a default value using a function
     const [ovarianStimulationData, setOvarianStimulationData] = useState<OvarianStimulationData>(() => ({
         prescription: { dateIssued: new Date().toISOString().split('T')[0], notes: '', items: [] },
         startDate: new Date().toISOString().split('T')[0],
         drugResponse: '',
+        status: 'IN_PROGRESS' // Default status changed to IN_PROGRESS
     }));
 
     const [isOvarianStimulationDialogOpen, setIsOvarianStimulationDialogOpen] = useState(false);
     const [isLoadingOvarianStimulation, setIsLoadingOvarianStimulation] = useState(false);
     const [errorOvarianStimulation, setErrorOvarianStimulation] = useState<string | null>(null);
+
     const [isSavingOvarianStimulation, setIsSavingOvarianStimulation] = useState(false);
     const [saveErrorOvarianStimulation, setSaveErrorOvarianStimulation] = useState<string | null>(null);
     const [saveSuccessOvarianStimulation, setSaveSuccessOvarianStimulation] = useState(false);
+
+    const [isCompleting, setIsCompleting] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
 
     const [medicationList, setMedicationList] = useState<Medication[]>([]);
     const [isLoadingMedicationList, setIsLoadingMedicationList] = useState(false);
@@ -65,49 +84,59 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
             }
         };
         fetchMedications();
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
 
     // Fetch ovarian stimulation data when patientId or medicationList changes
     useEffect(() => {
         const fetchOvarianStimulationData = async () => {
-            if (!patientId || medicationList.length === 0) return; // Ensure patientId and medicationList are ready
+            if (!patientId || medicationList.length === 0) return;
 
             setIsLoadingOvarianStimulation(true);
             setErrorOvarianStimulation(null);
             try {
-                const data = await getOvarianStimulationProcess(patientId);
+                // *** THE FIX IS HERE: Cast the fetched data to OvarianStimulationData ***
+                const data = (await getOvarianStimulationProcess(patientId)) as OvarianStimulationData;
+
                 console.log("Fetched ovarian stimulation data:", data); // For debugging
                 if (data) {
+                    // Ensure the status from the fetched data is one of the valid enum values
+                    // This is a defensive check in case the API returns an unexpected string
+                    const validatedStatus: OvarianStimulationStatus = ['IN_PROGRESS', 'COMPLETED', 'CANCELLED'].includes(data.status)
+                        ? data.status
+                        : 'IN_PROGRESS'; // Default to IN_PROGRESS if API returns an unrecognized status
+
                     const itemsWithDrugNames = data.prescription.items.map((item) => ({
                         ...item,
                         drugName: medicationList.find(med => med.id === item.medicationId)?.name || 'Thuốc không xác định'
                     }));
+
                     setOvarianStimulationData({
-                        ...data,
+                        ...data, // This spreads all properties from 'data'
+                        status: validatedStatus, // Explicitly use the validated status
                         prescription: {
                             ...data.prescription,
                             items: itemsWithDrugNames
                         }
                     });
                 } else {
-                    // 2. IMPORTANT: If no data is found, and ovarianStimulationData is already
-                    // the default empty object, do not set state again with a new object.
-                    // Only reset to the default if it was previously populated with data
-                    // and now no data is found for the patient (e.g., patient changed).
-                    // Since we initialize `ovarianStimulationData` to a default,
-                    // we can often remove this else block, or ensure it only resets
-                    // if the *current* `ovarianStimulationData` is NOT the default already.
-                    // For now, removing it is the simplest fix if the goal is to always
-                    // show an empty form when no data is fetched.
-                    // If you *must* explicitly set it to the default, ensure it's a stable object.
-                    // For example, if you set it to a new object, it will cause a re-render.
-                    // Given the useState initialization, this `else` block can likely be removed.
+                    // If no data is found, reset to default 'IN_PROGRESS' state to allow new input
+                    setOvarianStimulationData(() => ({
+                        prescription: { dateIssued: new Date().toISOString().split('T')[0], notes: '', items: [] },
+                        startDate: new Date().toISOString().split('T')[0],
+                        drugResponse: '',
+                        status: 'IN_PROGRESS' // Reset to IN_PROGRESS
+                    }));
                 }
             } catch (error) {
                 console.error("Failed to fetch ovarian stimulation process:", error);
                 setErrorOvarianStimulation("Không thể tải dữ liệu phác đồ kích thích buồng trứng.");
-                // Optionally, reset to default on error if desired, but ensure it doesn't cause a loop
-                // setOvarianStimulationData(initialDefaultOvarianStimulationData); // if you define this outside
+                // Reset to default on error as well
+                setOvarianStimulationData(() => ({
+                    prescription: { dateIssued: new Date().toISOString().split('T')[0], notes: '', items: [] },
+                    startDate: new Date().toISOString().split('T')[0],
+                    drugResponse: '',
+                    status: 'IN_PROGRESS' // Reset to IN_PROGRESS
+                }));
             } finally {
                 setIsLoadingOvarianStimulation(false);
             }
@@ -118,8 +147,7 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
 
     const handleOvarianStimulationChange = (field: string, value, subField?: string) => {
         setOvarianStimulationData(prev => {
-            // prev is guaranteed to be a valid OvarianStimulationData object now due to useState initialization
-            if (field === 'startDate' || field === 'drugResponse') {
+            if (field === 'startDate' || field === 'drugResponse') { // Status is not changed via this handler
                 return { ...prev, [field]: value };
             }
             if (field === 'prescription' && subField) {
@@ -131,7 +159,7 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                     },
                 };
             }
-            return prev; // Should not happen with valid field/subField combinations
+            return prev;
         });
     };
 
@@ -182,7 +210,6 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
     };
 
     const handleSaveOvarianStimulation = useCallback(async () => {
-        // ovarianStimulationData is guaranteed to be non-null now
         if (!patientId) {
             setSaveErrorOvarianStimulation("Dữ liệu bệnh nhân không hợp lệ để lưu.");
             return;
@@ -197,6 +224,7 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                 ...ovarianStimulationData,
                 prescription: {
                     ...ovarianStimulationData.prescription,
+                    // Remove drugName before sending as it's a UI-only field
                     items: ovarianStimulationData.prescription.items.map(({ drugName, ...rest }) => rest)
                 }
             };
@@ -212,15 +240,88 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
         } finally {
             setIsSavingOvarianStimulation(false);
         }
-    }, [patientId, ovarianStimulationData]); // Dependencies for useCallback
+    }, [patientId, ovarianStimulationData]);
+
+    const handleCompleteOvarianStimulation = useCallback(async () => {
+        if (!patientId) {
+            setErrorOvarianStimulation("Dữ liệu bệnh nhân không hợp lệ để hoàn thành.");
+            return;
+        }
+        setIsCompleting(true);
+        setErrorOvarianStimulation(null);
+        try {
+            await completeOvarianStimulationProcess(patientId);
+            setOvarianStimulationData(prev => ({ ...prev, status: 'COMPLETED' }));
+            alert("Phác đồ đã được đánh dấu là HOÀN THÀNH.");
+            setIsOvarianStimulationDialogOpen(false); // Close dialog on success
+        } catch (error) {
+            console.error("Failed to complete ovarian stimulation process:", error);
+            setErrorOvarianStimulation(error.response?.data?.message || "Không thể hoàn thành phác đồ kích thích buồng trứng.");
+        } finally {
+            setIsCompleting(false);
+        }
+    }, [patientId]);
+
+    const handleCancelOvarianStimulation = useCallback(async () => {
+        if (!patientId) {
+            setErrorOvarianStimulation("Dữ liệu bệnh nhân không hợp lệ để hủy.");
+            return;
+        }
+        setIsCancelling(true);
+        setErrorOvarianStimulation(null);
+        try {
+            await cancelOvarianStimulationProcess(patientId);
+            setOvarianStimulationData(prev => ({ ...prev, status: 'CANCELLED' }));
+            alert("Phác đồ đã được đánh dấu là ĐÃ HỦY.");
+            setIsOvarianStimulationDialogOpen(false); // Close dialog on success
+        } catch (error) {
+            console.error("Failed to cancel ovarian stimulation process:", error);
+            setErrorOvarianStimulation(error.response?.data?.message || "Không thể hủy phác đồ kích thích buồng trứng.");
+        } finally {
+            setIsCancelling(false);
+        }
+    }, [patientId]);
 
     const renderValue = (value) => value || 'N/A';
+    const renderDrugResponse = (value: string | undefined | null): string => {
+    if (!value) {
+      return "Không xác định"; // Hoặc một chuỗi mặc định khác
+    }
+    switch (value) {
+      case "EFFECTIVE":
+        return "Hiệu quả";
+      case "INEFFECTIVE":
+        return "Không hiệu quả";
+      case "UNCLEAR":
+        return "Chưa rõ";
+      default:
+        return value;
+    }
+  };
+
+    // Determine if the form should be editable
+    const isEditable = ovarianStimulationData.status === 'IN_PROGRESS';
+    const isOperationInProgress = isSavingOvarianStimulation || isCompleting || isCancelling;
+
+    // Helper to render status in Vietnamese
+    const renderStatusInVietnamese = (status: OvarianStimulationStatus) => {
+        switch (status) {
+            case 'IN_PROGRESS':
+                return 'Đang tiến hành';
+            case 'COMPLETED':
+                return 'Đã hoàn thành';
+            case 'CANCELLED':
+                return 'Đã hủy';
+            default:
+                return 'Không xác định';
+        }
+    };
 
     return (
         <Card className="p-6 bg-white border border-[color:var(--card-border)]">
             <h3 className="text-lg font-semibold mb-4 flex items-center justify-between text-[color:var(--text-accent)]">
                 Phác đồ kích thích buồng trứng / Tiêm kích trứng
-                <Button variant="outline" size="sm" onClick={() => setIsOvarianStimulationDialogOpen(true)} className="ml-2">
+                <Button variant="outline" size="sm" onClick={() => setIsOvarianStimulationDialogOpen(true)} className="ml-2" disabled={isOperationInProgress}>
                     <Edit className="w-4 h-4 mr-2" /> {ovarianStimulationData.prescription.items.length > 0 || ovarianStimulationData.startDate ? 'Chỉnh sửa' : 'Nhập liệu'}
                 </Button>
             </h3>
@@ -240,8 +341,7 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
 
             {!isLoadingOvarianStimulation && !errorOvarianStimulation && (
                 <>
-                    {/* Check for data presence more robustly now that it's never null */}
-                    {(!ovarianStimulationData.prescription.items.length && !ovarianStimulationData.startDate && !ovarianStimulationData.drugResponse) ? (
+                    {(!ovarianStimulationData.prescription.items.length && !ovarianStimulationData.startDate && !ovarianStimulationData.drugResponse && ovarianStimulationData.status === 'IN_PROGRESS') ? (
                         <p className="text-center text-[color:var(--text-secondary)] mb-4">Chưa có dữ liệu phác đồ kích thích buồng trứng.</p>
                     ) : (
                         <div className="space-y-4">
@@ -252,7 +352,11 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                                 </div>
                                 <div>
                                     <Label>Đáp ứng thuốc</Label>
-                                    <p className="font-medium">{renderValue(ovarianStimulationData.drugResponse)}</p>
+                                    <p className="font-medium">{renderDrugResponse(ovarianStimulationData.drugResponse)}</p>
+                                </div>
+                                <div>
+                                    <Label>Trạng thái</Label>
+                                    <p className="font-medium">{renderStatusInVietnamese(ovarianStimulationData.status)}</p>
                                 </div>
                             </div>
 
@@ -295,39 +399,48 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
             )}
 
             <Dialog open={isOvarianStimulationDialogOpen} onOpenChange={setIsOvarianStimulationDialogOpen}>
-                <DialogContent className="sm:max-w-[700px] p-6">
+                <DialogContent className="sm:max-w-[700px] p-6 max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>{ovarianStimulationData.prescription.items.length > 0 || ovarianStimulationData.startDate ? 'Chỉnh sửa' : 'Nhập liệu'} Phác đồ kích thích buồng trứng</DialogTitle>
+                        <DialogTitle>{isEditable ? 'Chỉnh sửa' : 'Xem'} Phác đồ kích thích buồng trứng</DialogTitle>
+                        <DialogDescription>
+                            {isEditable ? "Cập nhật thông tin và đơn thuốc cho phác đồ kích thích buồng trứng." : "Phác đồ đã hoàn thành hoặc bị hủy, không thể chỉnh sửa."}
+                        </DialogDescription>
                     </DialogHeader>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
                         <div className="space-y-2">
                             <Label>Ngày bắt đầu</Label>
                             <Input
                                 type="date"
-                                value={ovarianStimulationData.startDate || ''} // Use || '' for controlled component
+                                value={ovarianStimulationData.startDate || ''}
                                 onChange={(e) => handleOvarianStimulationChange('startDate', e.target.value)}
-                                disabled={isSavingOvarianStimulation}
+                                disabled={!isEditable || isSavingOvarianStimulation}
                             />
                         </div>
                         <div className="space-y-2">
                             <Label>Đáp ứng thuốc</Label>
                             <Select
-                                value={ovarianStimulationData.drugResponse || ''} // Use || '' for controlled component
+                                value={ovarianStimulationData.drugResponse || ''}
                                 onValueChange={(value) => handleOvarianStimulationChange('drugResponse', value)}
-                                disabled={isSavingOvarianStimulation}
+                                disabled={!isEditable || isSavingOvarianStimulation}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Chọn đáp ứng" />
                                 </SelectTrigger>
-                                <SelectContent>
+                               <SelectContent>
                                     <SelectItem value="EFFECTIVE">Hiệu quả</SelectItem>
-                                    <SelectItem value="NOT_EFFECTIVE">Không hiệu quả</SelectItem>
-                                    <SelectItem value="GOOD">Tốt</SelectItem>
-                                    <SelectItem value="AVERAGE">Trung bình</SelectItem>
-                                    <SelectItem value="POOR">Kém</SelectItem>
+                                    <SelectItem value="INEFFECTIVE">Không hiệu quả</SelectItem>
+                                    <SelectItem value="UNCLEAR">Chưa kết luận</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
+                        {/* Status field - only display, not editable directly here */}
+                        <div className="col-span-2 flex items-center gap-2">
+                            <Label>Trạng thái phác đồ</Label>
+                            <p className="text-sm font-medium text-[color:var(--text-accent)]">
+                                {renderStatusInVietnamese(ovarianStimulationData.status)}
+                            </p>
+                        </div>
+
                         <div className="col-span-1 md:col-span-2 border-t pt-4 mt-4">
                             <h4 className="text-md font-semibold mb-2">Thông tin đơn thuốc</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -335,18 +448,18 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                                     <Label>Ngày cấp đơn</Label>
                                     <Input
                                         type="date"
-                                        value={ovarianStimulationData.prescription.dateIssued || ''} // Use || '' for controlled component
+                                        value={ovarianStimulationData.prescription.dateIssued || ''}
                                         onChange={(e) => handleOvarianStimulationChange('prescription', e.target.value, 'dateIssued')}
-                                        disabled={isSavingOvarianStimulation}
+                                        disabled={!isEditable || isSavingOvarianStimulation}
                                     />
                                 </div>
                                 <div className="space-y-2 col-span-1 md:col-span-2">
                                     <Label>Ghi chú đơn thuốc</Label>
                                     <Textarea
                                         placeholder="Ghi chú về đơn thuốc..."
-                                        value={ovarianStimulationData.prescription.notes || ''} // Use || '' for controlled component
+                                        value={ovarianStimulationData.prescription.notes || ''}
                                         onChange={(e) => handleOvarianStimulationChange('prescription', e.target.value, 'notes')}
-                                        disabled={isSavingOvarianStimulation}
+                                        disabled={!isEditable || isSavingOvarianStimulation}
                                     />
                                 </div>
                             </div>
@@ -354,7 +467,7 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                             <div className="mt-4">
                                 <div className="flex justify-between items-center mb-2">
                                     <Label>Các mục thuốc trong đơn</Label>
-                                    <Button variant="outline" size="sm" onClick={handleAddItem} disabled={isSavingOvarianStimulation}>
+                                    <Button variant="outline" size="sm" onClick={handleAddItem} disabled={!isEditable || isSavingOvarianStimulation}>
                                         <Plus className="w-4 h-4 mr-2" /> Thêm thuốc
                                     </Button>
                                 </div>
@@ -366,10 +479,10 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                                             <div key={index} className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
                                                 <span className="font-medium">{item.drugName} - {item.dosage}</span>
                                                 <div className="flex space-x-2">
-                                                    <Button variant="outline" size="icon" onClick={() => handleEditItem(item, index)} disabled={isSavingOvarianStimulation}>
+                                                    <Button variant="outline" size="icon" onClick={() => handleEditItem(item, index)} disabled={!isEditable || isSavingOvarianStimulation}>
                                                         <Edit className="w-4 h-4" />
                                                     </Button>
-                                                    <Button variant="outline" size="icon" className="text-red-600 hover:text-red-800" onClick={() => handleDeleteItem(index)} disabled={isSavingOvarianStimulation}>
+                                                    <Button variant="outline" size="icon" className="text-red-600 hover:text-red-800" onClick={() => handleDeleteItem(index)} disabled={!isEditable || isSavingOvarianStimulation}>
                                                         <Trash2 className="w-4 h-4" />
                                                     </Button>
                                                 </div>
@@ -380,16 +493,36 @@ const OvarianStimulationProtocolCard: React.FC<OvarianStimulationProtocolCardPro
                             </div>
                         </div>
                     </div>
-                    <DialogFooter>
-                        {isSavingOvarianStimulation && <Loader2 className="h-5 w-5 animate-spin mr-2" />}
+                    <DialogFooter className="sticky bottom-[-15px] bg-white z-10 border-t pt-4">
+                        {isOperationInProgress && <Loader2 className="h-5 w-5 animate-spin mr-2" />}
                         {saveErrorOvarianStimulation && <p className="text-red-500 text-sm mr-2">{saveErrorOvarianStimulation}</p>}
                         {saveSuccessOvarianStimulation && <p className="text-green-500 text-sm mr-2">Lưu thành công!</p>}
-                        <Button variant="outline" onClick={() => setIsOvarianStimulationDialogOpen(false)} disabled={isSavingOvarianStimulation}>
-                            <X className="w-4 h-4 mr-2" /> Hủy
-                        </Button>
-                        <Button onClick={handleSaveOvarianStimulation} disabled={isSavingOvarianStimulation}>
-                            <Save className="w-4 h-4 mr-2" /> Lưu
-                        </Button>
+
+                        {/* Action Buttons: Complete and Cancel */}
+                        {ovarianStimulationData.status === 'IN_PROGRESS' && (
+                            <>
+                                <Button
+                                    variant="outline"
+                                    onClick={handleCancelOvarianStimulation}
+                                    disabled={isOperationInProgress}
+                                    className="text-orange-600 hover:text-orange-800"
+                                >
+                                     {isCancelling ? 'Đang hủy...' : 'Hủy phác đồ'}
+                                </Button>
+                                <Button
+                                    onClick={handleCompleteOvarianStimulation}
+                                    disabled={isOperationInProgress}
+                                    className="bg-[#6C9BCF] text-white border-[#6C9BCF]  hover:bg-[#4A7BC0] text-white"
+                                >
+                                     {isCompleting ? 'Đang hoàn thành...' : 'Hoàn thành phác đồ'}
+                                </Button>
+                            </>
+                        )}
+                        {isEditable && (
+                            <Button onClick={handleSaveOvarianStimulation} disabled={isSavingOvarianStimulation}>
+                                <Save className="w-4 h-4 mr-2" /> {isSavingOvarianStimulation ? 'Đang lưu...' : 'Lưu'}
+                            </Button>
+                        )}
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

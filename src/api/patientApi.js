@@ -5,9 +5,14 @@ export const updatePatient = async (data) => {
   return response.data;
 };
 
+export const getPatientProfile = async () => {
+  const response = await apiClient.get('patients/me');
+  return response.data;
+};
+
 export const getPatients = async () => {
   const response = await apiClient.get('receptionists/patients');
-  return response.data;
+  return response.data; 
 };
 
 export const getPatientDetails = async (id) => {

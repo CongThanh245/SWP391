@@ -32,11 +32,11 @@ const LoginPage = () => {
             <FcGoogle className={styles.googleIcon} />
             Đăng nhập với Google
           </button>
-          <div className={styles.formOptions}>
+          {/* <div className={styles.formOptions}>
             <a href="/forgot-password" className={styles.forgotPassword}>
               Quên mật khẩu?
             </a>
-          </div>
+          </div> */}
           <div className={styles.signupPrompt}>
             <p>
               Chưa có tài khoản? <a href="/register">Đăng ký ngay</a>

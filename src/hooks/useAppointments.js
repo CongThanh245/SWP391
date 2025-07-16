@@ -3,7 +3,6 @@ import {
   fetchAppointments,
   searchAppointments,
 } from "@api/appointmentApi";
-import { formatDate } from "@utils/format"; // Assuming utils is in the same directory
 
 const DEFAULT_FILTERS = { dateFilter: "all", specificDate: "" };
 
@@ -71,7 +70,7 @@ export const useAppointments = ({
           patientName: appt.patientName,
           doctorName: appt.doctorName,
           status,
-          date: formatDate(appt.appointmentDateTime), // Use formatDate from utils
+          date: appt.appointmentDateTime, 
           time,
           notes: appt.notes || "",
           rawDateTime: appt.appointmentDateTime,

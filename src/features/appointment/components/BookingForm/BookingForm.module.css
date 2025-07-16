@@ -1,35 +1,42 @@
-/* BookingForm.module.css */
 .bookingForm {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  max-width: 900px; /* Increased from 800px to 900px */
+  max-width: 1200px;
+  /* Increased to accommodate three frames */
   width: 100%;
   margin: 0 auto;
   padding: var(--spacing-md);
-  min-width: 700px; /* Added minimum width to ensure form doesn't get too narrow */
+  min-width: 900px;
+  /* Adjusted for wider layout */
 }
 
-/* Form content as two columns layout */
+/* Form content as three frames layout */
 .formContent {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-xl);
+  display: flex;
+  flex-direction: row;
+  /* Changed to row for horizontal layout */
+  gap: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
 }
 
-/* Left column - Doctor and Date */
-.leftColumn {
+/* Frame styling */
+.frame {
+  flex: 1;
+  /* Each frame takes equal width */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+  background: var(--card-background);
+  min-width: 300px;
 }
 
-/* Right column - Time and Notes */
-.rightColumn {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
+/* Frame title */
+.frameTitle {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
 }
 
 /* Form group for each input/select/textarea */
@@ -47,6 +54,17 @@
   margin-bottom: var(--spacing-xs);
 }
 
+.infoIcon {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--button-primary-bg);
+  background-color: #e0f2fe;
+  border-radius: 9999px;
+  padding: 0 6px;
+  line-height: 1.2;
+  cursor: help;
+}
+
 /* Required asterisk */
 .required {
   color: var(--warning-red);
@@ -57,7 +75,7 @@
 .select,
 .input,
 .textarea {
-  padding: var(--spacing-md); /* Increased from var(--spacing-sm) to var(--spacing-md) */
+  padding: var(--spacing-md);
   border: 1px solid var(--card-border);
   border-radius: 8px;
   font-size: var(--font-size-sm);
@@ -65,9 +83,9 @@
   background: var(--card-background);
   color: var(--text-primary);
   transition: all 0.3s ease;
-  width: 100%; /* Full width for consistency */
+  width: 100%;
   box-sizing: border-box;
-  min-height: 48px; /* Added minimum height for better touch targets */ 
+  min-height: 48px;
 }
 
 /* Focus and hover states */
@@ -87,19 +105,19 @@
 
 /* Specific styling for select elements */
 .select {
-  appearance: none; /* Remove default arrow */
+  appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center; /* Adjusted position for larger padding */
-  padding-right: 30px; /* Increased space for the custom arrow */
+  background-position: right 12px center;
+  padding-right: 30px;
 }
 
 /* Textarea specific styling */
 .textarea {
-  min-height: 140px; /* Increased from 120px to 140px */
+  min-height: 150px;
   resize: vertical;
   font-family: var(--font-family);
-  padding: 20px; /* Consistent with other inputs */
+  padding: 20px;
 }
 
 /* Button group for form actions */
@@ -116,17 +134,12 @@
   background: transparent;
   color: var(--text-secondary);
   border: 1px solid var(--card-border);
-  padding: var(--spacing-md) var(--spacing-lg); /* Increased padding */
+  padding: var(--spacing-md) var(--spacing-lg);
   border-radius: 6px;
   font-size: var(--font-size-sm);
   cursor: pointer;
   transition: all 0.3s ease;
-  min-height: 48px; /* Added consistent button height */
-}
-
-.cancelButton:hover {
-  border-color: var(--accent-color);
-  color: var(--text-primary);
+  min-height: 48px;
 }
 
 /* Submit button */
@@ -134,14 +147,14 @@
   background: var(--button-primary-bg);
   color: var(--button-primary-text);
   border: none;
-  padding: var(--spacing-md) var(--spacing-lg); /* Increased padding */
+  padding: var(--spacing-md) var(--spacing-lg);
   border-radius: 6px;
   font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 120px; /* Increased from 100px */
-  min-height: 48px; /* Added consistent button height */
+  min-width: 120px;
+  min-height: 48px;
 }
 
 .submitButton:hover {
@@ -166,28 +179,100 @@
   color: var(--success-green);
   font-size: var(--font-size-sm);
   text-align: center;
-  padding: var(--spacing-md); /* Increased padding */
+  padding: var(--spacing-md);
   background: rgba(76, 175, 80, 0.1);
   border-radius: 6px;
   margin-bottom: var(--spacing-md);
 }
 
+/* File list styling */
+.fileList {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.fileCard {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.fileCard:last-child {
+  border-bottom: none;
+}
+
+.fileLabel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.filePreview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fileImage {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.fileIcon {
+  font-size: 24px;
+}
+
+.fileName {
+  font-size: 14px;
+  color: #333;
+}
+
+.noFiles {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  padding: 8px;
+}
+
+.buttonGroup {
+  text-align: right;
+  gap: 20px;
+  display: flex;
+  justify-content: right;
+}
+
+.buttonGroup button {
+  padding: 1.5em 5em;
+  font-size: var(--font-size-sm);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 /* Responsive adjustments */
-@media (max-width: 900px) { /* Adjusted breakpoint */
+@media (max-width: 900px) {
   .bookingForm {
     max-width: 100%;
-    min-width: unset; /* Remove min-width on smaller screens */
+    min-width: unset;
     padding: var(--spacing-sm);
   }
 
   .formContent {
-    grid-template-columns: 1fr; /* Single column on mobile */
+    flex-direction: column;
+    /* Stack vertically on smaller screens */
     gap: var(--spacing-md);
   }
 
-  .leftColumn,
-  .rightColumn {
-    gap: var(--spacing-md);
+  .frame {
+    min-width: unset;
+    /* Remove min-width on smaller screens */
+    padding: var(--spacing-sm);
   }
 
   .buttonGroup {
@@ -203,15 +288,16 @@
 }
 
 @media (max-width: 768px) {
+
   .select,
   .input,
   .textarea {
-    padding: var(--spacing-sm); /* Reduce padding on very small screens */
-    min-height: 44px; /* Slightly smaller on mobile */
+    padding: var(--spacing-sm);
+    min-height: 44px;
   }
 
   .textarea {
-    min-height: 120px; /* Smaller textarea on mobile */
+    min-height: 120px;
   }
 
   .cancelButton,

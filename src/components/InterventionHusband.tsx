@@ -311,7 +311,7 @@ const InterventionHusband: React.FC<InterventionHusbandProps> = ({ patientId }) 
                                 <Edit className="w-4 h-4 mr-2" /> Chỉnh sửa quy trình
                             </Button>
                             <Button variant="outline" size="sm" onClick={handleCompleteProcess} disabled={isLoadingAnyOperation}>
-                                <CheckCircle className="w-4 h-4 mr-2" /> Hoàn thành
+                                  Hoàn thành
                             </Button>
                             <Button variant="outline" size="sm" onClick={handleCancelProcess} disabled={isLoadingAnyOperation}>
                                 <XCircle className="w-4 h-4 mr-2" /> Hủy
@@ -450,9 +450,6 @@ const InterventionHusband: React.FC<InterventionHusbandProps> = ({ patientId }) 
                         {isSaving && <Loader2 className="h-5 w-5 animate-spin mr-2 text-[color:var(--deep-taupe)]" />}
                         {saveError && <p className="text-red-500 text-sm mr-2">{saveError}</p>}
                         {saveSuccess && <p className="text-green-500 text-sm mr-2">Lưu thành công!</p>}
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSaving}>
-                            <X className="w-4 h-4 mr-2" /> Hủy
-                        </Button>
                         <Button onClick={handleSaveFormData} disabled={isSaving}>
                             <Save className="w-4 h-4 mr-2" /> Lưu
                         </Button>

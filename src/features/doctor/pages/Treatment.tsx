@@ -27,6 +27,8 @@ import {
   ToastClose,
 } from "@components/ui/toast";
 import { useTreatmentProgress } from '@components/TreatmentProgress';
+import { getMedicationList } from '@api/doctorInterventionApi';
+import FileList from '@components/FileList';
 
 interface TreatmentProps {
   onBackToDashboard?: () => void;
@@ -154,11 +156,16 @@ interface ProtocolPayload {
   husbandProtocols: LabTestItem[];
 }
 
+interface Medication { id: string; name: string; }
 
 const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) => {
   const { toasts, toast } = useToast();
   const [activeSubTab, setActiveSubTab] = useState('wife');
   const [activeInterventionTab, setActiveInterventionTab] = useState('wife');
+
+  const [medicationList, setMedicationList] = useState<Medication[]>([]);
+  const [isLoadingMedicationList, setIsLoadingMedicationList] = useState(false);
+  const [errorMedicationList, setErrorMedicationList] = useState<string | null>(null);
 
 
   const [generalDiagnosis, setGeneralDiagnosis] = useState('');
@@ -192,7 +199,6 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   const [wifeLabTests, setWifeLabTests] = useState<TestItem[]>([
     { id: 'cbc', name: 'Xét nghiệm máu toàn bộ (CBC)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
     { id: 'amh', name: 'Đánh giá dự trữ buồng trứng (AMH)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
-    { id: 'thyroid', name: 'Xét nghiệm tuyến giáp (TSH, T3, FT4)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
     { id: 'esr', name: 'Xét nghiệm tỉ lệ hồng cầu lắng (ESR)', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
     { id: 'chlamydia', name: 'Xét nghiệm Chlamydia', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
     { id: 'vdrl', name: 'Xét nghiệm VDRL', checked: false, status: 'not-ordered', protocolType: 'MONITORING' },
@@ -229,6 +235,23 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
     spouseGender: '',
   });
 
+
+  useEffect(() => {
+    const fetchMedications = async () => {
+      setIsLoadingMedicationList(true);
+      setErrorMedicationList(null);
+      try {
+        const data = await getMedicationList();
+        setMedicationList(data);
+      } catch (error) {
+        console.error("Failed to fetch medication list:", error);
+        setErrorMedicationList("Không thể tải danh sách thuốc. Vui lòng thử lại.");
+      } finally {
+        setIsLoadingMedicationList(false);
+      }
+    };
+    fetchMedications();
+  }, []);
   // Fetch wife vital data
   useEffect(() => {
     const fetchWifeVitalData = async () => {
@@ -569,8 +592,8 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
   const handleSaveRecord = async (): Promise<void> => {
     await saveGeneralInfo();
     await saveProtocols();
-
   };
+
 
 
 
@@ -710,10 +733,13 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
             onNotesChange={setFollowUpNotes}
             followUpReason={followUpReason}
             onReasonChange={setFollowUpReason}
-            patientId= {patientId}
+            patientId={patientId}
           />
+
+          
         </TabsContent>
       </Tabs>
+
 
       <div className="flex justify-end pt-6">
         <Button
@@ -751,11 +777,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsList>
 
         <TabsContent value="wife">
-          <InterventionWife patientId = {patientId} />
+          <InterventionWife patientId={patientId} />
         </TabsContent>
 
         <TabsContent value="husband">
-          <InterventionHusband patientId= {patientId} />
+          <InterventionHusband patientId={patientId} />
         </TabsContent>
 
         <TabsContent value="appointment">
@@ -771,14 +797,6 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         </TabsContent>
       </Tabs>
 
-      <div className="flex justify-end pt-6">
-        <Button
-          onClick={handleSaveRecord}
-          className="bg-[color:var(--button-primary-bg)] hover:bg-[color:var(--button-hover-bg)] text-[color:var(--button-primary-text)] px-8 py-2"
-        >
-          Lưu hồ sơ
-        </Button>
-      </div>
     </div>
   );
 
@@ -788,7 +806,7 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
         {onBackToDashboard && (
           <div className="mb-6">
             <Button variant="outline" onClick={onBackToDashboard} className="mb-4">
-              ← Quay về Dashboard
+              ← Quay về
             </Button>
           </div>
         )}
@@ -837,7 +855,11 @@ const Treatment: React.FC<TreatmentProps> = ({ onBackToDashboard, patientId }) =
           </TabsContent>
 
           <TabsContent value="post-intervention">
-            <PostIntervention />
+            <PostIntervention
+              patientId={patientId}
+              medicationList={medicationList}
+              AppointmentCalendar={AppointmentCalendar}
+            />
             <CompleteButtonComponent stageKey="postIntervention" stageName="Hậu can thiệp" />
           </TabsContent>
         </Tabs>

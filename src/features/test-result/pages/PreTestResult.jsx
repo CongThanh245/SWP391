@@ -15,6 +15,7 @@ import {
   updateEvaluationCriteria,
 } from "@api/patientApi";
 import styles from "./PreTestResult.module.css";
+import { Link } from "react-router-dom";
 
 const PreTestResult = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,6 +26,8 @@ const PreTestResult = () => {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
 
   useEffect(() => {
     fetchPatients();
@@ -57,14 +60,29 @@ const PreTestResult = () => {
       );
       setIsModalOpen(true);
     } catch (err) {
-      setError("Bệnh nhân chưa được bác sĩ chỉ định");
+      setError("Bệnh nhân chưa tới ngày khám");
     }
+  };
+
+  const validateForm = () => {
+    const errors = [];
+    evaluationCriteria.forEach((criterion) => {
+      const value = formData[criterion.id]?.currentValue || "";
+      if (!value.trim()) {
+        errors.push(`Bắt buộc phải điền ${criterion.name}`);
+      } else if (isNaN(value) || value.trim() === "") {
+        errors.push(`${criterion.name} chỉ được nhập số`);
+      }
+    });
+    return errors;
   };
 
   const handlePatientClick = (patient) => {
     setSelectedPatient(patient);
     const appointmentId = patient.latestAppointmentId;
     fetchEvaluationCriteria(appointmentId, patient.id);
+    setValidationErrors([]);
+    setShowErrorPopup(false);
   };
 
   const handleInputChange = (criterionId, field, value) => {
@@ -75,6 +93,13 @@ const PreTestResult = () => {
   };
 
   const handleSubmit = async () => {
+    const errors = validateForm();
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      setShowErrorPopup(true);
+      return;
+    }
+
     try {
       const updateData = Object.entries(formData).map(
         ([criteriaId, { currentValue, note }]) => ({
@@ -86,6 +111,8 @@ const PreTestResult = () => {
 
       await updateEvaluationCriteria(updateData);
       setIsModalOpen(false);
+      setValidationErrors([]);
+      setShowErrorPopup(false);
       await fetchPatients();
     } catch (err) {
       setError("Không thể cập nhật tiêu chí đánh giá");
@@ -127,15 +154,25 @@ const PreTestResult = () => {
   };
 
   if (isLoading) return <div className={styles.loading}>Đang tải...</div>;
-  if (error) return <div className={styles.error}>{error}</div>;
+  if (error)
+    return (
+      <div>
+        <button
+          onClick={() => window.location.reload()}
+          className={styles.backLink}
+        >
+          Quay lại
+        </button>
+        <div className={styles.error}>{error}</div>
+      </div>
+    );
 
   return (
     <div className={styles.patientListPage}>
       <div className={styles.pageHeader}>
-        <h2>Danh sách Bệnh nhân</h2>
-        <p>Quản lý thông tin bệnh nhân</p>
+        <h2>Nhập kết quả xét nghiệm</h2>
         <div className={styles.stats}>
-          <span>Tổng số: {patients.length}</span>
+          <span>Tổng số bệnh nhân: {patients.length}</span>
         </div>
       </div>
 
@@ -154,7 +191,7 @@ const PreTestResult = () => {
       <div className={styles.patientGrid}>
         {filteredPatients.length === 0 ? (
           <div className={styles.noResults}>
-            <User size={48} />
+            <User style={{ justifySelf: "center", marginBottom: "20px" }} size={48} />
             <h3>Không tìm thấy bệnh nhân</h3>
             <p>Thử tìm kiếm với từ khóa khác</p>
           </div>
@@ -221,6 +258,25 @@ const PreTestResult = () => {
               </button>
             </div>
 
+            {showErrorPopup && (
+              <div className={styles.errorPopup}>
+                <div className={styles.errorPopupContent}>
+                  <h4>Lỗi xác thực</h4>
+                  <ul>
+                    {validationErrors.map((error, index) => (
+                      <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                  <button
+                    className={styles.errorPopupClose}
+                    onClick={() => setShowErrorPopup(false)}
+                  >
+                    Đóng
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className={styles.modalContent}>
               <div className={styles.testResultsContainer}>
                 <div className={styles.tableHeader}>
@@ -237,7 +293,15 @@ const PreTestResult = () => {
                     <span>Mô tả</span>
                   </div>
 
-                  <div className={styles.headerCell}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "1em",
+                      paddingLeft: "1rem",
+                      alignItems: "center",
+                    }}
+                    className={styles.headerCell}
+                  >
                     <Edit3 size={16} />
                     <span>Ghi chú</span>
                   </div>
@@ -255,7 +319,13 @@ const PreTestResult = () => {
                       <div className={styles.testCell}>
                         <input
                           type="text"
-                          className={styles.resultInput}
+                          className={`${styles.resultInput} ${
+                            validationErrors.some((err) =>
+                              err.includes(criterion.name)
+                            )
+                              ? styles.inputError
+                              : ""
+                          }`}
                           value={formData[criterion.id]?.currentValue || ""}
                           onChange={(e) =>
                             handleInputChange(
@@ -304,15 +374,7 @@ const PreTestResult = () => {
             <div className={styles.modalFooter}>
               <div className={styles.footerActions}>
                 <button className={styles.saveButton} onClick={handleSubmit}>
-                  <Activity size={18} />
                   Lưu kết quả
-                </button>
-                <button
-                  className={styles.cancelButton}
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  <X size={18} />
-                  Hủy bỏ
                 </button>
               </div>
             </div>

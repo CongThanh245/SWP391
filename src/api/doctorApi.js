@@ -1,11 +1,29 @@
 // src/features/doctor/services/doctorApi.js
-import axios from 'axios';
 import apiClient from './axiosConfig';
 
-
-const API_URL = 'https://683a7bc143bb370a8672d354.mockapi.io/doctors';
-
 export const getDoctors = async (params = {}) => {
+  try {
+    const response = await apiClient.get('/guest/doctors', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch doctors:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to fetch doctors');
+  }
+};
+
+export const getDoctorDetails = async (doctorId) => {
+  try {
+    const response = await apiClient.get('/admin/doctor/doctor_id_ferticare', {
+      params: { doctor_id_ferticare: doctorId },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch doctor details:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to fetch doctor details');
+  }
+};
+
+export const getAdminDoctors = async (params = {}) => {
   try {
     const response = await apiClient.get('/admin/doctors', { params });
     return response.data;
@@ -14,7 +32,6 @@ export const getDoctors = async (params = {}) => {
     throw new Error(error.response?.data?.message || 'Failed to fetch doctors');
   }
 };
-
 export const getDoctorsStats = async () => {
   const response = await apiClient.get('/doctors/me/stats');
   return response.data
@@ -149,8 +166,8 @@ export const getDetailedTestResult = async (protocolId) => {
   }
 };
 
-export const handlePreParationStage  = async (patientId) =>{
-   try {
+export const handlePreParationStage = async (patientId) => {
+  try {
     const response = await apiClient.patch(`/doctors/treatment-profile/preparation/finish-stage?patientId=${patientId}`);
     return response.data;
   } catch (error) {
@@ -161,22 +178,91 @@ export const handlePreParationStage  = async (patientId) =>{
 
 export const getPreparationStatus = async (patientId) => {
   try {
-        const response = await apiClient.get(
-            '/doctors/treatment-profile/preparation/status',
-            {
-                params: {
-                    patientId: patientId
-                }
-            }
-        );
-        return response.data; // This will return { status: "PLANNED" } or similar
-    } catch (error) {
-        console.error('Failed to get preparation status:', error.response?.data || error.message);
-        throw error;
-    }
+    const response = await apiClient.get(
+      '/doctors/treatment-profile/preparation/status',
+      {
+        params: {
+          patientId: patientId
+        }
+      }
+    );
+    return response.data; // This will return { status: "PLANNED" } or similar
+  } catch (error) {
+    console.error('Failed to get preparation status:', error.response?.data || error.message);
+    throw error;
+  }
+}
+//Intervention
+export const completeInterventionStage = async (patientId) => {
+  try {
+    const response = await apiClient.patch(`/doctors/treatment-profile/intervention/finish-stage?patientId=${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching detailed test result for protocolId ${patientId}:`, error);
+    throw error;
+  }
 }
 
-export const saveFollowUpRecommendation = async (followUpData) =>{
+export const getInterventionStageStatus = async (patientId) => {
+  try {
+    const response = await apiClient.get(
+      '/doctors/treatment-profile/intervention/intervention-status',
+      {
+        params: {
+          patientId: patientId
+        }
+      }
+    );
+    return response.data; // This will return { status: "PLANNED" } or similar
+  } catch (error) {
+    console.error('Failed to get preparation status:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+//PostIntervention
+
+//Intervention
+export const completePostInterventionStage = async (patientId) => {
+  try {
+    const response = await apiClient.patch(`/doctors/treatment-profile/post-intervention/finish-stage?patientId=${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching detailed test result for protocolId ${patientId}:`, error);
+    throw error;
+  }
+}
+
+export const getPostInterventionStageStatus = async (patientId) => {
+  try {
+    const response = await apiClient.get(
+      '/doctors/treatment-profile/post-intervention/status',
+      {
+        params: {
+          patientId: patientId
+        }
+      }
+    );
+    return response.data; // This will return { status: "PLANNED" } or similar
+  } catch (error) {
+    console.error('Failed to get preparation status:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+export const completeTreatment = async (patientId) => {
+  try {
+    const response = await apiClient.patch(`/doctors/treatment-profile/treatment/finish-treatment?patientId=${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching detailed test result for protocolId ${patientId}:`, error);
+    throw error;
+  }
+}
+
+
+
+export const saveFollowUpRecommendation = async (followUpData) => {
   try {
     // Using apiClient.post as per your example's structure
     const response = await apiClient.patch(
@@ -190,3 +276,14 @@ export const saveFollowUpRecommendation = async (followUpData) =>{
     throw error; // Re-throw the error for external handling
   }
 };
+
+export const doctorFile = async (patientId) => {
+  try {
+    const response = await apiClient(`/appointment/files/doctor-get-files?patientId=${patientId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to save follow-up recommendation:', error.response?.data || error.message);
+    throw error;
+  }
+};
+

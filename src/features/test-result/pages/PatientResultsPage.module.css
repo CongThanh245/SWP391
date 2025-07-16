@@ -1,0 +1,257 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: var(--font-family);
+  background: linear-gradient(135deg, var(--primary-background) 0%, var(--secondary-background) 100%);
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+  background: var(--card-background);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 5px 15px var(--shadow-dark-gray);
+  position: relative;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-color) 0%, var(--deep-taupe) 100%);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: 5px;
+}
+
+.downloadButton {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.downloadButton:hover {
+  background: var(--button-hover-bg);
+}
+
+.timeline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  background: var(--card-background);
+  border-radius: 20px;
+  padding: 10px 20px;
+  box-shadow: 0 3px 10px var(--shadow-dark-gray);
+}
+
+.timelineItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.timelineLine {
+  width: 50px;
+  height: 2px;
+  background: var(--accent-color);
+  margin: 0 10px;
+}
+
+.sectionCard {
+  background: var(--card-background);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px var(--shadow-dark-gray);
+}
+
+.sectionHeader {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--deep-taupe) 100%);
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sectionBadge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 15px;
+  padding: 20px;
+}
+
+.topRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.infoCard {
+  background: var(--card-background);
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+}
+
+.cardHeader {
+  background: var(--secondary-background);
+  padding: 15px;
+  border-bottom: 2px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.cardHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cardContent {
+  padding: 15px;
+  font-size: var(--font-size-sm);
+}
+
+.vitalSignsTable, .protocolsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.vitalSignsTable th, .vitalSignsTable td,
+.protocolsTable th, .protocolsTable td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.vitalSignsTable th, .protocolsTable th {
+  font-weight: 600;
+}
+
+.monitoringList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.monitoringList h4{
+  padding-top: 1.5rem;
+  color: var(--info-blue);
+}
+
+.monitoringItem {
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.monitoringDate {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.monitoringDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.monitoringDetails span {
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+
+.noData {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 10px;
+  background: var(--secondary-background);
+  border-radius: 8px;
+}
+
+.loadingContainer, .errorContainer {
+  text-align: center;
+  padding: 20px;
+  background: var(--card-background);
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.loadingSpinner {
+  border: 4px solid var(--secondary-background);
+  border-top: 4px solid var(--accent-color);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  background: var(--card-background);
+  border-radius: var(--border-radius-2);
+  box-shadow: var(--shadow-dark-gray);
+  margin: var(--spacing-md) 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
