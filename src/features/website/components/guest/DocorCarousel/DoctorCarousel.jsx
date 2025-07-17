@@ -5,14 +5,15 @@ import DoctorCard from "@features/website/components/guest/DocorCarousel/DoctorC
 import { useDoctors } from "@hooks/useDoctors";
 import styles from "./DoctorCarousel.module.css";
 
-const visibleCount = 4;
-const cardWidth = 266; // Chiều rộng mỗi thẻ bác sĩ
-const cardMargin = 16; // Margin giữa các thẻ
+const visibleCount = 10;
+const cardWidth = 266; 
+const cardMargin = 16; 
 
 const DoctorsCarousel = () => {
   const carouselRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { doctors, loading, error } = useDoctors();
+  const size = 15;
+  const { doctors, loading, error } = useDoctors({size});
 
   const isAtStart = currentIndex === 0;
   const isAtEnd = currentIndex + visibleCount >= doctors.length;

@@ -26,7 +26,6 @@ export const useDoctors = (params = {}) => {
           imageProfile: doctor.imageProfile,
         }));
         setDoctors(mappedDoctors);
-        // Set pagination data
         setPagination({
           totalPages: data.totalPages || 1,
           totalElements: data.totalElements || 0,
