@@ -71,6 +71,7 @@ const PreInterventionSection = ({ results }) => {
                   <tr>
                     <th>Tên</th>
                     <th>Kết quả</th>
+                    <th>Mô tả</th>
                     <th>Ngày xét nghiệm</th>
                   </tr>
                 </thead>
@@ -78,8 +79,9 @@ const PreInterventionSection = ({ results }) => {
                   {results.protocol.map((p, idx) => (
                     <tr key={idx}>
                       <td>{p.protocolName}</td>
-                      <td>{p.currentValue || "N/A"}</td>
-                      <td>{p.evaluationDate || "N/A"}</td>
+                      <td>{p.note || "N/A" }</td>
+                      <td>{p.description}</td>
+                      <td>{p.evaluationDate }</td>
                     </tr>
                   ))}
                 </tbody>

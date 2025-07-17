@@ -65,16 +65,6 @@ export const DoctorSidebar: React.FC<DoctorSidebarProps> = ({ activeTab, onTabCh
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <Link to="/">
-                  <SidebarMenuButton
-                    className="w-full justify-start text-white hover:bg-[#3a2a1f] transition-colors"
-                  >
-                    <Home className="mr-2 h-4 w-4" />
-                    <span>Trang chủ</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.key}>
                   <SidebarMenuButton
